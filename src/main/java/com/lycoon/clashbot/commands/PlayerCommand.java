@@ -7,18 +7,16 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import com.lycoon.clashapi.cocmodels.player.Player;
 import com.lycoon.clashapi.cocmodels.player.Troop;
 import com.lycoon.clashbot.core.ClashBotMain;
-import com.lycoon.clashbot.draw.DrawUtils;
-import com.lycoon.clashbot.draw.FileUtils;
 import com.lycoon.clashbot.lang.LangUtils;
+import com.lycoon.clashbot.utils.DrawUtils;
+import com.lycoon.clashbot.utils.FileUtils;
+import com.lycoon.clashbot.utils.GameUtils;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
 
@@ -35,19 +33,9 @@ public class PlayerCommand
 	private final static String[] SPELLS = {"Lightning Spell", "Healing Spell", "Rage Spell", "Jump Spell", "Freeze Spell", "Clone Spell", "Poison Spell", "Earthquake Spell", "Haste Spell", "Skeleton Spell", "Bat Spell"};
 	private final static String[] MACHINES = {"Wall Wrecker", "Battle Blimp", "Stone Slammer", "Siege Barracks"};
 	
-	public static Troop getTroopByName(List<Troop> troops, String name)
-	{
-		for (int i=0; i < troops.size(); i++)
-		{
-			if (troops.get(i).getName().equals(name))
-				return troops.get(i);
-		}
-		return null;
-	}
-	
 	public static void drawTroop(Graphics2D g2d, Font font, List<Troop> troops, String troopName, int x, int y)
 	{
-		Troop troop = getTroopByName(troops, troopName);
+		Troop troop = GameUtils.getTroopByName(troops, troopName);
 		
 		// If the player has not unlocked the troop yet
 		if (troop == null)
@@ -104,13 +92,6 @@ public class PlayerCommand
 		drawTroop(g2d, font, machines, MACHINES[1], 875, y);
 		drawTroop(g2d, font, machines, MACHINES[2], 837, y + 37);
 		drawTroop(g2d, font, machines, MACHINES[3], 875, y + 37);
-	}
-	
-	public static String getCurrentSeason()
-	{
-		ZonedDateTime utcDateZoned = ZonedDateTime.now(ZoneId.of("Etc/UTC"));
-		DateTimeFormatter pattern = DateTimeFormatter.ofPattern("MMMM YYYY").withLocale(LangUtils.currentLang);
-		return utcDateZoned.format(pattern);
 	}
 	
 	public static void execute(MessageChannel channel, String tag)
@@ -199,7 +180,7 @@ public class PlayerCommand
 		DrawUtils.drawCenteredString(g2d, trophiesRect, font.deriveFont(FONT_SIZE+4f), nf.format(player.getTrophies()));
 		
 		// Statistics
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE+3f), lang.getString("season")+ " " +getCurrentSeason(), 486, 45);
+		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE+3f), lang.getString("season")+ " " +GameUtils.getCurrentSeason(), 486, 45);
 		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE-1.5f), lang.getString("attacks.won"), 486, 77);
 		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE-1.5f), lang.getString("defenses.won"), 486, 107);
 		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE-1.5f), lang.getString("donations"), 486, 143);

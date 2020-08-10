@@ -1,4 +1,4 @@
-package com.lycoon.clashbot.draw;
+package com.lycoon.clashbot.utils;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -68,10 +68,10 @@ public class DrawUtils
 	
 	public static void drawCenteredImage(Graphics2D g2d, Image img, Rectangle rect, int sizeX, int sizeY)
 	{
-		g2d.drawImage(img, 
-				(int)rect.getWidth()/2 - img.getWidth(null)/2, 
-				(int)rect.getHeight()/2 - img.getHeight(null)/2, 
-				sizeX, 
+		g2d.drawImage(img,
+				(int)(rect.getX() + rect.getWidth()/2) - img.getWidth(null)/2,
+				(int)(rect.getY() + rect.getHeight()/2) - img.getHeight(null)/2,
+				sizeX,
 				sizeY,
 				null);
 	}
