@@ -4,16 +4,16 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 import com.lycoon.clashapi.cocmodels.player.Troop;
-import com.lycoon.clashbot.lang.LangUtils;
 
 public class GameUtils
 {
-	public static String getCurrentSeason()
+	public static String getCurrentSeason(Locale lang)
 	{
 		ZonedDateTime utcDateZoned = ZonedDateTime.now(ZoneId.of("Etc/UTC"));
-		DateTimeFormatter pattern = DateTimeFormatter.ofPattern("MMMM YYYY").withLocale(LangUtils.currentLang);
+		DateTimeFormatter pattern = DateTimeFormatter.ofPattern("MMMM YYYY").withLocale(lang);
 		return utcDateZoned.format(pattern);
 	}
 	

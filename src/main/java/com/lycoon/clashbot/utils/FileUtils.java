@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
 import javax.imageio.ImageIO;
@@ -16,12 +19,16 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 
 public class FileUtils
 {
-	public static void sendImage(MessageChannel channel, BufferedImage image, String file)
+	public static void sendImage(MessageChannel channel, BufferedImage image, String file, String extension)
 	{
+		ZonedDateTime date = ZonedDateTime.now(ZoneId.of("UTC"));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+		String time = formatter.format(date);
+		
 		// Generating the picture
-		String filename = file+ ".png";
+		String filename = time + file + "." + extension;
 		File outputfile = new File("outputs/" + filename);
-		try {ImageIO.write(image, "png", outputfile);}
+		try {ImageIO.write(image, extension, outputfile);}
 		catch (IOException e) {e.printStackTrace();}
 		
 		// Sending the picture and then deleting it
@@ -31,7 +38,7 @@ public class FileUtils
 			catch (IOException e) {e.printStackTrace();}
 		};
 		channel.sendFile(outputfile).queue(deleteFile);
-		System.out.println("Message sent.");
+		System.out.println(filename+ " sent.");
 	}
 	
 	public static Image getImageFromFile(String file)
@@ -39,8 +46,7 @@ public class FileUtils
 		Image image = null;
 		try
 		{
-		    File pathToFile = new File("src/main/resources/" + file);
-		    image = ImageIO.read(pathToFile);
+		    image = ImageIO.read(FileUtils.class.getResource("/" + file));
 		}
 		catch (IOException ex) {ex.printStackTrace();}
 		return image;

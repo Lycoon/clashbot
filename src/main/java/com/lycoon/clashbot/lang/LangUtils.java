@@ -3,21 +3,28 @@ package com.lycoon.clashbot.lang;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import com.lycoon.clashbot.utils.DBUtils;
+
 public class LangUtils
 {
-	public static Locale currentLang;
-	public static ResourceBundle bundle;
 	public static final String[] LANGUAGES = {"en", "fr", "de", "es", "nl", "pt"};
 	
-	public static boolean updateLanguage(String language)
+	public static Locale getLanguage(long id)
 	{
-		if (!isSupportedLanguage(language))
-			return false;
-		
-		currentLang = new Locale(language);
-		bundle = ResourceBundle.getBundle("Messages", currentLang, new UTF16Control());
-		
-		return true;
+		return new Locale(DBUtils.getUserLang(id));
+	}
+	
+	public static ResourceBundle getTranslations(long id)
+	{
+		return getTranslations(getLanguage(id));
+	}
+	
+	public static ResourceBundle getTranslations(Locale locale)
+	{
+		return ResourceBundle.getBundle(
+				"Messages", 
+				locale, 
+				new UTF16Control());
 	}
 	
 	public static boolean isSupportedLanguage(String language)
@@ -30,13 +37,13 @@ public class LangUtils
 		return false;
 	}
 	
-	public static String getSupportedLanguages()
+	public static String getSupportedLanguages(Locale currentLanguage)
 	{
 		String res = "";
 		for (int i=0; i < LANGUAGES.length; i++)
 		{
 			Locale lang = new Locale(LANGUAGES[i]);
-			res += "- " + lang.getDisplayLanguage(currentLang) + " (" +LANGUAGES[i]+ ") \n";
+			res += "▫️ " + lang.getDisplayLanguage(currentLanguage) + " (`" +LANGUAGES[i]+ "`) \n";
 		}
 		
 		return res;

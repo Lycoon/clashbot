@@ -8,20 +8,29 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import com.lycoon.clashapi.cocmodels.player.Player;
 import com.lycoon.clashapi.cocmodels.player.Troop;
+import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
+import com.lycoon.clashbot.core.ErrorEmbed;
 import com.lycoon.clashbot.lang.LangUtils;
+import com.lycoon.clashbot.utils.DBUtils;
 import com.lycoon.clashbot.utils.DrawUtils;
 import com.lycoon.clashbot.utils.FileUtils;
 import com.lycoon.clashbot.utils.GameUtils;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class PlayerCommand
 {
+	private static ResourceBundle i18n;
+	private static Locale lang;
+	
 	private final static int WIDTH = 932;
 	private final static int HEIGHT = 322;
 	private final static float FONT_SIZE = 12f;
@@ -44,9 +53,7 @@ public class PlayerCommand
 		{
 			g2d.drawImage(FileUtils.getImageFromFile("troops/" + troop.getName() + ".png"), x, y, 35, 35, null);
 			if (troop.getLevel() == troop.getMaxLevel())
-			{
 				g2d.drawImage(FileUtils.getImageFromFile("icons/level-label-max.png"), x+2, y+18, 15, 15, null);
-			}
 			else
 			{
 				if (troop.getLevel() != 1)
@@ -94,19 +101,32 @@ public class PlayerCommand
 		drawTroop(g2d, font, machines, MACHINES[3], 875, y + 37);
 	}
 	
-	public static void execute(MessageChannel channel, String tag)
+	public static void execute(MessageReceivedEvent event, String... args)
 	{
-		ResourceBundle lang = LangUtils.bundle;
-		NumberFormat nf = NumberFormat.getInstance(LangUtils.currentLang);
+		MessageChannel channel = event.getChannel();
+		
+		lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
+		i18n = LangUtils.getTranslations(lang);
+		NumberFormat nf = NumberFormat.getInstance(lang);
 		
 		Player player = null;
-		try 
+		String tag = args.length > 0 ? args[0] : DBUtils.getPlayerTag(event.getAuthor().getIdLong());
+		
+		if (tag == null)
+		{
+			ErrorEmbed.sendError(channel, i18n.getString("set.player.error"), i18n.getString("set.player.help"));
+			return;
+		}
+		
+		try
 		{
 			player = ClashBotMain.clashAPI.getPlayer(tag);
 		} 
-		catch (IOException e)
+		catch (IOException e) {}
+		catch (ClashAPIException e)
 		{
-			e.printStackTrace();
+			ErrorEmbed.sendExceptionError(event, e, tag, "player");
+			return;
 		}
 		
 		// Initializing image
@@ -124,29 +144,28 @@ public class PlayerCommand
 		DrawUtils.drawCenteredString(g2d, level, font.deriveFont(FONT_SIZE+5f), player.getExpLevel().toString());
 		
 		// Nickname
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE+6f), player.getName(), 75, 39);
+		DrawUtils.drawShadowedString(g2d, player.getName(), 75, 39, FONT_SIZE+6f);
 		
 		// Player tag
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE-1f), player.getTag(), 75, 55);
+		DrawUtils.drawShadowedString(g2d, player.getTag(), 75, 55, FONT_SIZE-1f);
 		
 		// Townhall
-		g2d.drawImage(FileUtils.getImageFromFile("buildings/townhalls/home/th" +player.getTownHallLevel()+ ".png"), 80, 80, 100, 100, null);
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE-2f), lang.getString("townhall"), 25, 125);
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE+8f), lang.getString("level") + " " +player.getTownHallLevel(), 25, 150);
+		g2d.drawImage(CacheComponents.getTownHallImage(player.getTownHallLevel()), 80, 80, 100, 100, null);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("townhall"), 25, 125, FONT_SIZE-2f);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("level") + " " +player.getTownHallLevel(), 25, 150, FONT_SIZE+8f);
 		
 		// Builder hall
 		if (player.getBuilderHallLevel() != null)
 		{
-			g2d.drawImage(FileUtils.getImageFromFile("buildings/townhalls/builder/bh" +player.getBuilderHallLevel()+ ".png"), 265, 85, 95, 95, null);
-			DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE+8f), lang.getString("level") + " " +player.getBuilderHallLevel(), 200, 150);
+			g2d.drawImage(CacheComponents.getBuilderHallImage(player.getBuilderHallLevel()), 265, 85, 95, 95, null);
+			DrawUtils.drawShadowedString(g2d, i18n.getString("level") + " " +player.getBuilderHallLevel(), 200, 150, FONT_SIZE+8f);
 		}
 		else
 		{
 			// In case the player has not built the builder hall yet
-			DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE+8f), lang.getString("no.builderhall"), 200, 150);
-			
+			DrawUtils.drawShadowedString(g2d, i18n.getString("no.builderhall"), 200, 150, FONT_SIZE+8f);
 		}
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE-2f), lang.getString("builderhall"), 200, 125);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("builderhall"), 200, 125, FONT_SIZE-2f);
 		
 		// League
 		if (player.getLeague() != null)
@@ -155,7 +174,7 @@ public class PlayerCommand
 		{
 			g2d.drawImage(FileUtils.getImageFromFile("icons/noleague.png"), 383, 30, 90, 90, null);
 			Rectangle noLeagueRect = new Rectangle(375, 60, 105, 20);
-			DrawUtils.drawCenteredString(g2d, noLeagueRect, font.deriveFont(FONT_SIZE-4f), lang.getString("no.league"));
+			DrawUtils.drawCenteredString(g2d, noLeagueRect, font.deriveFont(FONT_SIZE-4f), i18n.getString("no.league"));
 		}
 		
 		// Clan
@@ -166,12 +185,12 @@ public class PlayerCommand
 			Rectangle clanNameRect = new Rectangle(775, 130, 148, 30);
 			Rectangle clanRoleRect = new Rectangle(775, 151, 148, 30);
 			DrawUtils.drawCenteredString(g2d, clanNameRect, font.deriveFont(FONT_SIZE+2f), player.getClan().getName());
-			DrawUtils.drawCenteredString(g2d, clanRoleRect, font.deriveFont(FONT_SIZE-2f), lang.getString(player.getRole()));
+			DrawUtils.drawCenteredString(g2d, clanRoleRect, font.deriveFont(FONT_SIZE-2f), i18n.getString(player.getRole()));
 		}
 		else
 		{
 			Rectangle noClanRect = new Rectangle(775, 130, 148, 30);
-			DrawUtils.drawCenteredString(g2d, noClanRect, font.deriveFont(FONT_SIZE+2f), lang.getString("no.clan"));
+			DrawUtils.drawCenteredString(g2d, noClanRect, font.deriveFont(FONT_SIZE+2f), i18n.getString("no.clan"));
 			g2d.drawImage(FileUtils.getImageFromFile("icons/noclan.png"), 812, 40, 75, 75, null);
 		}
 		
@@ -180,19 +199,19 @@ public class PlayerCommand
 		DrawUtils.drawCenteredString(g2d, trophiesRect, font.deriveFont(FONT_SIZE+4f), nf.format(player.getTrophies()));
 		
 		// Statistics
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE+3f), lang.getString("season")+ " " +GameUtils.getCurrentSeason(), 486, 45);
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE-1.5f), lang.getString("attacks.won"), 486, 77);
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE-1.5f), lang.getString("defenses.won"), 486, 107);
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE-1.5f), lang.getString("donations"), 486, 143);
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE-1.5f), lang.getString("donations.received"), 486, 173);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("season")+ " " +GameUtils.getCurrentSeason(lang), 486, 45, FONT_SIZE+3f);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("attacks.won"), 486, 77, FONT_SIZE-1.5f);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("defenses.won"), 486, 107, FONT_SIZE-1.5f);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("donations"), 486, 143, FONT_SIZE-1.5f);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("donations.received"), 486, 173, FONT_SIZE-1.5f);
 		
-		DrawUtils.drawSimpleString(g2d, font.deriveFont(FONT_SIZE), new Color(0x444545), nf.format(player.getAttackWins()), 693, 79);
-		DrawUtils.drawSimpleString(g2d, font.deriveFont(FONT_SIZE), new Color(0x444545), nf.format(player.getDefenseWins()), 693, 109);
-		DrawUtils.drawSimpleString(g2d, font.deriveFont(FONT_SIZE), new Color(0x444545), nf.format(player.getDonations()), 693, 144);
-		DrawUtils.drawSimpleString(g2d, font.deriveFont(FONT_SIZE), new Color(0x444545), nf.format(player.getDonationsReceived()), 693, 174);
+		DrawUtils.drawSimpleString(g2d, nf.format(player.getAttackWins()), 693, 79, FONT_SIZE, new Color(0x444545));
+		DrawUtils.drawSimpleString(g2d, nf.format(player.getDefenseWins()), 693, 109, FONT_SIZE, new Color(0x444545));
+		DrawUtils.drawSimpleString(g2d, nf.format(player.getDonations()), 693, 144, FONT_SIZE, new Color(0x444545));
+		DrawUtils.drawSimpleString(g2d, nf.format(player.getDonationsReceived()), 693, 174, FONT_SIZE, new Color(0x444545));
 		
 		// Army
-		DrawUtils.drawShadowedString(g2d, font.deriveFont(FONT_SIZE+2f), lang.getString("army"), 21, 222);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("army"), 21, 222, FONT_SIZE+2f);
 		
 		// Troops
 		List<Troop> troops = player.getTroops();
@@ -205,7 +224,7 @@ public class PlayerCommand
 		drawSpells(g2d, font, spells, ARMY_BASE_LINE);
 		drawMachines(g2d, font, troops, ARMY_BASE_LINE);
 		
-		FileUtils.sendImage(channel, image, player.getTag());
+		FileUtils.sendImage(channel, image, player.getTag(), "png");
 		
 		g2d.dispose();
 	}
