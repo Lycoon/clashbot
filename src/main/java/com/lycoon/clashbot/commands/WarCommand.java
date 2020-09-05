@@ -28,6 +28,7 @@ import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.core.ErrorEmbed;
 import com.lycoon.clashbot.lang.LangUtils;
+import com.lycoon.clashbot.utils.CoreUtils;
 import com.lycoon.clashbot.utils.DBUtils;
 import com.lycoon.clashbot.utils.DrawUtils;
 import com.lycoon.clashbot.utils.FileUtils;
@@ -221,6 +222,10 @@ public class WarCommand
 		Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
 		i18n = LangUtils.getTranslations(lang);
 		
+		// If rate limitation has exceeded
+		if (!CoreUtils.checkThrottle(event, lang))
+			return;
+		
 		WarInfo war = null;
 		String tag = args.length > 0 ? args[0] : DBUtils.getClanTag(event.getAuthor().getIdLong());
 		
@@ -355,7 +360,7 @@ public class WarCommand
 			DrawUtils.drawSimpleString(g2d, df.format(war.getClan().getDestructionPercentage())+ "%", 240, 150, 32f, Color.BLACK);
 			DrawUtils.drawSimpleStringLeft(g2d, df.format(war.getEnemy().getDestructionPercentage())+ "%", 1700, 150, 32f, Color.BLACK);
 			
-			FileUtils.sendImage(channel, image, tag + "war", "jpg");
+			FileUtils.sendImage(event, image, tag + "war", "jpg");
 			g2d.dispose();
 		}
 		else

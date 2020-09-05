@@ -6,11 +6,9 @@ import java.util.Properties;
 
 import javax.security.auth.login.LoginException;
 
-import com.google.gson.JsonSyntaxException;
 import com.lycoon.clashapi.core.ClashAPI;
 import com.lycoon.clashbot.event.EventListener;
 
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -21,7 +19,7 @@ public class ClashBotMain
 	public static ClashAPI clashAPI;
 	public static CacheComponents cached;
 	
-	public static void main(String[] args) throws JsonSyntaxException, IOException, LoginException, ClassNotFoundException, InstantiationException, IllegalAccessException
+	public static void main(String[] args) throws IOException, LoginException, ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
 		Properties tokens = new Properties();
 		tokens.load(new FileInputStream(CONFIG));
@@ -30,8 +28,6 @@ public class ClashBotMain
     	builder.addEventListeners(new EventListener());
     	builder.setStatus(OnlineStatus.ONLINE);
         builder.setActivity(Activity.playing("Clash of Clans"));
-        
-        JDA jda = builder.build();
         
         clashAPI = new ClashAPI(tokens.getProperty("clash-of-clans").toString());
         cached = CacheComponents.getInstance();

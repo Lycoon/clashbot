@@ -2,15 +2,16 @@ package com.lycoon.clashbot.commands;
 
 public enum Command
 {
-	CLEAR     (CommandCategory.GENERAL, "clear", "cmd.clear.desc"),
-	LANG      (CommandCategory.GENERAL, "lang", "cmd.lang.desc"),
-	INFO      (CommandCategory.GENERAL, "info", "cmd.info.desc"),
-	HELP      (CommandCategory.GENERAL, "help", "cmd.help.desc"),
-	SET       (CommandCategory.GENERAL, "set", "cmd.set.desc", "<clan|player|lang> <value>"),
-	WARLEAGUE (CommandCategory.CLAN, "warleague", "cmd.warleague.desc", "[clanTag]"),
-	WARLOG    (CommandCategory.CLAN, "warlog", "cmd.warlog.desc", "[clanTag]"),
-	WAR       (CommandCategory.CLAN, "war", "cmd.war.desc", "[clanTag]"),
-	PLAYER    (CommandCategory.PLAYER, "player", "cmd.player.desc", "[playerTag]");
+	INVITE    (CommandCategory.GENERAL, "invite",    "cmd.invite.desc"),
+	CLEAR     (CommandCategory.GENERAL, "clear",     "cmd.clear.desc"),
+	LANG      (CommandCategory.GENERAL, "lang",      "cmd.lang.desc"),
+	INFO      (CommandCategory.GENERAL, "info",      "cmd.info.desc"),
+	HELP      (CommandCategory.GENERAL, "help",      "cmd.help.desc"),
+	SET       (CommandCategory.GENERAL, "set",       "cmd.set.desc",       "<clan|player|lang> <value>"),
+	WARLEAGUE (CommandCategory.CLAN,    "warleague", "cmd.warleague.desc", "[clanTag]"),
+	WARLOG    (CommandCategory.CLAN,    "warlog",    "cmd.warlog.desc",    "[clanTag]"),
+	WAR       (CommandCategory.CLAN,    "war",       "cmd.war.desc",       "[clanTag]"),
+	PLAYER    (CommandCategory.PLAYER,  "player",    "cmd.player.desc",    "[playerTag]");
 	
 	public static final String PREFIX = "!";
 	

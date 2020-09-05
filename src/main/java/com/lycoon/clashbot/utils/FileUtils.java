@@ -15,11 +15,11 @@ import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class FileUtils
 {
-	public static void sendImage(MessageChannel channel, BufferedImage image, String file, String extension)
+	public static void sendImage(MessageReceivedEvent event, BufferedImage image, String file, String extension)
 	{
 		ZonedDateTime date = ZonedDateTime.now(ZoneId.of("UTC"));
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
@@ -31,13 +31,28 @@ public class FileUtils
 		try {ImageIO.write(image, extension, outputfile);}
 		catch (IOException e) {e.printStackTrace();}
 		
-		// Sending the picture and then deleting it
-		Consumer<Message> deleteFile = (res) ->
+		// Callback function
+		Consumer<Message> sendingCallback = (res) ->
 		{
+			System.out.println("SENDING CALLBACK...");
+			
+			// Bot rate limitation
+			long id = event.getAuthor().getIdLong();
+			CoreUtils.addUserToGenerating(id);
+			System.out.println("ADDED TO GENERATING...");
+			
+			try {Thread.sleep(CoreUtils.threshold);}
+			catch (InterruptedException e1) {e1.printStackTrace();}
+			
+			CoreUtils.removeUserFromGenerating(id);
+			System.out.println("REMOVED FROM GENERATING...");
+			
+			// Deleting picture from disk
 			try {Files.delete(Paths.get(outputfile.getPath()));}
 			catch (IOException e) {e.printStackTrace();}
 		};
-		channel.sendFile(outputfile).queue(deleteFile);
+		event.getChannel().sendFile(outputfile).queue(sendingCallback);
+		
 		System.out.println(filename+ " sent.");
 	}
 	

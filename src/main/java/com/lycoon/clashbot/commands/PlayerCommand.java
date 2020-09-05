@@ -18,6 +18,7 @@ import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.core.ErrorEmbed;
 import com.lycoon.clashbot.lang.LangUtils;
+import com.lycoon.clashbot.utils.CoreUtils;
 import com.lycoon.clashbot.utils.DBUtils;
 import com.lycoon.clashbot.utils.DrawUtils;
 import com.lycoon.clashbot.utils.FileUtils;
@@ -108,6 +109,10 @@ public class PlayerCommand
 		lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
 		i18n = LangUtils.getTranslations(lang);
 		NumberFormat nf = NumberFormat.getInstance(lang);
+		
+		// Checking rate limitation
+		if (!CoreUtils.checkThrottle(event, lang))
+			return;
 		
 		Player player = null;
 		String tag = args.length > 0 ? args[0] : DBUtils.getPlayerTag(event.getAuthor().getIdLong());
@@ -224,7 +229,7 @@ public class PlayerCommand
 		drawSpells(g2d, font, spells, ARMY_BASE_LINE);
 		drawMachines(g2d, font, troops, ARMY_BASE_LINE);
 		
-		FileUtils.sendImage(channel, image, player.getTag(), "png");
+		FileUtils.sendImage(event, image, player.getTag(), "png");
 		
 		g2d.dispose();
 	}

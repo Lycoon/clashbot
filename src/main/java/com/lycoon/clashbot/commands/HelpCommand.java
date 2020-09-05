@@ -15,18 +15,17 @@ public class HelpCommand
 	
 	public static void drawCategory(CommandCategory category, Command[] commands)
 	{
-		builder.appendDescription("__" +i18n.getString(category.toString()) + "__\n");
+		String categoryField = "";
 		for (int i=0; i < commands.length; i++)
 		{
 			Command cmd = commands[i];
 			if (cmd.getCategory().equals(category))
 			{
-				builder.appendDescription("▫️ `" +cmd.formatFullCommand());
-				builder.appendDescription("`\n");
-				builder.appendDescription("    " + i18n.getString(cmd.getDescription())+ "\n");
+				categoryField += "▫️ `" +cmd.formatFullCommand()+ "` ";
+				categoryField += i18n.getString(cmd.getDescription())+ "\n";
 			}
 		}
-		builder.appendDescription("\n");
+		builder.addField(i18n.getString(category.toString()), categoryField, false);
 	}
 	
 	public static void execute(MessageReceivedEvent event)

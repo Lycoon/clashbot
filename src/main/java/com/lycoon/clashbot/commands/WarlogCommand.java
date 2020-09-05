@@ -1,6 +1,6 @@
 package com.lycoon.clashbot.commands;
 
-import java.awt.Color;
+//import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -18,6 +18,7 @@ import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.core.ErrorEmbed;
 import com.lycoon.clashbot.lang.LangUtils;
+import com.lycoon.clashbot.utils.CoreUtils;
 import com.lycoon.clashbot.utils.DBUtils;
 import com.lycoon.clashbot.utils.DrawUtils;
 import com.lycoon.clashbot.utils.FileUtils;
@@ -33,12 +34,14 @@ public class WarlogCommand
 	private final static int WIDTH = 1400;
 	private final static float FONT_SIZE = 16f;
 	
+	/*
 	private static Color winsColor = new Color(0xd5edba);
 	private static Color lossesColor = new Color(0xf2c8c7);
 	private static Color tiesColor = new Color(0xcccccc);
 	private static Color totalColor = new Color(0xfefed1);
 	private static Color versusColor = new Color(0xffffc0);
 	private static Color percentageColor = new Color(0x5e5d60);
+	*/
 	
 	public static void drawWar(Graphics2D g2d, WarlogItem war, int y)
 	{
@@ -65,6 +68,10 @@ public class WarlogCommand
 		
 		Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
 		i18n = LangUtils.getTranslations(lang);
+		
+		// If rate limitation has exceeded
+		if (!CoreUtils.checkThrottle(event, lang))
+			return;
 		
 		WarlogModel warlog = null;
 		String tag = args.length > 0 ? args[0] : DBUtils.getClanTag(event.getAuthor().getIdLong());
@@ -108,7 +115,7 @@ public class WarlogCommand
 			drawWar(g2d, wars.get(i), i*MEMBER_HEIGHT + 172);
 		}
 		
-		FileUtils.sendImage(channel, image, tag + "warlog", "jpg");
+		FileUtils.sendImage(event, image, tag + "warlog", "jpg");
 		g2d.dispose();
 	}
 }

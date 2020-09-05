@@ -7,6 +7,7 @@ import com.lycoon.clashbot.commands.ClearCommand;
 import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.commands.HelpCommand;
 import com.lycoon.clashbot.commands.InfoCommand;
+import com.lycoon.clashbot.commands.InviteCommand;
 import com.lycoon.clashbot.commands.LangCommand;
 import com.lycoon.clashbot.commands.PlayerCommand;
 import com.lycoon.clashbot.commands.SetCommand;
@@ -108,6 +109,10 @@ public class EventListener extends ListenerAdapter
         		else if (isCommand(args[0], Command.CLEAR)) // !clear command
         		{
         			ClearCommand.execute(event);
+        		}
+        		else if (isCommand(args[0], Command.INVITE)) // !clear command
+        		{
+        			InviteCommand.execute(event);
         		}
         	}
     	}

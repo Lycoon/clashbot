@@ -39,7 +39,7 @@ public class UTF16Control extends Control
         {
             try 
             {
-                bundle = new PropertyResourceBundle(new InputStreamReader(stream, "UTF-16"));
+                bundle = new PropertyResourceBundle(new InputStreamReader(stream, "UTF-8"));
             } 
             finally 
             {
