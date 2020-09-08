@@ -86,10 +86,10 @@ public class WarlogCommand
 		{
 			warlog = ClashBotMain.clashAPI.getWarlog(tag);
 		}
-		catch (IOException e) {}
+		catch (IOException ignored) {}
 		catch (ClashAPIException e) 
 		{
-			ErrorEmbed.sendExceptionError(event, e, tag, "warlog");
+			ErrorEmbed.sendExceptionError(event, i18n, e, tag, "warlog");
 			return;
 		}
 		

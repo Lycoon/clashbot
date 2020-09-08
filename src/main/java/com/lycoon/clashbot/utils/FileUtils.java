@@ -32,24 +32,19 @@ public class FileUtils
 		catch (IOException e) {e.printStackTrace();}
 		
 		// Callback function
+		long id = event.getAuthor().getIdLong();
+		CoreUtils.addUserToGenerating(id);
 		Consumer<Message> sendingCallback = (res) ->
 		{
-			System.out.println("SENDING CALLBACK...");
-			
+			// Deleting picture from disk
+			try {Files.delete(Paths.get(outputfile.getPath()));}
+			catch (IOException e) {e.printStackTrace();}
+
 			// Bot rate limitation
-			long id = event.getAuthor().getIdLong();
-			CoreUtils.addUserToGenerating(id);
-			System.out.println("ADDED TO GENERATING...");
-			
 			try {Thread.sleep(CoreUtils.threshold);}
 			catch (InterruptedException e1) {e1.printStackTrace();}
 			
 			CoreUtils.removeUserFromGenerating(id);
-			System.out.println("REMOVED FROM GENERATING...");
-			
-			// Deleting picture from disk
-			try {Files.delete(Paths.get(outputfile.getPath()));}
-			catch (IOException e) {e.printStackTrace();}
 		};
 		event.getChannel().sendFile(outputfile).queue(sendingCallback);
 		

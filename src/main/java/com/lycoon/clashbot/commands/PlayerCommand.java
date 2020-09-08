@@ -29,9 +29,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class PlayerCommand
 {
-	private static ResourceBundle i18n;
-	private static Locale lang;
-	
 	private final static int WIDTH = 932;
 	private final static int HEIGHT = 322;
 	private final static float FONT_SIZE = 12f;
@@ -53,7 +50,7 @@ public class PlayerCommand
 		else
 		{
 			g2d.drawImage(FileUtils.getImageFromFile("troops/" + troop.getName() + ".png"), x, y, 35, 35, null);
-			if (troop.getLevel() == troop.getMaxLevel())
+			if (troop.getLevel().intValue() == troop.getMaxLevel().intValue())
 				g2d.drawImage(FileUtils.getImageFromFile("icons/level-label-max.png"), x+2, y+18, 15, 15, null);
 			else
 			{
@@ -105,9 +102,9 @@ public class PlayerCommand
 	public static void execute(MessageReceivedEvent event, String... args)
 	{
 		MessageChannel channel = event.getChannel();
-		
-		lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
-		i18n = LangUtils.getTranslations(lang);
+
+		Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
+		ResourceBundle i18n = LangUtils.getTranslations(lang);
 		NumberFormat nf = NumberFormat.getInstance(lang);
 		
 		// Checking rate limitation
@@ -127,15 +124,15 @@ public class PlayerCommand
 		{
 			player = ClashBotMain.clashAPI.getPlayer(tag);
 		} 
-		catch (IOException e) {}
+		catch (IOException ignored) {}
 		catch (ClashAPIException e)
 		{
-			ErrorEmbed.sendExceptionError(event, e, tag, "player");
+			ErrorEmbed.sendExceptionError(event, i18n, e, tag, "player");
 			return;
 		}
 		
 		// Initializing image
-		BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2d = DrawUtils.initGraphics(WIDTH, HEIGHT, image);
 		
 		Font font = DrawUtils.getFont("Supercell.ttf").deriveFont(FONT_SIZE);
@@ -229,7 +226,7 @@ public class PlayerCommand
 		drawSpells(g2d, font, spells, ARMY_BASE_LINE);
 		drawMachines(g2d, font, troops, ARMY_BASE_LINE);
 		
-		FileUtils.sendImage(event, image, player.getTag(), "png");
+		FileUtils.sendImage(event, image, player.getTag(), "jpg");
 		
 		g2d.dispose();
 	}

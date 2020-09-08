@@ -5,7 +5,6 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import com.lycoon.clashbot.core.ErrorEmbed;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.DBUtils;
 
@@ -64,11 +63,31 @@ public class SetCommand
 		{
 			Locale lang = LangUtils.getLanguage(id);
 			ResourceBundle i18n = LangUtils.getTranslations(lang);
-			
-			ErrorEmbed.sendError(event.getChannel(), 
-					MessageFormat.format(i18n.getString("lang.error"), language), 
-					i18n.getString("lang.info.supported")+ "\n" +LangUtils.getSupportedLanguages(lang),
-					i18n.getString("lang.suggest.contact"));
+
+			EmbedBuilder builder = new EmbedBuilder();
+			builder.setTitle(MessageFormat.format(i18n.getString("lang.error"), language));
+			builder.appendDescription(i18n.getString("lang.info.supported"));
+
+			int length = LangUtils.LANGUAGES.length;
+			double perColumn = Math.ceil(length / 3D);
+			StringBuilder str = new StringBuilder();
+			for (int i=0; i < length; i++)
+			{
+				if (i != 0 && i % perColumn == 0)
+				{
+					builder.addField(str.toString(), "", true);
+					str = new StringBuilder();
+				}
+
+				String curr = LangUtils.LANGUAGES[i];
+				Locale localeLang = new Locale(curr);
+				str.append("▫ ").append(localeLang.getDisplayLanguage(lang)).append(" (`").append(curr).append("`)\n");
+
+				if (i == length-1)
+					builder.addField(str.toString(), "", true);
+			}
+			builder.setFooter(i18n.getString("lang.suggest.contact"));
+			event.getChannel().sendMessage(builder.build()).queue();
 		}
 	}
 }

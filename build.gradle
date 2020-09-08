@@ -11,10 +11,18 @@ plugins {
     id 'java-library'
 }
 
+version '1.0'
+sourceCompatibility = 1.8
+
 repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+
+    // Custom libs
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
@@ -25,11 +33,24 @@ dependencies {
     implementation 'com.google.guava:guava:28.0-jre'
     
     implementation 'com.google.code.gson:gson:2.8.6'
+
+    // Logback
     implementation 'ch.qos.logback:logback-classic:1.2.3'
+
+    // MariaDB
+    implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.2'
+
+    // HikariCP
+    implementation 'com.zaxxer:HikariCP:3.4.5'
+
+    // Discord
+    implementation 'net.dv8tion:JDA:4.2.0_203'
+
+    // ClashAPI
+    implementation name:'ClashAPI-1.0', ext:'jar'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
-    
-    // Discord Java library
-    compile 'net.dv8tion:JDA:4.2.0_168'
 }
+
+compileJava.options.encoding = 'UTF-8'

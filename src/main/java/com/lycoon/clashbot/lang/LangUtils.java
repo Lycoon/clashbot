@@ -29,9 +29,9 @@ public class LangUtils
 	
 	public static boolean isSupportedLanguage(String language)
 	{
-		for (int i=0; i < LANGUAGES.length; i++)
+		for (String s : LANGUAGES)
 		{
-			if (LANGUAGES[i].equals(language))
+			if (s.equals(language))
 				return true;
 		}
 		return false;
@@ -39,13 +39,13 @@ public class LangUtils
 	
 	public static String getSupportedLanguages(Locale currentLanguage)
 	{
-		String res = "";
-		for (int i=0; i < LANGUAGES.length; i++)
+		StringBuilder res = new StringBuilder();
+		for (String language : LANGUAGES)
 		{
-			Locale lang = new Locale(LANGUAGES[i]);
-			res += "▫️ " + lang.getDisplayLanguage(currentLanguage) + " (`" +LANGUAGES[i]+ "`) \n";
+			Locale lang = new Locale(language);
+			res.append("▫ ").append(lang.getDisplayLanguage(currentLanguage)).append(" (`").append(language).append("`) \n");
 		}
 		
-		return res;
+		return res.toString();
 	}
 }

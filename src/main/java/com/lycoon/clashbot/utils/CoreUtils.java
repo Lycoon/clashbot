@@ -18,7 +18,7 @@ public class CoreUtils
 {
 	static Duration rateTime = Duration.ofSeconds(6);
 	static long threshold = rateTime.toMillis();
-	static HashMap<Long, ZonedDateTime> generating;
+	static HashMap<Long, ZonedDateTime> generating = new HashMap<>();
 	
 	public static long getLastTimeDifference(long id)
 	{
@@ -42,7 +42,6 @@ public class CoreUtils
 	
 	public static boolean checkThrottle(MessageReceivedEvent event, Locale lang)
 	{
-		System.out.println("CHECK THROTTLE...");
 		ResourceBundle i18n = LangUtils.getTranslations(lang);
 		
 		NumberFormat nf = NumberFormat.getNumberInstance(lang);

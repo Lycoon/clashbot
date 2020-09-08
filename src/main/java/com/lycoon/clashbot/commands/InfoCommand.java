@@ -28,7 +28,6 @@ public class InfoCommand
 				i18n.getString("info.description") + "\n\n"
 				+ MessageFormat.format(i18n.getString("info.author"), TWITTER, DISCORD)+ "\n"
 				+ MessageFormat.format(i18n.getString("info.code"), BOT_CODE)+ "\n"
-				+ MessageFormat.format(i18n.getString("info.api"), API_CODE)+ "\n"
 				+ MessageFormat.format(i18n.getString("info.support"), PAYPAL)+ "\n\n"
 				+ MessageFormat.format(i18n.getString("info.help"), Command.HELP.formatCommand())
 				);

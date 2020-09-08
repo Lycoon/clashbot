@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
+import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.lang.LangUtils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -12,11 +13,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class ErrorEmbed
 {
-	public static void sendExceptionError(MessageReceivedEvent event, Exception e, String... args)
+	public static void sendExceptionError(MessageReceivedEvent event, ResourceBundle i18n, Exception e, String... args)
 	{
 		MessageChannel channel = event.getChannel();
-		ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-		
 		switch (e.getMessage())
 		{
 			case "400":
@@ -43,6 +42,12 @@ public class ErrorEmbed
 						i18n.getString("exception.other"),
 						i18n.getString("exception.contact"));
 		}
+	}
+
+	public static void throwCommandError(MessageChannel channel, ResourceBundle i18n, Command cmd)
+	{
+		ErrorEmbed.sendError(channel, i18n.getString("wrong.usage"),
+				MessageFormat.format(i18n.getString("tip.usage"), cmd.formatFullCommand()));
 	}
 	
 	public static void sendError(MessageChannel channel, String title, String... args)

@@ -42,7 +42,7 @@ public class EventListener extends ListenerAdapter
         	if (args.length > 0)
         	{
         		MessageChannel channel = event.getChannel();
-        		if (isCommand(args[0], Command.SET)) // !set command
+        		if (isCommand(args[0], Command.SETLANG)) // !set command
         		{
         			if (args.length > 2)
         			{
@@ -59,12 +59,16 @@ public class EventListener extends ListenerAdapter
     	    					break;
         					default:
         						ErrorEmbed.sendError(channel, i18n.getString("wrong.usage"), 
-        								MessageFormat.format(i18n.getString("tip.usage"), i18n.getString("set.usage")));
+        								MessageFormat.format(i18n.getString("tip.usage.two"),
+												Command.SETLANG.formatFullCommand(),
+												Command.SETTAG.formatFullCommand()));
         				}
         			}
         			else
 						ErrorEmbed.sendError(channel, i18n.getString("wrong.usage"), 
-								MessageFormat.format(i18n.getString("tip.usage"), Command.SET.formatFullCommand()));
+								MessageFormat.format(i18n.getString("tip.usage.two"),
+										Command.SETLANG.formatFullCommand(),
+										Command.SETTAG.formatFullCommand()));
         		}
         		else if (isCommand(args[0], Command.LANG)) // !lang command
         		{
@@ -91,12 +95,33 @@ public class EventListener extends ListenerAdapter
         			else
         				WarlogCommand.execute(event);
         		}
-        		else if (isCommand(args[0], Command.WARLEAGUE)) // !warleague command
+        		else if (isCommand(args[0], Command.WARLEAGUE_ALL)) // !warleague command
         		{
         			if (args.length > 1)
-        				WarLeagueCommand.execute(event, args[1]);
-        			else
-        				WarLeagueCommand.execute(event);
+					{
+						switch(args[1])
+						{
+							case "round":
+								if (args.length > 3)
+									WarLeagueCommand.executeRound(event, args[2], args[3]);
+								else if (args.length == 3)
+									WarLeagueCommand.executeRound(event, args[2]);
+								else
+									ErrorEmbed.sendError(channel, i18n.getString("wrong.usage"),
+											MessageFormat.format(i18n.getString("tip.usage"), Command.WARLEAGUE_ROUND.formatFullCommand()));
+								return;
+							case "all":
+								if (args.length > 2)
+									WarLeagueCommand.executeAll(event, args[2]);
+								else
+									WarLeagueCommand.executeAll(event);
+								return;
+							default:
+								WarLeagueCommand.executeClan(event, args[1]);
+								return;
+						}
+					}
+        			WarLeagueCommand.executeClan(event);
         		}
         		else if (isCommand(args[0], Command.INFO)) // !info command
         		{

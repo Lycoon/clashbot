@@ -28,10 +28,7 @@ import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.core.ErrorEmbed;
 import com.lycoon.clashbot.lang.LangUtils;
-import com.lycoon.clashbot.utils.CoreUtils;
-import com.lycoon.clashbot.utils.DBUtils;
-import com.lycoon.clashbot.utils.DrawUtils;
-import com.lycoon.clashbot.utils.FileUtils;
+import com.lycoon.clashbot.utils.*;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -64,36 +61,13 @@ public class WarCommand
 	private static long highestStarsExec = 0;
 	
 	private static ResourceBundle i18n;
-	private static Color notUsedAttackColor = new Color(0xfbc546);
-	private static Color attackColor = new Color(0x4c493a);
-	
-	public static int getPositive(float value)
-	{
-		return (int)(value * (value < 0 ? -1 : 1));
-	}
-	
-	public static int[] getTimeLeft(String toParse)
-	{
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss.SSS'Z'");
-		LocalDateTime endDate = LocalDateTime.parse(toParse, formatter);
-		ZonedDateTime zonedTime = endDate.atZone(ZoneId.of("UTC"));
-		Duration diff = Duration.between(ZonedDateTime.now(), zonedTime);
-		long s = diff.getSeconds();
-		
-		long hours = (long)s/3600;
-		s -= hours*3600;
-		long minutes = (long)s/60;
-		s -= minutes*60;
-		
-		int[] res = {(int)hours, (int)minutes, (int)s};
-		return res;
-	}
+	private static final Color notUsedAttackColor = new Color(0xfbc546);
+	private static final Color attackColor = new Color(0x4c493a);
 	
 	public static ClanWarMember getClanWarMemberByTag(List<ClanWarMember> members, String tag)
 	{
-		for (int i=0; i < members.size(); i++)
+		for (ClanWarMember member : members)
 		{
-			ClanWarMember member = members.get(i);
 			if (member.getTag().equals(tag))
 				return member;
 		}
@@ -102,19 +76,12 @@ public class WarCommand
 	
 	public static List<Attack> getAttacksByOrder(List<ClanWarMember> members)
 	{
-		List<Attack> sortedAttacks = new ArrayList<Attack>();
-		for (int i=0; i < members.size(); i++)
+		List<Attack> sortedAttacks = new ArrayList<>();
+		for (ClanWarMember member : members)
 		{
-			ClanWarMember member = members.get(i);
 			List<Attack> attacks = member.getAttacks();
 			if (attacks != null)
-			{
-				for (int j=0; j < attacks.size(); j++)
-				{
-					Attack atk = attacks.get(j);
-					sortedAttacks.add(atk);
-				}
-			}
+				sortedAttacks.addAll(attacks);
 		}
 		sortedAttacks.sort(new SortAttackByOrder());
 		return sortedAttacks;
@@ -145,8 +112,7 @@ public class WarCommand
 		return 0;
 	}
 	
-	public static void drawMember(Graphics2D g2d, ClanWarMember member, 
-			List<ClanWarMember> members, List<ClanWarMember> enemyMembers, List<Attack> sortedAttacks, int i, int x, int y)
+	public static void drawMember(Graphics2D g2d, ClanWarMember member, List<ClanWarMember> enemyMembers, List<Attack> sortedAttacks, int i, int x, int y)
 	{
 		g2d.setColor(Color.WHITE);
 		
@@ -169,10 +135,10 @@ public class WarCommand
 		List<Attack> attacks = member.getAttacks();
 		for (int j=0; j < 2; j++)
 		{
-			DrawUtils.drawSimpleString(g2d, MessageFormat.format(i18n.getString("attack"), j+1), x+390, y+24 + j*35, 10f, attackColor);
+			DrawUtils.drawSimpleString(g2d, MessageFormat.format(i18n.getString("attack.index"), j+1), x+390, y+24 + j*35, 10f, attackColor);
 			if (attacks != null)
 			{
-				Attack attack = null;
+				Attack attack;
 				if (j < attacks.size())
 				{
 					// If the player made at least one attack
@@ -239,13 +205,13 @@ public class WarCommand
 		{
 			war = ClashBotMain.clashAPI.getCurrentWar(tag);
 		}
-		catch (IOException e) {}
+		catch (IOException ignored) {}
 		catch (ClashAPIException e) 
 		{
-			ErrorEmbed.sendExceptionError(event, e, tag, "war");
+			ErrorEmbed.sendExceptionError(event, i18n, e, tag, "war");
 			return;
 		}
-		
+
 		if (!war.getState().equals("notInWar"))
 		{
 			// Initializing image
@@ -273,7 +239,7 @@ public class WarCommand
 					WIDTH, image_height-355, 
 					null);
 			System.out.println("DRAW MAIN BACKGROUND: " +(System.currentTimeMillis()-start)/1000.0+ "s");
-			
+
 			// Bottom background
 			long startbg = System.currentTimeMillis();
 			g2d.drawImage(FileUtils.getImageFromFile("backgrounds/clanwar/background-panel-end.png"), 
@@ -307,7 +273,7 @@ public class WarCommand
 			switch (war.getState())
 			{
 				case "inWar":
-					timeLeft = getTimeLeft(war.getEndTime());
+					timeLeft = GameUtils.getTimeLeft(war.getEndTime());
 					DrawUtils.drawSimpleCenteredString(g2d, i18n.getString("war.inwar"), statusRect, 40f, Color.BLACK);
 					DrawUtils.drawSimpleCenteredString(g2d, 
 							MessageFormat.format(i18n.getString("war.timeleft"), 
@@ -315,7 +281,7 @@ public class WarCommand
 							timeRect, 50f, Color.BLACK);
 					break;
 				case "preparation":
-					timeLeft = getTimeLeft(war.getStartTime());
+					timeLeft = GameUtils.getTimeLeft(war.getStartTime());
 					DrawUtils.drawSimpleCenteredString(g2d, i18n.getString("war.preparation"), statusRect, 40f, Color.BLACK);
 					DrawUtils.drawSimpleCenteredString(g2d, 
 							MessageFormat.format(i18n.getString("war.timeleft"), 
@@ -324,7 +290,7 @@ public class WarCommand
 					break;
 				default: 
 					//warEnded
-					timeLeft = getTimeLeft(war.getEndTime());
+					timeLeft = GameUtils.getTimeLeft(war.getEndTime());
 					
 					DrawUtils.drawSimpleCenteredString(g2d, i18n.getString("war.ended"), statusRect, 40f, Color.BLACK);
 					DrawUtils.drawSimpleCenteredString(g2d, 
@@ -338,8 +304,8 @@ public class WarCommand
 			{
 				ClanWarMember member = members.get(i);
 				ClanWarMember enemy = enemyMembers.get(i);
-				drawMember(g2d, member, members, enemyMembers, attacks, i, 18, i*(MEMBER_HEIGHT+PADDING) + 250);
-				drawMember(g2d, enemy, enemyMembers, members, enemyAttacks, i, 957, i*(MEMBER_HEIGHT+PADDING) + 250);
+				drawMember(g2d, member, enemyMembers, attacks, i, 18, i*(MEMBER_HEIGHT+PADDING) + 250);
+				drawMember(g2d, enemy, members, enemyAttacks, i, 957, i*(MEMBER_HEIGHT+PADDING) + 250);
 			}
 			System.out.println("DRAW MEMBERS: " +(System.currentTimeMillis()-startMember)/1000.0+ "s");
 			System.out.println("DRAW ALL STARS: " +starsExec/1000.0+ "s");

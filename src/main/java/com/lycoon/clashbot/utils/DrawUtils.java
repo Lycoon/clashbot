@@ -93,6 +93,22 @@ public class DrawUtils
 		
 		g2d.setFont(tmpFont);
 	}
+
+	public static void drawShadowedStringLeft(Graphics2D g2d, String text, int x, int y, float size, Color color)
+	{
+		Font tmpFont = g2d.getFont();
+
+		g2d.setFont(g2d.getFont().deriveFont(size));
+		FontRenderContext ctx = g2d.getFontRenderContext();
+		double textWith = g2d.getFont().getStringBounds(text, ctx).getWidth();
+
+		g2d.setColor(Color.BLACK);
+		g2d.drawString(text, x-(int)textWith, y + 2);
+		g2d.setColor(color);
+		g2d.drawString(text, x-(int)textWith, y);
+
+		g2d.setFont(tmpFont);
+	}
 	
 	public static void drawSimpleStringLeft(Graphics2D g2d, String text, int x, int y, float size)
 	{

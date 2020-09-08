@@ -6,9 +6,9 @@ public enum CommandCategory
 	CLAN    ("category.clan"),
 	PLAYER  ("category.player");
 	
-	private String name;
+	private final String name;
 	
-	private CommandCategory(String name)
+	CommandCategory(String name)
 	{
 		this.name = name;
 	}

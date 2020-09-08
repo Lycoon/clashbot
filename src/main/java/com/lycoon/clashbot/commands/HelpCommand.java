@@ -15,17 +15,17 @@ public class HelpCommand
 	
 	public static void drawCategory(CommandCategory category, Command[] commands)
 	{
-		String categoryField = "";
+		StringBuilder categoryField = new StringBuilder();
 		for (int i=0; i < commands.length; i++)
 		{
 			Command cmd = commands[i];
 			if (cmd.getCategory().equals(category))
 			{
-				categoryField += "▫️ `" +cmd.formatFullCommand()+ "` ";
-				categoryField += i18n.getString(cmd.getDescription())+ "\n";
+				categoryField.append("▫ `").append(cmd.formatFullCommand()).append("` ");
+				categoryField.append(i18n.getString(cmd.getDescription())).append("\n");
 			}
 		}
-		builder.addField(i18n.getString(category.toString()), categoryField, false);
+		builder.addField(i18n.getString(category.toString()), categoryField.toString(), false);
 	}
 	
 	public static void execute(MessageReceivedEvent event)
@@ -35,11 +35,11 @@ public class HelpCommand
 		
 		builder.setColor(Color.GRAY);
 		builder.setTitle(i18n.getString("cmd.help.panel"));
+		builder.appendDescription(i18n.getString("tip.help"));
 		
 		CommandCategory[] categories = CommandCategory.values();
-		for (int i=0; i < categories.length; i++)
+		for (CommandCategory category : categories)
 		{
-			CommandCategory category = categories[i];
 			drawCategory(category, Command.values());
 		}
 		

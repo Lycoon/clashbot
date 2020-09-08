@@ -16,10 +16,10 @@ public class CacheComponents
 	public static Image warWon = FileUtils.getImageFromFile("backgrounds/warlog/win-panel-full.png");
 	public static Image warLost = FileUtils.getImageFromFile("backgrounds/warlog/lose-panel-full.png");
 	
-	public static List<Image> townhalls = new ArrayList<Image>();
-	public static List<Image> builderhalls = new ArrayList<Image>();
+	public static List<Image> townhalls = new ArrayList<>();
+	public static List<Image> builderhalls = new ArrayList<>();
 	
-	private static CacheComponents singleton = new CacheComponents();
+	private static final CacheComponents singleton = new CacheComponents();
 	
 	private CacheComponents()
 	{
