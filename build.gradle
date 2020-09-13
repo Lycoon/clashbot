@@ -47,7 +47,7 @@ dependencies {
     implementation 'net.dv8tion:JDA:4.2.0_203'
 
     // ClashAPI
-    implementation name:'ClashAPI-1.0', ext:'jar'
+    implementation name:'ClashAPI', ext:'jar'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'

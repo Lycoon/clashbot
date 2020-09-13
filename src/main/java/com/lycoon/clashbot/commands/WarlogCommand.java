@@ -97,7 +97,8 @@ public class WarlogCommand
 		WarlogModel warlog = getWarlog(event, lang, args);
 		if (warlog == null)
 			return;
-		
+
+		// Removing clan wars with null clans
 		List<WarlogItem> wars = warlog.getWars();
 		for (int i=0; i < wars.size(); i++)
 		{
@@ -123,7 +124,7 @@ public class WarlogCommand
 		
 		for (int i=0; i < wars.size(); i++)
 		{
-			drawWar(g2d, wars.get(i), 118 + i*WAR_ITEM_HEIGHT + i*PADDING);
+			drawWar(g2d, wars.get(i), 118 + i * WAR_ITEM_HEIGHT + i * PADDING);
 		}
 		
 		FileUtils.sendImage(event, image, "warlog", "jpg");
