@@ -90,10 +90,13 @@ public class EventListener extends ListenerAdapter
         		}
         		else if (isCommand(args[0], Command.WARLOG)) // !warlog command
         		{
-        			if (args.length > 1)
+        			if (args.length > 2)
+        				WarlogCommand.execute(event, args[1], args[2]);
+        			else if (args.length == 2)
         				WarlogCommand.execute(event, args[1]);
         			else
-        				WarlogCommand.execute(event);
+						ErrorEmbed.sendError(channel, i18n.getString("wrong.usage"),
+								MessageFormat.format(i18n.getString("tip.usage"), Command.WARLOG.formatFullCommand()));
         		}
         		else if (isCommand(args[0], Command.WARLEAGUE_ALL)) // !warleague command
         		{

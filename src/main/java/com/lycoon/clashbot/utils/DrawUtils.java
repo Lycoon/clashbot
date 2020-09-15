@@ -1,13 +1,6 @@
 package com.lycoon.clashbot.utils;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -155,10 +148,15 @@ public class DrawUtils
 	
 	public static void drawCenteredString(Graphics2D g2d, Rectangle rect, Font font, String text)
 	{
-	    FontMetrics metrics = g2d.getFontMetrics(font);
-	    int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
-	    int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
-	    drawShadowedString(g2d, text, x, y, font.getSize());
+		drawCenteredString(g2d, rect, font, text, DEFAULT_COLOR);
+	}
+
+	public static void drawCenteredString(Graphics2D g2d, Rectangle rect, Font font, String text, Color color)
+	{
+		FontMetrics metrics = g2d.getFontMetrics(font);
+		int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
+		int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
+		drawShadowedString(g2d, text, x, y, font.getSize(), 2, color);
 	}
 	
 	public static void drawCenteredImage(Graphics2D g2d, Image img, Rectangle rect, int sizeX, int sizeY)

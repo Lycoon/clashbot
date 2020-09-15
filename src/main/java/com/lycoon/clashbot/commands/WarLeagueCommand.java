@@ -1,12 +1,5 @@
 package com.lycoon.clashbot.commands;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.List;
-
 import com.lycoon.clashapi.cocmodels.clanwar.ClanWarModel;
 import com.lycoon.clashapi.cocmodels.clanwar.WarInfo;
 import com.lycoon.clashapi.cocmodels.clanwar.league.Round;
@@ -18,8 +11,14 @@ import com.lycoon.clashbot.core.ErrorEmbed;
 import com.lycoon.clashbot.core.RoundWarInfo;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
-
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.*;
 
 public class WarLeagueCommand
 {

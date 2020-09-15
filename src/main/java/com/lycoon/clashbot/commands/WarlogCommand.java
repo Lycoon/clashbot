@@ -1,34 +1,34 @@
 package com.lycoon.clashbot.commands;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 import com.lycoon.clashapi.cocmodels.clanwar.ClanWarModel;
 import com.lycoon.clashapi.cocmodels.clanwar.WarlogItem;
 import com.lycoon.clashapi.cocmodels.clanwar.WarlogModel;
-import com.lycoon.clashapi.cocmodels.clanwar.league.WarLeagueGroup;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.core.ErrorEmbed;
 import com.lycoon.clashbot.lang.LangUtils;
-import com.lycoon.clashbot.utils.CoreUtils;
-import com.lycoon.clashbot.utils.DBUtils;
-import com.lycoon.clashbot.utils.DrawUtils;
-import com.lycoon.clashbot.utils.FileUtils;
-
+import com.lycoon.clashbot.utils.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class WarlogCommand
 {
 	public static ResourceBundle i18n;
+	public static Locale lang;
 	
-	private final static int PADDING = 6;
+	private final static int PADDING = 3;
+	private final static int SIZE = 5;
 	private final static int WAR_ITEM_HEIGHT = 74;
 	private final static int WIDTH = 932;
 	private final static float FONT_SIZE = 16f;
@@ -36,7 +36,7 @@ public class WarlogCommand
 	private static Color backgroundColor = new Color(0xe7e7e1);
 	private static Color winsColor = new Color(0xd5edba);
 	private static Color lossesColor = new Color(0xf2c8c7);
-	private static Color tiesColor = new Color(0xcccccc);
+	private static Color drawsColor = new Color(0xcccccc);
 	private static Color totalColor = new Color(0xfefed1);
 	private static Color versusColor = new Color(0xffffc0);
 	private static Color percentageColor = new Color(0x5e5d60);
@@ -50,12 +50,36 @@ public class WarlogCommand
 		// Clan badges
 		ClanWarModel clan = war.getClan();
 		ClanWarModel enemy = war.getOpponent();
-		g2d.drawImage(FileUtils.getImageFromUrl(clan.getBadgeUrls().getSmall()), 400, y+40, null);
-		g2d.drawImage(FileUtils.getImageFromUrl(enemy.getBadgeUrls().getSmall()), 550, y+40, null);
+		g2d.drawImage(FileUtils.getImageFromUrl(clan.getBadgeUrls().getMedium()), 395, y+5, 70, 70, null);
+		g2d.drawImage(FileUtils.getImageFromUrl(enemy.getBadgeUrls().getMedium()), 470, y+5, 70, 70, null);
 		
 		// Clan names
-		DrawUtils.drawShadowedStringLeft(g2d, clan.getName(), 380, y+40, 20f);
-		DrawUtils.drawShadowedString(g2d, enemy.getName(), 600, y+40, 20f);
+		DrawUtils.drawShadowedStringLeft(g2d, clan.getName(), 375, y+28, 20f);
+		DrawUtils.drawShadowedString(g2d, enemy.getName(), 555, y+28, 20f);
+
+		// Stars
+		g2d.drawImage(CacheComponents.newStar, 355, y+40, 22, 22, null);
+		g2d.drawImage(CacheComponents.newStar, 555, y+40, 22, 22, null);
+		DrawUtils.drawShadowedStringLeft(g2d, clan.getStars().toString(), 350, y+59, 16f);
+		DrawUtils.drawShadowedString(g2d, enemy.getStars().toString(), 581, y+59, 16f);
+
+		// Destruction percentage
+		DecimalFormatSymbols dfs = new DecimalFormatSymbols(lang);
+		DecimalFormat df = new DecimalFormat("#.##", dfs);
+		DrawUtils.drawSimpleStringLeft(g2d, df.format(war.getOpponent().getDestructionPercentage())+ "%", 300, y+59, 16f, percentageColor);
+		DrawUtils.drawSimpleString(g2d, df.format(war.getClan().getDestructionPercentage())+ "%", 630, y+59, 16f, percentageColor);
+
+		// Experience earned
+		g2d.drawImage(FileUtils.getImageFromFile("icons/exp-badge.png"), 24, y+20, 20, 20, null);
+		DrawUtils.drawSimpleString(g2d, "+" + clan.getExpEarned(), 48, y+35, 14f, Color.BLACK);
+
+		// End time
+		int[] timeLeft = GameUtils.getTimeLeft(war.getEndTime());
+		DrawUtils.drawSimpleString(g2d, MessageFormat.format(i18n.getString("warlog.days.ago"), timeLeft[0]/24), 24, y+60, 12f, Color.WHITE);
+
+		// Versus team size
+		Rectangle teamSizeRect = new Rectangle(0, y+35, WIDTH, 15);
+		DrawUtils.drawCenteredString(g2d, teamSizeRect, g2d.getFont().deriveFont(14f), MessageFormat.format(i18n.getString("team.size.versus"), war.getTeamSize()), versusColor);
 	}
 
 	public static WarlogModel getWarlog(MessageReceivedEvent event, Locale lang, String[] args)
@@ -66,7 +90,7 @@ public class WarlogCommand
 
 		WarlogModel warlog = null;
 		ResourceBundle i18n = LangUtils.getTranslations(lang);
-		String tag = args.length > 1 ? args[0] : DBUtils.getClanTag(event.getAuthor().getIdLong());
+		String tag = args.length > 1 ? args[1] : DBUtils.getClanTag(event.getAuthor().getIdLong());
 
 		if (tag == null)
 		{
@@ -91,14 +115,33 @@ public class WarlogCommand
 	{
 		MessageChannel channel = event.getChannel();
 		
-		Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
+		lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
 		i18n = LangUtils.getTranslations(lang);
 
 		WarlogModel warlog = getWarlog(event, lang, args);
 		if (warlog == null)
 			return;
 
-		// Removing clan wars with null clans
+		// Checking index validity
+		int index;
+		try
+		{
+			index = Integer.parseInt(args[0]);
+			if (index < 1)
+			{
+				ErrorEmbed.sendError(event.getChannel(),
+						i18n.getString("wrong.usage"), i18n.getString("exception.index.format"));
+				return;
+			}
+		}
+		catch(NumberFormatException e)
+		{
+			ErrorEmbed.sendError(event.getChannel(),
+					i18n.getString("wrong.usage"), i18n.getString("exception.index.format"));
+			return;
+		}
+
+		// Removing wars with null clans
 		List<WarlogItem> wars = warlog.getWars();
 		for (int i=0; i < wars.size(); i++)
 		{
@@ -106,12 +149,38 @@ public class WarlogCommand
 				wars.remove(i);
 		}
 
+		// Checking if there are any clan wars
+		if (wars.size() <= 0)
+		{
+			ErrorEmbed.sendError(channel, i18n.getString("no.warlog"));
+			return;
+		}
+
+		// Computing stats
+		int total, wins, losses, draws;
+		total = wins = losses = draws = 0;
+		for (WarlogItem war : wars)
+		{
+			switch(war.getResult())
+			{
+				case "win":
+					wins++;
+					break;
+				case "lose":
+					losses++;
+					break;
+				default:
+					draws++;
+			}
+		}
+		total = wins + losses + draws;
+
 		// Computing height
-		int height = 0;
+		int height = 15 + 88 + 15 + (WAR_ITEM_HEIGHT + PADDING)*SIZE + 12;
 		
 		// Initializing image
-		BufferedImage image = new BufferedImage(WIDTH, 700, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g2d = DrawUtils.initGraphics(WIDTH, 700, image);
+		BufferedImage image = new BufferedImage(WIDTH, height, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g2d = DrawUtils.initGraphics(WIDTH, height, image);
 		Font font = DrawUtils.getFont("Supercell.ttf").deriveFont(FONT_SIZE);
 		g2d.setFont(font);
 
@@ -121,10 +190,23 @@ public class WarlogCommand
 		
 		// Top background
 		g2d.drawImage(FileUtils.getImageFromFile("backgrounds/warlog/stats-panel-full.png"), 0, 15, null);
-		
-		for (int i=0; i < wars.size(); i++)
+
+		// Drawing stats
+		DrawUtils.drawShadowedString(g2d, i18n.getString("warlog.stats"), 80, 52, 20f);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("wins"), 340, 40, 16f, 2, winsColor);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("losses"), 495, 40, 16f, 2, lossesColor);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("draws"), 645, 40, 16f, 2, drawsColor);
+		DrawUtils.drawShadowedString(g2d, i18n.getString("total"), 790, 40, 16f, 2, totalColor);
+
+		DrawUtils.drawShadowedString(g2d, String.valueOf(wins), 340, 70, 18f);
+		DrawUtils.drawShadowedString(g2d, String.valueOf(losses), 495, 70, 18f);
+		DrawUtils.drawShadowedString(g2d, String.valueOf(draws), 645, 70, 18f);
+		DrawUtils.drawShadowedString(g2d, String.valueOf(total), 790, 70, 18f);
+
+		// Drawing wars
+		for (int i = 0; i < SIZE; i++)
 		{
-			drawWar(g2d, wars.get(i), 118 + i * WAR_ITEM_HEIGHT + i * PADDING);
+			drawWar(g2d, wars.get((index-1)*SIZE + i), 118 + i * WAR_ITEM_HEIGHT + i * PADDING);
 		}
 		
 		FileUtils.sendImage(event, image, "warlog", "jpg");

@@ -31,25 +31,26 @@ dependencies {
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:28.0-jre'
-    
-    implementation 'com.google.code.gson:gson:2.8.6'
 
     // Logback
     implementation 'ch.qos.logback:logback-classic:1.2.3'
+    
+	// GSON (Serialization)
+    implementation 'com.google.code.gson:gson:2.8.6'
 
-    // MariaDB
+    // MariaDB (Database)
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.2'
 
-    // HikariCP
+    // HikariCP (Connection pool)
     implementation 'com.zaxxer:HikariCP:3.4.5'
 
-    // Discord
+    // DiscordJDA (Discord API)
     implementation 'net.dv8tion:JDA:4.2.0_203'
 
-    // ClashAPI
+    // ClashAPI (Custom Clash of Clans API)
     implementation name:'ClashAPI', ext:'jar'
 
-    // Use JUnit test framework
+    // Use JUnit test framework 
     testImplementation 'junit:junit:4.12'
 }
 
