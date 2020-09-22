@@ -1,9 +1,9 @@
 package com.lycoon.clashbot.lang;
 
+import com.lycoon.clashbot.utils.DBUtils;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import com.lycoon.clashbot.utils.DBUtils;
 
 public class LangUtils
 {
@@ -22,7 +22,7 @@ public class LangUtils
 	public static ResourceBundle getTranslations(Locale locale)
 	{
 		return ResourceBundle.getBundle(
-				"Messages", 
+				"lang/lang",
 				locale, 
 				new UTF16Control());
 	}

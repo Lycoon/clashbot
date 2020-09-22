@@ -2,19 +2,20 @@ package com.lycoon.clashbot.commands;
 
 public enum Command
 {
-	INVITE    (CommandCategory.GENERAL,     "invite",    "cmd.invite.desc"),
-	CLEAR     (CommandCategory.GENERAL,     "clear",     "cmd.clear.desc"),
-	LANG      (CommandCategory.GENERAL,     "lang",      "cmd.lang.desc"),
-	INFO      (CommandCategory.GENERAL,     "info",      "cmd.info.desc"),
-	HELP      (CommandCategory.GENERAL,     "help",      "cmd.help.desc"),
-	SETTAG    (CommandCategory.GENERAL,     "set",       "cmd.settag.desc",          "<clan|player> <tag>"),
-	SETLANG   (CommandCategory.GENERAL,     "set",       "cmd.setlang.desc",         "lang <language>"),
-	WARLEAGUE_ROUND (CommandCategory.CLAN,  "warleague", "cmd.warleague.round.desc", "round <index> [clanTag]"),
-	WARLEAGUE_ALL (CommandCategory.CLAN,    "warleague", "cmd.warleague.all.desc",   "all [clanTag]"),
-	WARLEAGUE_CLAN (CommandCategory.CLAN,   "warleague", "cmd.warleague.clan.desc",  "[clanTag]"),
-	WARLOG    (CommandCategory.CLAN,        "warlog",    "cmd.warlog.desc",          "[clanTag]"),
-	WAR       (CommandCategory.CLAN,        "war",       "cmd.war.desc",             "[clanTag]"),
-	PLAYER    (CommandCategory.PLAYER,      "player",    "cmd.player.desc",          "[playerTag]");
+	INVITE       (CommandCategory.GENERAL,     "invite",    "cmd.invite.desc"),
+	CLEAR        (CommandCategory.GENERAL,     "clear",     "cmd.clear.desc"),
+	LANG         (CommandCategory.GENERAL,     "lang",      "cmd.lang.desc"),
+	INFO         (CommandCategory.GENERAL,     "info",      "cmd.info.desc"),
+	HELP         (CommandCategory.GENERAL,     "help",      "cmd.help.desc"),
+	SETTAG       (CommandCategory.GENERAL,     "set",       "cmd.settag.desc",          "<clan|player> <tag>"),
+	SETLANG      (CommandCategory.GENERAL,     "set",       "cmd.setlang.desc",         "lang <language>"),
+	CLAN            (CommandCategory.CLAN,     "clan",      "cmd.clan.desc",            "[clanTag]"),
+	WARLEAGUE_ROUND (CommandCategory.CLAN,     "warleague", "cmd.warleague.round.desc", "round <index> [clanTag]"),
+	//WARLEAGUE_ALL   (CommandCategory.CLAN,     "warleague", "cmd.warleague.all.desc",   "all [clanTag]"),
+	//WARLEAGUE_CLAN  (CommandCategory.CLAN,     "warleague", "cmd.warleague.clan.desc",  "[clanTag]"),
+	WARLOG          (CommandCategory.CLAN,     "warlog",    "cmd.warlog.desc",          "<index> [clanTag]"),
+	WAR             (CommandCategory.CLAN,     "war",       "cmd.war.desc",             "<index> [clanTag]"),
+	PLAYER        (CommandCategory.PLAYER,     "player",    "cmd.player.desc",          "[playerTag]");
 	
 	public static final String PREFIX = "!";
 	

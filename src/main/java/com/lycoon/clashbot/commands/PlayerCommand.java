@@ -1,31 +1,24 @@
 package com.lycoon.clashbot.commands;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.text.NumberFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 import com.lycoon.clashapi.cocmodels.player.Player;
 import com.lycoon.clashapi.cocmodels.player.Troop;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
-import com.lycoon.clashbot.core.ErrorEmbed;
+import com.lycoon.clashbot.utils.ErrorUtils;
 import com.lycoon.clashbot.lang.LangUtils;
-import com.lycoon.clashbot.utils.CoreUtils;
-import com.lycoon.clashbot.utils.DBUtils;
-import com.lycoon.clashbot.utils.DrawUtils;
-import com.lycoon.clashbot.utils.FileUtils;
-import com.lycoon.clashbot.utils.GameUtils;
-
+import com.lycoon.clashbot.utils.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 public class PlayerCommand
 {
@@ -116,7 +109,7 @@ public class PlayerCommand
 		
 		if (tag == null)
 		{
-			ErrorEmbed.sendError(channel, i18n.getString("set.player.error"), i18n.getString("set.player.help"));
+			ErrorUtils.sendError(channel, i18n.getString("set.player.error"), i18n.getString("set.player.help"));
 			return;
 		}
 		
@@ -127,7 +120,7 @@ public class PlayerCommand
 		catch (IOException ignored) {}
 		catch (ClashAPIException e)
 		{
-			ErrorEmbed.sendExceptionError(event, i18n, e, tag, "player");
+			ErrorUtils.sendExceptionError(event, i18n, e, tag, "player");
 			return;
 		}
 		
@@ -138,15 +131,15 @@ public class PlayerCommand
 		Font font = DrawUtils.getFont("Supercell.ttf").deriveFont(FONT_SIZE);
 		g2d.setFont(font);
 		
-		g2d.drawImage(FileUtils.getImageFromFile("backgrounds/profile.png"), 0, 0, null);
+		g2d.drawImage(FileUtils.getImageFromFile("backgrounds/player-profile.png"), 0, 0, null);
 		
 		// Experience level
 		g2d.drawImage(FileUtils.getImageFromFile("icons/exp-star.png"), 20, 18, 45, 45, null);
 		Rectangle level = new Rectangle(23, 30, 40, 20);
-		DrawUtils.drawCenteredString(g2d, level, font.deriveFont(FONT_SIZE+5f), player.getExpLevel().toString());
+		DrawUtils.drawCenteredString(g2d, level, font.deriveFont(FONT_SIZE+5f), Objects.requireNonNull(player).getExpLevel().toString());
 		
 		// Nickname
-		DrawUtils.drawShadowedString(g2d, player.getName(), 75, 39, FONT_SIZE+6f);
+		DrawUtils.drawShadowedString(g2d, player.getName(), 75, 36, FONT_SIZE+8f);
 		
 		// Player tag
 		DrawUtils.drawShadowedString(g2d, player.getTag(), 75, 55, FONT_SIZE-1f);
@@ -226,7 +219,7 @@ public class PlayerCommand
 		drawSpells(g2d, font, spells, ARMY_BASE_LINE);
 		drawMachines(g2d, font, troops, ARMY_BASE_LINE);
 		
-		FileUtils.sendImage(event, image, player.getTag(), "jpg");
+		FileUtils.sendImage(event, image, player.getTag(), "png");
 		
 		g2d.dispose();
 	}

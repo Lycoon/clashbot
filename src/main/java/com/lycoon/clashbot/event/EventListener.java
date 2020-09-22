@@ -1,25 +1,14 @@
 package com.lycoon.clashbot.event;
 
-import java.text.MessageFormat;
-import java.util.ResourceBundle;
-
-import com.lycoon.clashbot.commands.ClearCommand;
-import com.lycoon.clashbot.commands.Command;
-import com.lycoon.clashbot.commands.HelpCommand;
-import com.lycoon.clashbot.commands.InfoCommand;
-import com.lycoon.clashbot.commands.InviteCommand;
-import com.lycoon.clashbot.commands.LangCommand;
-import com.lycoon.clashbot.commands.PlayerCommand;
-import com.lycoon.clashbot.commands.SetCommand;
-import com.lycoon.clashbot.commands.WarCommand;
-import com.lycoon.clashbot.commands.WarLeagueCommand;
-import com.lycoon.clashbot.commands.WarlogCommand;
-import com.lycoon.clashbot.core.ErrorEmbed;
+import com.lycoon.clashbot.commands.*;
+import com.lycoon.clashbot.utils.ErrorUtils;
 import com.lycoon.clashbot.lang.LangUtils;
-
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
 public class EventListener extends ListenerAdapter
 {
@@ -58,14 +47,14 @@ public class EventListener extends ListenerAdapter
     	    					SetCommand.executeLang(event, args[2]);
     	    					break;
         					default:
-        						ErrorEmbed.sendError(channel, i18n.getString("wrong.usage"), 
+        						ErrorUtils.sendError(channel, i18n.getString("wrong.usage"),
         								MessageFormat.format(i18n.getString("tip.usage.two"),
 												Command.SETLANG.formatFullCommand(),
 												Command.SETTAG.formatFullCommand()));
         				}
         			}
         			else
-						ErrorEmbed.sendError(channel, i18n.getString("wrong.usage"), 
+						ErrorUtils.sendError(channel, i18n.getString("wrong.usage"),
 								MessageFormat.format(i18n.getString("tip.usage.two"),
 										Command.SETLANG.formatFullCommand(),
 										Command.SETTAG.formatFullCommand()));
@@ -81,12 +70,22 @@ public class EventListener extends ListenerAdapter
         			else
         				PlayerCommand.execute(event);
         		}
+				else if (isCommand(args[0], Command.CLAN)) // !player command
+				{
+					if (args.length > 1)
+						ClanCommand.execute(event, args[1]);
+					else
+						ClanCommand.execute(event);
+				}
         		else if (isCommand(args[0], Command.WAR)) // !war command
         		{
-        			if (args.length > 1)
-        				WarCommand.execute(event, args[1]);
-        			else
-        				WarCommand.execute(event);
+					if (args.length > 2)
+						WarCommand.execute(event, args[1], args[2]);
+					else if (args.length == 2)
+						WarCommand.execute(event, args[1]);
+					else
+						ErrorUtils.sendError(channel, i18n.getString("wrong.usage"),
+								MessageFormat.format(i18n.getString("tip.usage"), Command.WAR.formatFullCommand()));
         		}
         		else if (isCommand(args[0], Command.WARLOG)) // !warlog command
         		{
@@ -95,10 +94,10 @@ public class EventListener extends ListenerAdapter
         			else if (args.length == 2)
         				WarlogCommand.execute(event, args[1]);
         			else
-						ErrorEmbed.sendError(channel, i18n.getString("wrong.usage"),
+						ErrorUtils.sendError(channel, i18n.getString("wrong.usage"),
 								MessageFormat.format(i18n.getString("tip.usage"), Command.WARLOG.formatFullCommand()));
         		}
-        		else if (isCommand(args[0], Command.WARLEAGUE_ALL)) // !warleague command
+        		else if (isCommand(args[0], Command.WARLEAGUE_ROUND)) // !warleague command
         		{
         			if (args.length > 1)
 					{
@@ -110,7 +109,7 @@ public class EventListener extends ListenerAdapter
 								else if (args.length == 3)
 									WarLeagueCommand.executeRound(event, args[2]);
 								else
-									ErrorEmbed.sendError(channel, i18n.getString("wrong.usage"),
+									ErrorUtils.sendError(channel, i18n.getString("wrong.usage"),
 											MessageFormat.format(i18n.getString("tip.usage"), Command.WARLEAGUE_ROUND.formatFullCommand()));
 								return;
 							case "all":

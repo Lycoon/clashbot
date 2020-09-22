@@ -1,5 +1,8 @@
 package com.lycoon.clashbot.utils;
 
+import com.lycoon.clashbot.lang.LangUtils;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
@@ -8,11 +11,6 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import com.lycoon.clashbot.core.ErrorEmbed;
-import com.lycoon.clashbot.lang.LangUtils;
-
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class CoreUtils
 {
@@ -52,7 +50,7 @@ public class CoreUtils
 		boolean isValid = timeDifference >= threshold;
 		
 		if (!isValid)
-			ErrorEmbed.sendError(event.getChannel(), 
+			ErrorUtils.sendError(event.getChannel(),
 					i18n.getString("exception.rate.exceeded"), 
 					MessageFormat.format(
 							i18n.getString("exception.rate.exceeded.left"), 

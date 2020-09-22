@@ -2,9 +2,12 @@ package com.lycoon.clashbot.utils;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
+import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.AttributedString;
+import java.util.Objects;
 
 public class DrawUtils
 {
@@ -17,7 +20,6 @@ public class DrawUtils
 		g2d.clearRect(0, 0, width, height);
 		
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		
 		return g2d;
@@ -30,11 +32,10 @@ public class DrawUtils
 		try 
 		{
 			InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream("fonts/" + file);
-			font = Font.createFont(Font.TRUETYPE_FONT, stream);
+			font = Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(stream));
 		}
-		catch (FontFormatException e) {e.printStackTrace();}
-		catch (IOException e) {e.printStackTrace();}
-		
+		catch (FontFormatException | IOException e) {e.printStackTrace();}
+
 		return font;
 	}
 	

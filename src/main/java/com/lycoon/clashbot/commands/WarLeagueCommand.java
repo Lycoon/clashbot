@@ -7,7 +7,6 @@ import com.lycoon.clashapi.cocmodels.clanwar.league.WarLeagueGroup;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.core.ClanWarStats;
 import com.lycoon.clashbot.core.ClashBotMain;
-import com.lycoon.clashbot.core.ErrorEmbed;
 import com.lycoon.clashbot.core.RoundWarInfo;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
@@ -75,7 +74,7 @@ public class WarLeagueCommand
 				DrawUtils.drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.ended"));
 				break;
 			case "notInWar":
-				ErrorEmbed.sendError(event.getChannel(), i18n.getString("exception.warleague.notinwar"));
+				ErrorUtils.sendError(event.getChannel(), i18n.getString("exception.warleague.notinwar"));
 				return;
 			default:
 				// inWar
@@ -187,7 +186,7 @@ public class WarLeagueCommand
 
 		if (tag == null)
 		{
-			ErrorEmbed.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
+			ErrorUtils.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
 			return null;
 		}
 
@@ -198,7 +197,7 @@ public class WarLeagueCommand
 		catch (IOException ignored) {}
 		catch (ClashAPIException e)
 		{
-			ErrorEmbed.sendExceptionError(event, i18n, e, tag, "warleague");
+			ErrorUtils.sendExceptionError(event, i18n, e, tag, "warleague");
 			return null;
 		}
 		return leagueGroup;
@@ -210,23 +209,9 @@ public class WarLeagueCommand
 		ResourceBundle i18n = LangUtils.getTranslations(lang);
 
 		// Checking index validity
-		int index;
-		try
-		{
-			index = Integer.parseInt(args[0]);
-			if (index > 7 || index < 1)
-			{
-				ErrorEmbed.sendError(event.getChannel(),
-						i18n.getString("wrong.usage"), i18n.getString("exception.warleague.index"));
-				return;
-			}
-		}
-		catch(NumberFormatException e)
-		{
-			ErrorEmbed.sendError(event.getChannel(),
-					i18n.getString("wrong.usage"), i18n.getString("exception.warleague.index"));
+		int index = ErrorUtils.checkIndex(event, i18n, args[0], 7);
+		if (index == -1)
 			return;
-		}
 
 		WarLeagueGroup warLeague = getLeagueGroup(event, lang, args);
 		if (warLeague == null)
@@ -242,7 +227,7 @@ public class WarLeagueCommand
 		List<WarInfo> roundWars = getWars(warLeague, index-1);
 		drawRound(g2d, event, roundWars, i18n, index-1);
 		
-		FileUtils.sendImage(event, image, "cwl", "jpg");
+		FileUtils.sendImage(event, image, "cwl", "png");
 		g2d.dispose();
 	}
 
@@ -321,7 +306,7 @@ public class WarLeagueCommand
 			System.out.println(clan.getName()+ ": " +stars.get(clan.getName())+ " étoiles (" +destruction.get(clan.getName())+ "%)");
 		}
 
-		//FileUtils.sendImage(event, image, "cwl-all", "jpg");
+		FileUtils.sendImage(event, image, "cwl-all", "png");
 		g2d.dispose();
 	}
 

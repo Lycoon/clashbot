@@ -1,17 +1,15 @@
-package com.lycoon.clashbot.core;
-
-import java.awt.Color;
-import java.text.MessageFormat;
-import java.util.ResourceBundle;
+package com.lycoon.clashbot.utils;
 
 import com.lycoon.clashbot.commands.Command;
-import com.lycoon.clashbot.lang.LangUtils;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class ErrorEmbed
+import java.awt.*;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
+
+public class ErrorUtils
 {
 	public static void sendExceptionError(MessageReceivedEvent event, ResourceBundle i18n, Exception e, String... args)
 	{
@@ -44,9 +42,31 @@ public class ErrorEmbed
 		}
 	}
 
+	public static int checkIndex(MessageReceivedEvent event, ResourceBundle i18n, String arg, int max)
+	{
+		int index;
+		try
+		{
+			index = Integer.parseInt(arg);
+			if (index < 1 || index > max)
+			{
+				ErrorUtils.sendError(event.getChannel(),
+						i18n.getString("wrong.usage"), MessageFormat.format(i18n.getString("exception.index"), 1, max));
+				return -1;
+			}
+		}
+		catch(NumberFormatException e)
+		{
+			ErrorUtils.sendError(event.getChannel(),
+					i18n.getString("wrong.usage"), MessageFormat.format(i18n.getString("exception.index"), 1, max));
+			return -1;
+		}
+		return index;
+	}
+
 	public static void throwCommandError(MessageChannel channel, ResourceBundle i18n, Command cmd)
 	{
-		ErrorEmbed.sendError(channel, i18n.getString("wrong.usage"),
+		ErrorUtils.sendError(channel, i18n.getString("wrong.usage"),
 				MessageFormat.format(i18n.getString("tip.usage"), cmd.formatFullCommand()));
 	}
 	

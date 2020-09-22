@@ -6,7 +6,6 @@ import com.lycoon.clashapi.cocmodels.clanwar.WarlogModel;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
-import com.lycoon.clashbot.core.ErrorEmbed;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -33,13 +32,13 @@ public class WarlogCommand
 	private final static int WIDTH = 932;
 	private final static float FONT_SIZE = 16f;
 
-	private static Color backgroundColor = new Color(0xe7e7e1);
-	private static Color winsColor = new Color(0xd5edba);
-	private static Color lossesColor = new Color(0xf2c8c7);
-	private static Color drawsColor = new Color(0xcccccc);
-	private static Color totalColor = new Color(0xfefed1);
-	private static Color versusColor = new Color(0xffffc0);
-	private static Color percentageColor = new Color(0x5e5d60);
+	private final static Color backgroundColor = new Color(0xe7e7e1);
+	private final static Color winsColor = new Color(0xd5edba);
+	private final static Color lossesColor = new Color(0xf2c8c7);
+	private final static Color drawsColor = new Color(0xcccccc);
+	private final static Color totalColor = new Color(0xfefed1);
+	private final static Color versusColor = new Color(0xffffc0);
+	private final static Color percentageColor = new Color(0x5e5d60);
 	
 	public static void drawWar(Graphics2D g2d, WarlogItem war, int y)
 	{
@@ -94,7 +93,7 @@ public class WarlogCommand
 
 		if (tag == null)
 		{
-			ErrorEmbed.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
+			ErrorUtils.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
 			return null;
 		}
 
@@ -105,7 +104,7 @@ public class WarlogCommand
 		catch (IOException ignored) {}
 		catch (ClashAPIException e)
 		{
-			ErrorEmbed.sendExceptionError(event, i18n, e, tag, "warlog");
+			ErrorUtils.sendExceptionError(event, i18n, e, tag, "warlog");
 			return null;
 		}
 		return warlog;
@@ -123,23 +122,9 @@ public class WarlogCommand
 			return;
 
 		// Checking index validity
-		int index;
-		try
-		{
-			index = Integer.parseInt(args[0]);
-			if (index < 1)
-			{
-				ErrorEmbed.sendError(event.getChannel(),
-						i18n.getString("wrong.usage"), i18n.getString("exception.index.format"));
-				return;
-			}
-		}
-		catch(NumberFormatException e)
-		{
-			ErrorEmbed.sendError(event.getChannel(),
-					i18n.getString("wrong.usage"), i18n.getString("exception.index.format"));
+		int index = ErrorUtils.checkIndex(event, i18n, args[0], warlog.getWars().size() / SIZE);
+		if (index == -1)
 			return;
-		}
 
 		// Removing wars with null clans
 		List<WarlogItem> wars = warlog.getWars();
@@ -152,7 +137,7 @@ public class WarlogCommand
 		// Checking if there are any clan wars
 		if (wars.size() <= 0)
 		{
-			ErrorEmbed.sendError(channel, i18n.getString("no.warlog"));
+			ErrorUtils.sendError(channel, i18n.getString("no.warlog"));
 			return;
 		}
 
@@ -161,16 +146,19 @@ public class WarlogCommand
 		total = wins = losses = draws = 0;
 		for (WarlogItem war : wars)
 		{
-			switch(war.getResult())
+			if (war.getResult() != null)
 			{
-				case "win":
-					wins++;
-					break;
-				case "lose":
-					losses++;
-					break;
-				default:
-					draws++;
+				switch(war.getResult())
+				{
+					case "win":
+						wins++;
+						break;
+					case "lose":
+						losses++;
+						break;
+					default:
+						draws++;
+				}
 			}
 		}
 		total = wins + losses + draws;
@@ -193,6 +181,7 @@ public class WarlogCommand
 
 		// Drawing stats
 		DrawUtils.drawShadowedString(g2d, i18n.getString("warlog.stats"), 80, 52, 20f);
+		DrawUtils.drawShadowedString(g2d, MessageFormat.format(i18n.getString("warlog.coverage"), wars.size()), 80, 70, 10f);
 		DrawUtils.drawShadowedString(g2d, i18n.getString("wins"), 340, 40, 16f, 2, winsColor);
 		DrawUtils.drawShadowedString(g2d, i18n.getString("losses"), 495, 40, 16f, 2, lossesColor);
 		DrawUtils.drawShadowedString(g2d, i18n.getString("draws"), 645, 40, 16f, 2, drawsColor);
@@ -209,7 +198,7 @@ public class WarlogCommand
 			drawWar(g2d, wars.get((index-1)*SIZE + i), 118 + i * WAR_ITEM_HEIGHT + i * PADDING);
 		}
 		
-		FileUtils.sendImage(event, image, "warlog", "jpg");
+		FileUtils.sendImage(event, image, "warlog", "png");
 		g2d.dispose();
 	}
 }
