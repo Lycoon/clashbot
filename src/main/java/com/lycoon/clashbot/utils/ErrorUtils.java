@@ -51,14 +51,17 @@ public class ErrorUtils
 			if (index < 1 || index > max)
 			{
 				ErrorUtils.sendError(event.getChannel(),
-						i18n.getString("wrong.usage"), MessageFormat.format(i18n.getString("exception.index"), 1, max));
+						i18n.getString("wrong.usage"),
+						MessageFormat.format(i18n.getString("exception.index"), 1, max));
 				return -1;
 			}
 		}
 		catch(NumberFormatException e)
 		{
-			ErrorUtils.sendError(event.getChannel(),
-					i18n.getString("wrong.usage"), MessageFormat.format(i18n.getString("exception.index"), 1, max));
+			ErrorUtils.sendError(
+					event.getChannel(),
+					i18n.getString("wrong.usage"),
+					MessageFormat.format(i18n.getString("exception.index"), 1, max));
 			return -1;
 		}
 		return index;

@@ -1,8 +1,8 @@
 package com.lycoon.clashbot.event;
 
 import com.lycoon.clashbot.commands.*;
-import com.lycoon.clashbot.utils.ErrorUtils;
 import com.lycoon.clashbot.lang.LangUtils;
+import com.lycoon.clashbot.utils.ErrorUtils;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -13,6 +13,10 @@ import java.util.ResourceBundle;
 public class EventListener extends ListenerAdapter
 {
 	static boolean isCommand(String arg, Command cmd)
+	{
+		return arg.equalsIgnoreCase(cmd.formatCommand());
+	}
+	static boolean isAdminCommand(String arg, AdminCommand cmd)
 	{
 		return arg.equalsIgnoreCase(cmd.formatCommand());
 	}
@@ -141,6 +145,13 @@ public class EventListener extends ListenerAdapter
         		{
         			InviteCommand.execute(event);
         		}
+				else if (isAdminCommand(args[0], AdminCommand.SERVERS)) // !servers command
+				{
+					if (AdminCommand.isAdmin(event.getAuthor().getIdLong()))
+						ServersCommand.execute(event);
+					else
+						ErrorUtils.sendError(event.getChannel(), i18n.getString("exception.permission"));
+				}
         	}
     	}
     }

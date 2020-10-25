@@ -1,6 +1,10 @@
 package com.lycoon.clashbot.utils;
 
-import java.awt.Image;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,11 +15,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
-
-import javax.imageio.ImageIO;
-
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class FileUtils
 {
@@ -68,7 +67,7 @@ public class FileUtils
 		try
 		{
 			URL url = new URL(link);
-		    image = ImageIO.read(url);
+			image = ImageIO.read(url);
 		} 
 		catch (IOException ex) {ex.printStackTrace();}
 		return image;

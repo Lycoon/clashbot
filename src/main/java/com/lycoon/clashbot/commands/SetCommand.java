@@ -1,23 +1,34 @@
 package com.lycoon.clashbot.commands;
 
-import java.awt.Color;
+import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashbot.core.ClashBotMain;
+import com.lycoon.clashbot.lang.LangUtils;
+import com.lycoon.clashbot.utils.DBUtils;
+import com.lycoon.clashbot.utils.ErrorUtils;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.awt.*;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import com.lycoon.clashbot.lang.LangUtils;
-import com.lycoon.clashbot.utils.DBUtils;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SetCommand
 {
 	public static void executePlayer(MessageReceivedEvent event, String tag)
 	{
-		DBUtils.setPlayerTag(event.getAuthor().getIdLong(), tag);
 		ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-		
+
+		// Checks if the player exists
+		try { ClashBotMain.clashAPI.getPlayer(tag); }
+		catch (ClashAPIException | IOException e)
+		{
+			ErrorUtils.sendExceptionError(event, i18n, e, tag, "player");
+			return;
+		}
+
+		DBUtils.setPlayerTag(event.getAuthor().getIdLong(), tag);
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setColor(Color.GREEN);
 		builder.setTitle(MessageFormat.format(i18n.getString("set.player.success"), tag));
@@ -29,9 +40,17 @@ public class SetCommand
 	
 	public static void executeClan(MessageReceivedEvent event, String tag)
 	{
-		DBUtils.setClanTag(event.getAuthor().getIdLong(), tag);
 		ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-		
+
+		// Checks if the clan exists
+		try { ClashBotMain.clashAPI.getClan(tag); }
+		catch (ClashAPIException | IOException e)
+		{
+			ErrorUtils.sendExceptionError(event, i18n, e, tag, "clan");
+			return;
+		}
+
+		DBUtils.setClanTag(event.getAuthor().getIdLong(), tag);
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setColor(Color.GREEN);
 		builder.setTitle(MessageFormat.format(i18n.getString("set.clan.success"), tag));
@@ -65,6 +84,7 @@ public class SetCommand
 			ResourceBundle i18n = LangUtils.getTranslations(lang);
 
 			EmbedBuilder builder = new EmbedBuilder();
+			builder.setColor(Color.RED);
 			builder.setTitle(MessageFormat.format(i18n.getString("lang.error"), language));
 			builder.appendDescription(i18n.getString("lang.info.supported"));
 

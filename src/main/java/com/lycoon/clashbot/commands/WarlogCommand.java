@@ -121,11 +121,6 @@ public class WarlogCommand
 		if (warlog == null)
 			return;
 
-		// Checking index validity
-		int index = ErrorUtils.checkIndex(event, i18n, args[0], warlog.getWars().size() / SIZE);
-		if (index == -1)
-			return;
-
 		// Removing wars with null clans
 		List<WarlogItem> wars = warlog.getWars();
 		for (int i=0; i < wars.size(); i++)
@@ -140,6 +135,11 @@ public class WarlogCommand
 			ErrorUtils.sendError(channel, i18n.getString("no.warlog"));
 			return;
 		}
+
+		// Checking index validity
+		int index = ErrorUtils.checkIndex(event, i18n, args[0], (int) Math.floor(wars.size() / SIZE));
+		if (index == -1)
+			return;
 
 		// Computing stats
 		int total, wins, losses, draws;

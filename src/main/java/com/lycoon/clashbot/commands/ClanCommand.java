@@ -5,12 +5,8 @@ import com.lycoon.clashapi.cocmodels.clan.ClanModel;
 import com.lycoon.clashapi.cocmodels.clan.Label;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.core.ClashBotMain;
-import com.lycoon.clashbot.utils.ErrorUtils;
 import com.lycoon.clashbot.lang.LangUtils;
-import com.lycoon.clashbot.utils.CoreUtils;
-import com.lycoon.clashbot.utils.DBUtils;
-import com.lycoon.clashbot.utils.DrawUtils;
-import com.lycoon.clashbot.utils.FileUtils;
+import com.lycoon.clashbot.utils.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -221,9 +217,10 @@ public class ClanCommand
         DrawUtils.drawShadowedString(g2d, i18n.getString("clan.clanwar.streak"), 621, 292, 13f);
 
         DrawUtils.drawSimpleString(g2d, nf.format(clan.getWarWins()), 826, 198, 12f, valueColor);
-        DrawUtils.drawSimpleString(g2d, nf.format(clan.getWarLosses()), 826, 228, 12f, valueColor);
-        DrawUtils.drawSimpleString(g2d, nf.format(clan.getWarTies()), 826, 263, 12f, valueColor);
         DrawUtils.drawSimpleString(g2d, nf.format(clan.getWarWinStreak()), 826, 293, 12f, valueColor);
+
+        DrawUtils.drawSimpleString(g2d, clan.isWarLogPublic() ? nf.format(clan.getWarLosses()) : i18n.getString("warlog.private"), 826, 228, 12f, valueColor);
+        DrawUtils.drawSimpleString(g2d, clan.isWarLogPublic() ? nf.format(clan.getWarTies()) : i18n.getString("warlog.private"), 826, 263, 12f, valueColor);
 
         FileUtils.sendImage(event, image, clan.getTag(), "png");
 

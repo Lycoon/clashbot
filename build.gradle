@@ -9,49 +9,45 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
+    id 'application'
 }
 
-version '1.0'
-sourceCompatibility = 1.8
+mainClassName = "com.lycoon.clashbot.core.ClashBotMain"
+
+jar {
+    manifest {
+        attributes "Main-Class": "$mainClassName"
+    }
+
+    from {
+        configurations.runtimeClasspath
+                .findAll { !it.name.endsWith('pom') }
+                .collect{ it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+version '1.0.1'
 
 repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
 
-    // Custom libs
     flatDir {
         dirs 'libs'
     }
 }
 
 dependencies {
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api 'org.apache.commons:commons-math3:3.6.1'
-
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation 'com.google.guava:guava:28.0-jre'
-
-    // Logback
-    implementation 'ch.qos.logback:logback-classic:1.2.3'
-    
-	// GSON (Serialization)
-    implementation 'com.google.code.gson:gson:2.8.6'
-
-    // MariaDB (Database)
-    implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.2'
-
-    // HikariCP (Connection pool)
-    implementation 'com.zaxxer:HikariCP:3.4.5'
-
-    // DiscordJDA (Discord API)
-    implementation 'net.dv8tion:JDA:4.2.0_203'
-
-    // ClashAPI (Custom Clash of Clans API)
-    implementation name:'ClashAPI', ext:'jar'
-
-    // Use JUnit test framework 
-    testImplementation 'junit:junit:4.12'
+    api 'org.apache.commons:commons-math3:3.6.1' // This dependency is exported to consumers, that is to say found on their compile classpath.
+    implementation 'com.google.guava:guava:28.0-jre' // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    implementation 'ch.qos.logback:logback-classic:1.2.3' // Logback
+    implementation 'com.google.code.gson:gson:2.8.6' // GSON (Serialization)
+    implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.2' // MariaDB (Database)
+    implementation 'com.zaxxer:HikariCP:3.4.5' // HikariCP (Connection pool)
+    implementation 'net.dv8tion:JDA:4.2.0_203' // DiscordJDA (Discord API)
+    implementation name:'ClashAPI', ext:'jar'// ClashAPI (Custom Clash of Clans API)
+    testImplementation 'junit:junit:4.12'// Use JUnit test framework
 }
 
 compileJava.options.encoding = 'UTF-8'

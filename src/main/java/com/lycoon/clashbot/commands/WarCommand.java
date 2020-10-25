@@ -40,6 +40,8 @@ class SortAttackByOrder implements Comparator<Attack>
 
 public class WarCommand
 {
+	private static String tag;
+
 	private final static int PADDING = 145;
 	private final static int SIZE = 5;
 	private final static int WIDTH = 1200;
@@ -167,7 +169,7 @@ public class WarCommand
 		g2d.setColor(Color.WHITE);
 
 		// Username
-		Rectangle usernameRect1 = new Rectangle(63, y+7, 100, 20);
+		Rectangle usernameRect1 = new Rectangle(65, y+7, 100, 20);
 		Rectangle usernameRect2 = new Rectangle(1035, y+7, 100, 20);
 		DrawUtils.drawCenteredString(g2d, usernameRect1, g2d.getFont().deriveFont(18f), member.getName());
 		DrawUtils.drawCenteredString(g2d, usernameRect2, g2d.getFont().deriveFont(18f), enemy.getName());
@@ -177,7 +179,7 @@ public class WarCommand
 		g2d.drawImage(CacheComponents.getTownHallImage(enemy.getTownhallLevel()), 1110, y + 47, 75, 75, null);
 
 		// Map position
-		Rectangle posRect = new Rectangle(0, y+70, WIDTH, 20);
+		Rectangle posRect = new Rectangle(0, y+73, WIDTH, 20);
 		DrawUtils.drawCenteredString(g2d, posRect, g2d.getFont().deriveFont(32f), member.getMapPosition()+ ".");
 
 		// Stars
@@ -195,7 +197,7 @@ public class WarCommand
 
 		WarInfo war = null;
 		ResourceBundle i18n = LangUtils.getTranslations(lang);
-		String tag = args.length > 1 ? args[1] : DBUtils.getClanTag(event.getAuthor().getIdLong());
+		tag = args.length > 1 ? args[1] : DBUtils.getClanTag(event.getAuthor().getIdLong());
 
 		if (tag == null)
 		{
@@ -260,8 +262,8 @@ public class WarCommand
 			g2d.drawImage(FileUtils.getImageFromUrl(war.getEnemy().getBadgeUrls().getSmall()), 1050, 20, 135, 135, null);
 			
 			// Clan names
-			DrawUtils.drawShadowedString(g2d, war.getClan().getName(), 165, 70, 35f, 2, clanNameColor);
-			DrawUtils.drawShadowedStringLeft(g2d, war.getEnemy().getName(), 1030, 70, 35f, 2, clanNameColor);
+			DrawUtils.drawShadowedString(g2d, war.getClan().getName(), 165, 70, 32f, 2, clanNameColor);
+			DrawUtils.drawShadowedStringLeft(g2d, war.getEnemy().getName(), 1030, 70, 32f, 2, clanNameColor);
 
 			// Status
 			Rectangle statusRect = new Rectangle(0, 55, WIDTH, 20);
@@ -321,6 +323,6 @@ public class WarCommand
 			g2d.dispose();
 		}
 		else
-			ErrorUtils.sendError(channel, MessageFormat.format(i18n.getString("exception.404.war"), "war"));
+			ErrorUtils.sendError(channel, MessageFormat.format(i18n.getString("exception.404.war"), tag));
 	}
 }
