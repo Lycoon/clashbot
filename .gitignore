@@ -7,6 +7,7 @@ build
 .metadata
 bin/
 tmp/
+*.cfg
 *.tmp
 *.bak
 *.swp
@@ -15,4 +16,5 @@ local.properties
 .settings/
 .loadpath
 .recommenders
-keys.json
+database.properties
+tokens.properties

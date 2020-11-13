@@ -65,8 +65,8 @@ public class WarlogCommand
 		// Destruction percentage
 		DecimalFormatSymbols dfs = new DecimalFormatSymbols(lang);
 		DecimalFormat df = new DecimalFormat("#.##", dfs);
-		DrawUtils.drawSimpleStringLeft(g2d, df.format(war.getOpponent().getDestructionPercentage())+ "%", 300, y+59, 16f, percentageColor);
-		DrawUtils.drawSimpleString(g2d, df.format(war.getClan().getDestructionPercentage())+ "%", 630, y+59, 16f, percentageColor);
+		DrawUtils.drawSimpleStringLeft(g2d, df.format(war.getClan().getDestructionPercentage())+ "%", 300, y+59, 16f, percentageColor);
+		DrawUtils.drawSimpleString(g2d, df.format(war.getOpponent().getDestructionPercentage())+ "%", 630, y+59, 16f, percentageColor);
 
 		// Experience earned
 		g2d.drawImage(FileUtils.getImageFromFile("icons/exp-badge.png"), 24, y+20, 20, 20, null);
@@ -121,6 +121,11 @@ public class WarlogCommand
 		if (warlog == null)
 			return;
 
+		// Checking index validity
+		int index = ErrorUtils.checkIndex(event, i18n, args[0], warlog.getWars().size() / SIZE);
+		if (index == -1)
+			return;
+
 		// Removing wars with null clans
 		List<WarlogItem> wars = warlog.getWars();
 		for (int i=0; i < wars.size(); i++)
@@ -135,11 +140,6 @@ public class WarlogCommand
 			ErrorUtils.sendError(channel, i18n.getString("no.warlog"));
 			return;
 		}
-
-		// Checking index validity
-		int index = ErrorUtils.checkIndex(event, i18n, args[0], (int) Math.floor(wars.size() / SIZE));
-		if (index == -1)
-			return;
 
 		// Computing stats
 		int total, wins, losses, draws;
