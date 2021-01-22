@@ -12,25 +12,25 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class ClashBotMain 
+public class ClashBotMain
 {
-	private static final String CONFIG = "tokens.properties";
-	public static ClashAPI clashAPI;
-	public static CacheComponents cached;
-	public static JDA jda;
-	
-	public static void main(String[] args) throws IOException, LoginException
-	{
-		Properties tokens = new Properties();
-		tokens.load(new FileInputStream(CONFIG));
+    private static final String CONFIG = "tokens.properties";
+    public static ClashAPI clashAPI;
+    public static CacheComponents cached;
+    public static JDA jda;
 
-		JDABuilder builder = JDABuilder.createDefault(tokens.getProperty("discord"));
-		builder.addEventListeners(new EventListener());
-		builder.setStatus(OnlineStatus.ONLINE);
-		builder.setActivity(Activity.playing("Clash of Clans"));
-		jda = builder.build();
+    public static void main(String[] args) throws IOException, LoginException
+    {
+        Properties tokens = new Properties();
+        tokens.load(new FileInputStream(CONFIG));
 
-		clashAPI = new ClashAPI(tokens.getProperty("clash-of-clans"));
-		cached = CacheComponents.getInstance();
-	}
+        JDABuilder builder = JDABuilder.createDefault(tokens.getProperty("discord"));
+        builder.addEventListeners(new EventListener());
+        builder.setStatus(OnlineStatus.ONLINE);
+        builder.setActivity(Activity.playing("Clash of Clans"));
+        jda = builder.build();
+
+        clashAPI = new ClashAPI(tokens.getProperty("clash-of-clans"));
+        cached = CacheComponents.getInstance();
+    }
 }

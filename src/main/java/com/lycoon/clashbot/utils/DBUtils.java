@@ -10,12 +10,11 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public class DBUtils
 {
-    private static HikariConfig cfg;
-    private static HikariDataSource ds;
+	private static final HikariDataSource ds;
     
     static
     {
-        cfg = new HikariConfig("database.properties");
+		HikariConfig cfg = new HikariConfig("database.properties");
         ds = new HikariDataSource(cfg);
     }
     
@@ -30,7 +29,7 @@ public class DBUtils
 	{
 		String req = "SELECT lang FROM user WHERE id=?;";
 		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req);)
+				PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			ResultSet res = statement.executeQuery();
@@ -41,7 +40,7 @@ public class DBUtils
 			if (res.next())
 				return res.getString("lang");
 		}
-		catch (SQLException e) {}
+		catch (SQLException ignored) {}
 		return "en";
 	}
 	
@@ -49,7 +48,7 @@ public class DBUtils
 	{
 		String req = "SELECT player FROM user WHERE id=?;";
 		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req);)
+				PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			ResultSet res = statement.executeQuery();
@@ -60,7 +59,7 @@ public class DBUtils
 			if (res.next())
 				return res.getString("player");
 		}
-		catch (SQLException e) {}
+		catch (SQLException ignored) {}
 		return null;
 	}
 	
@@ -68,7 +67,7 @@ public class DBUtils
 	{
 		String req = "SELECT clan FROM user WHERE id=?;";
 		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req);)
+				PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			ResultSet res = statement.executeQuery();
@@ -79,7 +78,7 @@ public class DBUtils
 			if (res.next())
 				return res.getString("clan");
 		}
-		catch (SQLException e) {}
+		catch (SQLException ignored) {}
 		return null;
 	}
 	
@@ -87,7 +86,7 @@ public class DBUtils
 	{
 		String req = "INSERT INTO user(id, lang) VALUES(?, ?) ON DUPLICATE KEY UPDATE lang=?;";
 		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req);)
+				PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			statement.setString(2, lang);
@@ -97,14 +96,14 @@ public class DBUtils
 			statement.close();
 			conn.close();
 		}
-		catch (SQLException e) {}
+		catch (SQLException ignored) {}
 	}
 	
 	public static void setPlayerTag(long id, String playerTag)
 	{
 		String req = "INSERT INTO user(id, player) VALUES(?, ?) ON DUPLICATE KEY UPDATE player=?;";
 		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req);)
+				PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			statement.setString(2, playerTag);
@@ -114,14 +113,14 @@ public class DBUtils
 			statement.close();
 			conn.close();
 		}
-		catch (SQLException e) {}
+		catch (SQLException ignored) {}
 	}
 	
 	public static void setClanTag(long id, String clanTag)
 	{
 		String req = "INSERT INTO user(id, clan) VALUES(?, ?) ON DUPLICATE KEY UPDATE clan=?;";
 		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req);)
+				PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			statement.setString(2, clanTag);
@@ -131,14 +130,14 @@ public class DBUtils
 			statement.close();
 			conn.close();
 		}
-		catch (SQLException e) {}
+		catch (SQLException ignored) {}
 	}
 	
 	public static void deleteUser(long id)
 	{
 		String req = "DELETE FROM user WHERE id=?;";
 		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req);)
+				PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			statement.executeUpdate();
@@ -146,6 +145,6 @@ public class DBUtils
 			statement.close();
 			conn.close();
 		}
-		catch (SQLException e) {}
+		catch (SQLException ignored) {}
 	}
 }

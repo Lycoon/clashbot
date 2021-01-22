@@ -11,17 +11,22 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class ClearCommand
 {
-	public static void execute(MessageReceivedEvent event)
-	{
-		long id = event.getAuthor().getIdLong();
-		ResourceBundle i18n = LangUtils.getTranslations(id);
-		DBUtils.deleteUser(id);
-		
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setColor(Color.GREEN);
-		builder.setTitle(i18n.getString("clear.success"));
-		
-		event.getChannel().sendMessage(builder.build()).queue();
-		builder.clear();
-	}
+    public static void dispatch(MessageReceivedEvent event, String... args)
+    {
+        execute(event);
+    }
+
+    public static void execute(MessageReceivedEvent event)
+    {
+        long id = event.getAuthor().getIdLong();
+        ResourceBundle i18n = LangUtils.getTranslations(id);
+        DBUtils.deleteUser(id);
+
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setColor(Color.GREEN);
+        builder.setTitle(i18n.getString("clear.success"));
+
+        event.getChannel().sendMessage(builder.build()).queue();
+        builder.clear();
+    }
 }

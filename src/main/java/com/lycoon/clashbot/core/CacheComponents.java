@@ -13,8 +13,10 @@ public class CacheComponents
 	public static Image noStar = FileUtils.getImageFromFile("icons/clanwar/noclan-star.png");
 	public static Image memberLight = FileUtils.getImageFromFile("backgrounds/clanwar/member-light.png");
 	public static Image memberDark = FileUtils.getImageFromFile("backgrounds/clanwar/member-dark.png");
-	public static Image warWon = FileUtils.getImageFromFile("backgrounds/warlog/win-panel-full.png");
-	public static Image warLost = FileUtils.getImageFromFile("backgrounds/warlog/lose-panel-full.png");
+	public static Image warlogCWL = FileUtils.getImageFromFile("backgrounds/warlog/cwl-panel-full.png");
+	public static Image warlogWon = FileUtils.getImageFromFile("backgrounds/warlog/win-panel-full.png");
+	public static Image warlogLost = FileUtils.getImageFromFile("backgrounds/warlog/lose-panel-full.png");
+	public static Image warlogTie = FileUtils.getImageFromFile("backgrounds/warlog/tie-panel-full.png");
 	
 	public static List<Image> townhalls = new ArrayList<>();
 	public static List<Image> builderhalls = new ArrayList<>();

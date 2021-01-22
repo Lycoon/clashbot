@@ -55,12 +55,12 @@ public class DrawUtils
 		
 		g2d.setFont(g2d.getFont().deriveFont(size));
 		FontRenderContext ctx = g2d.getFontRenderContext();
-		double textWith = g2d.getFont().getStringBounds(text, ctx).getWidth();
+		double textWidth = g2d.getFont().getStringBounds(text, ctx).getWidth();
 		
 		g2d.setColor(Color.BLACK);
-		g2d.drawString(text, x-(int)textWith, y + borderSize);
+		g2d.drawString(text, x-(int)textWidth, y + borderSize);
 		g2d.setColor(color);
-		g2d.drawString(text, x-(int)textWith, y);
+		g2d.drawString(text, x-(int)textWidth, y);
 		
 		g2d.setFont(tmpFont);
 	}

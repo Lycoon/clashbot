@@ -2,7 +2,7 @@ package com.lycoon.clashbot.commands;
 
 public enum AdminCommand
 {
-    SERVERS       ("servers");
+    ADMIN       ("admin");
 
     public static final String PREFIX = "!";
     public static final String[] ADMINS = {"138282927502000128", "198485955701768192"};
@@ -25,9 +25,8 @@ public enum AdminCommand
 
     public static boolean isAdmin(long id)
     {
-        for (int i=0; i < ADMINS.length; i++)
-        {
-            if (Long.valueOf(ADMINS[i]) == id)
+        for (String admin : ADMINS) {
+            if (Long.parseLong(admin) == id)
                 return true;
         }
         return false;

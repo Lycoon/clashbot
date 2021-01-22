@@ -7,6 +7,7 @@ import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -31,7 +32,8 @@ public class ClanCommand
     private static Color clanTypeInviteOnlyColor = new Color(0xfbbf70);
     private static Color valueColor = new Color(0x444545);
 
-    private final static Map<String, String> regions = new HashMap<String, String>() {{
+    private final static Map<String, String> regions = new HashMap<String, String>()
+    {{
         put("Europe", "europe");
         put("North America", "north.america");
         put("South America", "south.america");
@@ -41,7 +43,8 @@ public class ClanCommand
         put("International", "international");
     }};
 
-    private final static Map<String, String> labels = new HashMap<String, String>() {{
+    private final static Map<String, String> labels = new HashMap<String, String>()
+    {{
         put("Clan Wars", "label.clanwars");
         put("Clan War League", "label.clanwarleague");
         put("Trophy Pushing", "label.trophy");
@@ -59,6 +62,14 @@ public class ClanCommand
         put("Competitive", "label.competitive");
         put("Newbie Friendly", "label.newbie");
     }};
+
+    public static void dispatch(MessageReceivedEvent event, String... args)
+    {
+        if (args.length > 1)
+            ClanCommand.execute(event, args[1]);
+        else
+            ClanCommand.execute(event);
+    }
 
     public static int getAverageTrophies(List<ClanMember> members)
     {
@@ -97,9 +108,9 @@ public class ClanCommand
         try
         {
             clan = ClashBotMain.clashAPI.getClan(tag);
-        }
-        catch (IOException ignored) {}
-        catch (ClashAPIException e)
+        } catch (IOException ignored)
+        {
+        } catch (ClashAPIException e)
         {
             ErrorUtils.sendExceptionError(event, i18n, e, tag, "clan");
             return null;
@@ -158,7 +169,7 @@ public class ClanCommand
             DrawUtils.drawShadowedStringLeft(g2d, i18n.getString(regions.get(clan.getLocation().getName())), 905, 33, 14f, 2);
 
         // Invitation type
-        switch(clan.getType())
+        switch (clan.getType())
         {
             case "inviteOnly":
                 DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("clan.type.inviteonly"), 905, 67, 12f, 2, clanTypeInviteOnlyColor);
@@ -186,12 +197,12 @@ public class ClanCommand
         else
         {
             // Printing each label
-            for (int i=0; i < clan.getLabels().size(); i++)
+            for (int i = 0; i < clan.getLabels().size(); i++)
             {
                 Label label = clan.getLabels().get(i);
-                g2d.drawImage(FileUtils.getImageFromFile("backgrounds/field-placeholder.png"), 70, 190 + i*40, 185, 24, null);
-                g2d.drawImage(FileUtils.getImageFromUrl(label.getIconUrls().getMedium()), 25, 185 + i*40, 35, 35, null);
-                DrawUtils.drawShadowedString(g2d, i18n.getString(labels.get(label.getName())), 80, 207 + i*40, 12f);
+                g2d.drawImage(FileUtils.getImageFromFile("backgrounds/field-placeholder.png"), 70, 190 + i * 40, 185, 24, null);
+                g2d.drawImage(FileUtils.getImageFromUrl(label.getIconUrls().getMedium()), 25, 185 + i * 40, 35, 35, null);
+                DrawUtils.drawShadowedString(g2d, i18n.getString(labels.get(label.getName())), 80, 207 + i * 40, 12f);
             }
         }
 
@@ -199,14 +210,14 @@ public class ClanCommand
         Rectangle trophiesTitleRect = new Rectangle(279, 155, 318, 5);
         DrawUtils.drawCenteredString(g2d, trophiesTitleRect, font.deriveFont(16f), i18n.getString("clan.trophies.title"));
         DrawUtils.drawShadowedString(g2d, i18n.getString("clan.trophies.required"), 294, 197, 13f);
-        DrawUtils.drawShadowedString(g2d, i18n.getString("clan.trophies.total"), 294, 227, 13f);
-        DrawUtils.drawShadowedString(g2d, i18n.getString("clan.trophies.total.builder"), 294, 262, 13f);
-        DrawUtils.drawShadowedString(g2d, i18n.getString("clan.trophies.average"), 294, 292, 13f);
+        DrawUtils.drawShadowedString(g2d, i18n.getString("clan.trophies.average"), 294, 227, 13f);
+        DrawUtils.drawShadowedString(g2d, i18n.getString("clan.trophies.total"), 294, 262, 13f);
+        DrawUtils.drawShadowedString(g2d, i18n.getString("clan.trophies.total.builder"), 294, 292, 13f);
 
         DrawUtils.drawSimpleString(g2d, nf.format(clan.getRequiredTrophies()), 503, 198, 12f, valueColor);
-        DrawUtils.drawSimpleString(g2d, nf.format(clan.getTotalTrophies()), 503, 228, 12f, valueColor);
-        DrawUtils.drawSimpleString(g2d, nf.format(clan.getTotalVersusTrophies()), 503, 263, 12f, valueColor);
-        DrawUtils.drawSimpleString(g2d, nf.format(getAverageTrophies(clan.getMemberList())), 503, 293, 12f, valueColor);
+        DrawUtils.drawSimpleString(g2d, nf.format(getAverageTrophies(clan.getMemberList())), 503, 228, 12f, valueColor);
+        DrawUtils.drawSimpleString(g2d, nf.format(clan.getTotalTrophies()), 503, 263, 12f, valueColor);
+        DrawUtils.drawSimpleString(g2d, nf.format(clan.getTotalVersusTrophies()), 503, 293, 12f, valueColor);
 
         // Clan wars section
         Rectangle clanwarTitleRect = new Rectangle(600, 155, 318, 5);

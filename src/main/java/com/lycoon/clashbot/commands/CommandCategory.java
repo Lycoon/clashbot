@@ -2,7 +2,8 @@ package com.lycoon.clashbot.commands;
 
 public enum CommandCategory
 {
-	GENERAL ("category.general"),
+	MISC ("category.misc"),
+	SETTINGS ("category.settings"),
 	CLAN    ("category.clan"),
 	PLAYER  ("category.player");
 	
