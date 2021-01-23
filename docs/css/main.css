@@ -2222,7 +2222,7 @@ footer .menu li a:hover {
 
 .copyright {
   padding: 15px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid rgba(255, 255, 255, 0.4);
   color: #ffffff;
   margin-top: 30px;
 }
