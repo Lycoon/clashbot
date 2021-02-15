@@ -1,6 +1,7 @@
 package com.lycoon.clashbot.event;
 
 import com.lycoon.clashbot.commands.*;
+import com.lycoon.clashbot.core.ClashBotMain;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -23,6 +24,7 @@ public class EventListener extends ListenerAdapter
         if (!message.startsWith(Command.PREFIX))
             return;
 
+        ClashBotMain.LOGGER.info(event.getAuthor().getAsTag() + " issued: " + message);
         String[] args = message.split(" ");
 
         if (isCommand(args[0], Command.SETLANG)) // !set

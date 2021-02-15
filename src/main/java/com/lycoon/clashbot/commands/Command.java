@@ -10,6 +10,7 @@ public enum Command
     CLEAR(CommandCategory.SETTINGS, "clear", "cmd.clear.desc"),
     SETTAG(CommandCategory.SETTINGS, "set", "cmd.settag.desc", "<clan|player> <tag>"),
     SETLANG(CommandCategory.SETTINGS, "set", "cmd.setlang.desc", "lang <language>"),
+    SETPREFIX(CommandCategory.SETTINGS, "set", "cmd.setprefix.desc", "prefix <prefix>"),
     CLAN(CommandCategory.CLAN, "clan", "cmd.clan.desc", "[clanTag]"),
     WARLEAGUE_ROUND(CommandCategory.CLAN, "warleague", "cmd.warleague.round.desc", "round <index> [clanTag]"),
     //WARLEAGUE_ALL   (CommandCategory.CLAN,     "warleague", "cmd.warleague.all.desc",   "all [clanTag]"),

@@ -1,12 +1,12 @@
 package com.lycoon.clashbot.utils;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 public class DBUtils
 {
@@ -81,6 +81,25 @@ public class DBUtils
 		catch (SQLException ignored) {}
 		return null;
 	}
+
+	public static String getServerPrefix(long id)
+	{
+		String req = "SELECT prefix FROM server WHERE id=?;";
+		try (Connection conn = DBUtils.getConnection();
+			 PreparedStatement statement = conn.prepareStatement(req))
+		{
+			statement.setLong(1, id);
+			ResultSet res = statement.executeQuery();
+
+			statement.close();
+			conn.close();
+
+			if (res.next())
+				return res.getString("prefix");
+		}
+		catch (SQLException ignored) {}
+		return "!";
+	}
 	
 	public static void setUserLang(long id, String lang)
 	{
@@ -127,6 +146,23 @@ public class DBUtils
 			statement.setString(3, clanTag);
 			statement.executeUpdate();
 			
+			statement.close();
+			conn.close();
+		}
+		catch (SQLException ignored) {}
+	}
+
+	public static void setServerPrefix(long id, String prefix)
+	{
+		String req = "INSERT INTO server(id, prefix) VALUES(?, ?) ON DUPLICATE KEY UPDATE prefix=?;";
+		try (Connection conn = DBUtils.getConnection();
+			 PreparedStatement statement = conn.prepareStatement(req))
+		{
+			statement.setLong(1, id);
+			statement.setString(2, prefix);
+			statement.setString(3, prefix);
+			statement.executeUpdate();
+
 			statement.close();
 			conn.close();
 		}

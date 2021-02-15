@@ -6,6 +6,7 @@ import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.DBUtils;
 import com.lycoon.clashbot.utils.ErrorUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
@@ -35,6 +36,8 @@ public class SetCommand
             executeClan(event, args[2]);
         else if (type.equals("lang"))
             executeLang(event, args[2]);
+        else if (type.equals("prefix"))
+            executePrefix(event, args[2]);
         else
         {
             ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
@@ -43,6 +46,27 @@ public class SetCommand
                             Command.SETLANG.formatFullCommand(),
                             Command.SETTAG.formatFullCommand()));
         }
+    }
+
+    public static void executePrefix(MessageReceivedEvent event, String prefix)
+    {
+        ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
+        if (!event.getMember().hasPermission(Permission.MANAGE_SERVER)) // insufficient permission
+        {
+            ErrorUtils.sendError(event.getChannel(),
+                    i18n.getString("exception.permission"),
+                    "You don't have the required `MANAGE_SERVER` permission to change the server prefix.");
+            return;
+        }
+
+        DBUtils.setServerPrefix(event.getGuild().getIdLong(), prefix);
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setColor(Color.GREEN);
+        builder.setTitle(MessageFormat.format(i18n.getString("set.prefix.success"), prefix));
+        builder.setFooter(i18n.getString("set.prefix.tip"));
+
+        event.getChannel().sendMessage(builder.build()).queue();
+        builder.clear();
     }
 
     public static void executePlayer(MessageReceivedEvent event, String tag)

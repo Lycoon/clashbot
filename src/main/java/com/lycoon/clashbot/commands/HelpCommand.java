@@ -1,12 +1,11 @@
 package com.lycoon.clashbot.commands;
 
-import java.awt.Color;
-import java.util.ResourceBundle;
-
 import com.lycoon.clashbot.lang.LangUtils;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.awt.*;
+import java.util.ResourceBundle;
 
 public class HelpCommand
 {
@@ -44,9 +43,7 @@ public class HelpCommand
 
         CommandCategory[] categories = CommandCategory.values();
         for (CommandCategory category : categories)
-        {
             drawCategory(category, Command.values());
-        }
 
         event.getChannel().sendMessage(builder.build()).queue();
     }

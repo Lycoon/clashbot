@@ -12,6 +12,7 @@ public class InfoCommand
 {
     private static final String TWITTER = "@LycoonMC";
     private static final String DISCORD = "Lycoon#7542";
+    private static final String WEBSITE = "https://lycoon.github.io/clash-bot/";
     private static final String BOT_CODE = "https://github.com/Lycoon/clash-bot";
     private static final String API_CODE = "https://github.com/Lycoon/clash-api";
     private static final String DISCORD_INVITE = "https://discord.gg/Cy86PDA";
@@ -32,6 +33,7 @@ public class InfoCommand
         builder.setDescription(
                 i18n.getString("info.description") + "\n\n"
                         + MessageFormat.format(i18n.getString("info.author"), TWITTER, DISCORD) + "\n"
+                        + MessageFormat.format(i18n.getString("info.website"), WEBSITE) + "\n"
                         + MessageFormat.format(i18n.getString("info.code"), BOT_CODE) + "\n"
                         + MessageFormat.format(i18n.getString("info.discord.invite"), DISCORD_INVITE) + "\n"
                         + MessageFormat.format(i18n.getString("info.support"), PAYPAL) + "\n\n"

@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
 import java.io.FileInputStream;
@@ -14,6 +16,7 @@ import java.util.Properties;
 
 public class ClashBotMain
 {
+    public static Logger LOGGER = LoggerFactory.getLogger(ClashBotMain.class.getName());
     private static final String CONFIG = "tokens.properties";
     public static ClashAPI clashAPI;
     public static CacheComponents cached;
@@ -22,12 +25,22 @@ public class ClashBotMain
     public static void main(String[] args) throws IOException, LoginException
     {
         Properties tokens = new Properties();
-        tokens.load(new FileInputStream(CONFIG));
+
+        try
+        {
+            // Loading secret tokens
+            tokens.load(new FileInputStream(CONFIG));
+            LOGGER.info("Secret tokens loaded");
+        }
+        catch (IOException e)
+        {
+            LOGGER.error(e.getMessage());
+        }
 
         JDABuilder builder = JDABuilder.createDefault(tokens.getProperty("discord"));
         builder.addEventListeners(new EventListener());
-        builder.setStatus(OnlineStatus.ONLINE);
         builder.setActivity(Activity.playing("Clash of Clans"));
+        builder.setStatus(OnlineStatus.ONLINE);
         jda = builder.build();
 
         clashAPI = new ClashAPI(tokens.getProperty("clash-of-clans"));

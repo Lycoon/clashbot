@@ -5,7 +5,6 @@ import com.lycoon.clashapi.cocmodels.player.Troop;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
-import com.lycoon.clashbot.utils.ErrorUtils;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -231,7 +230,7 @@ public class PlayerCommand
         drawSpells(g2d, font, spells, ARMY_BASE_LINE);
         drawMachines(g2d, font, troops, ARMY_BASE_LINE);
 
-        FileUtils.sendImage(event, image, player.getTag(), "png");
+        FileUtils.sendImage(event, image, "player", "png");
 
         g2d.dispose();
     }

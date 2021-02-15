@@ -46,7 +46,14 @@ dependencies {
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.6.2' // MariaDB (Database)
     implementation 'com.zaxxer:HikariCP:3.4.5' // HikariCP (Connection pool)
     implementation 'net.dv8tion:JDA:4.2.0_203' // DiscordJDA (Discord API)
-    implementation name:'ClashAPI', ext:'jar'// ClashAPI (Custom Clash of Clans API)
+    implementation name:'ClashAPI', ext:'jar' // ClashAPI (Custom Clash of Clans API)
+
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
+    compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.21'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
+    compile group: 'ch.qos.logback', name: 'logback-access', version: '1.2.3'
+
     testImplementation 'junit:junit:4.12'// Use JUnit test framework
 }
 

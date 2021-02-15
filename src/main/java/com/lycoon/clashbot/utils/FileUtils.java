@@ -1,5 +1,6 @@
 package com.lycoon.clashbot.utils;
 
+import com.lycoon.clashbot.core.ClashBotMain;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -46,8 +47,7 @@ public class FileUtils
 			CoreUtils.removeUserFromGenerating(id);
 		};
 		event.getChannel().sendFile(outputfile).queue(sendingCallback);
-		
-		System.out.println(filename+ " sent.");
+		ClashBotMain.LOGGER.info(outputfile.getName() + " sent to " + event.getAuthor().getAsTag() + " on " + event.getGuild().getIdLong());
 	}
 	
 	public static Image getImageFromFile(String file)
