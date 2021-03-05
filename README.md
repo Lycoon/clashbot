@@ -15,6 +15,7 @@ The bot proposes several features including: language choice, saving default tag
 - `!clear` - deletes all the data the bot database has about you.
 - `!set <clan|player> <tag>` sets your default clan or player tag.
 - `!set lang <language>` - sets your default language.
+- `!set prefix <prefix>` - sets the default server prefix.
 
 ### Clan
 - `!clan [clanTag]` - shows clan profile.
