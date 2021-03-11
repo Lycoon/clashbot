@@ -30,7 +30,7 @@ The bot proposes several features including: language choice, saving default tag
 The bot relies on a custom Java wrapper I designed to make calls to the game API. I wrote it for the purpose of this project but it can be used for any other. I'm trying to keep up with the updates of the game so that most features are implemented.
 
 # Disclaimer
-This repository **does not** accept any contribution is only consultable for the sake of transparency.
+This repository **does not** accept any contribution and is only consultable for the sake of transparency.
 It is **strictly forbidden** to impersonate the official bot by making it run on your own.
 
 *This material is unofficial and is not endorsed by Supercell. For more information see Supercell's Fan Content Policy: www.supercell.com/fan-content-policy.*
