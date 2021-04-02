@@ -16,16 +16,17 @@ import java.util.Properties;
 
 public class ClashBotMain
 {
-    public static Logger LOGGER = LoggerFactory.getLogger(ClashBotMain.class.getName());
     private static final String CONFIG = "tokens.properties";
+
+    public static Logger LOGGER = LoggerFactory.getLogger(ClashBotMain.class.getName());
+    public static long[] owners = { 138282927502000128L };
     public static ClashAPI clashAPI;
     public static CacheComponents cached;
     public static JDA jda;
 
-    public static void main(String[] args) throws IOException, LoginException
+    public static void main(String[] args) throws LoginException
     {
         Properties tokens = new Properties();
-
         try
         {
             // Loading secret tokens

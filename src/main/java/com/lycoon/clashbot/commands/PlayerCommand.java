@@ -116,7 +116,7 @@ public class PlayerCommand
             return;
 
         Player player = null;
-        String tag = args.length > 0 ? args[0] : DBUtils.getPlayerTag(event.getAuthor().getIdLong());
+        String tag = args.length > 0 ? args[0] : DatabaseUtils.getPlayerTag(event.getAuthor().getIdLong());
 
         if (tag == null)
         {

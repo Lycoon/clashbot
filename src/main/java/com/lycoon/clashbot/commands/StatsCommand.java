@@ -2,16 +2,16 @@ package com.lycoon.clashbot.commands;
 
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
+import com.lycoon.clashbot.utils.CoreUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.List;
 
 public class StatsCommand
 {
@@ -41,6 +41,6 @@ public class StatsCommand
         general += "👥 Used by `" + nf.format(members) + "` members\n";
         builder.setDescription(general);
 
-        event.getChannel().sendMessage(builder.build()).queue();
+        CoreUtils.sendMessage(event, i18n, builder);
     }
 }

@@ -1,6 +1,8 @@
 package com.lycoon.clashbot.commands;
 
 import com.lycoon.clashbot.lang.LangUtils;
+import com.lycoon.clashbot.utils.CoreUtils;
+import com.lycoon.clashbot.utils.DatabaseUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -17,6 +19,7 @@ public class InfoCommand
     private static final String API_CODE = "https://github.com/Lycoon/clash-api";
     private static final String DISCORD_INVITE = "https://discord.gg/Cy86PDA";
     private static final String PAYPAL = "https://www.patreon.com/clashbot";
+    private static final String VERSION = "1.1.2";
 
     public static void dispatch(MessageReceivedEvent event, String... args)
     {
@@ -26,6 +29,7 @@ public class InfoCommand
     public static void execute(MessageReceivedEvent event)
     {
         ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
+        String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
         EmbedBuilder builder = new EmbedBuilder();
 
         builder.setColor(Color.GRAY);
@@ -34,12 +38,11 @@ public class InfoCommand
                 i18n.getString("info.description") + "\n\n"
                         + MessageFormat.format(i18n.getString("info.author"), TWITTER, DISCORD) + "\n"
                         + MessageFormat.format(i18n.getString("info.website"), WEBSITE) + "\n"
-                        + MessageFormat.format(i18n.getString("info.code"), BOT_CODE) + "\n"
                         + MessageFormat.format(i18n.getString("info.discord.invite"), DISCORD_INVITE) + "\n"
                         + MessageFormat.format(i18n.getString("info.support"), PAYPAL) + "\n\n"
-                        + MessageFormat.format(i18n.getString("info.help"), Command.HELP.formatCommand())
+                        + "Version " + VERSION
         );
 
-        event.getChannel().sendMessage(builder.build()).queue();
+        CoreUtils.sendMessage(event, i18n, builder);
     }
 }

@@ -1,6 +1,6 @@
 package com.lycoon.clashbot.lang;
 
-import com.lycoon.clashbot.utils.DBUtils;
+import com.lycoon.clashbot.utils.DatabaseUtils;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -11,7 +11,7 @@ public class LangUtils
 	
 	public static Locale getLanguage(long id)
 	{
-		return new Locale(DBUtils.getUserLang(id));
+		return new Locale(DatabaseUtils.getUserLang(id));
 	}
 	
 	public static ResourceBundle getTranslations(long id)

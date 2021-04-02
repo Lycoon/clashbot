@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DBUtils
+public class DatabaseUtils
 {
 	private static final HikariDataSource ds;
     
@@ -18,7 +18,7 @@ public class DBUtils
         ds = new HikariDataSource(cfg);
     }
     
-    private DBUtils() {}
+    private DatabaseUtils() {}
     
     public static Connection getConnection() throws SQLException 
     {
@@ -28,8 +28,8 @@ public class DBUtils
 	public static String getUserLang(long id)
 	{
 		String req = "SELECT lang FROM user WHERE id=?;";
-		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req))
+		try (Connection conn = DatabaseUtils.getConnection();
+			 PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			ResultSet res = statement.executeQuery();
@@ -47,8 +47,8 @@ public class DBUtils
 	public static String getPlayerTag(long id)
 	{
 		String req = "SELECT player FROM user WHERE id=?;";
-		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req))
+		try (Connection conn = DatabaseUtils.getConnection();
+			 PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			ResultSet res = statement.executeQuery();
@@ -66,8 +66,8 @@ public class DBUtils
 	public static String getClanTag(long id)
 	{
 		String req = "SELECT clan FROM user WHERE id=?;";
-		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req))
+		try (Connection conn = DatabaseUtils.getConnection();
+			 PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			ResultSet res = statement.executeQuery();
@@ -85,7 +85,7 @@ public class DBUtils
 	public static String getServerPrefix(long id)
 	{
 		String req = "SELECT prefix FROM server WHERE id=?;";
-		try (Connection conn = DBUtils.getConnection();
+		try (Connection conn = DatabaseUtils.getConnection();
 			 PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
@@ -104,8 +104,8 @@ public class DBUtils
 	public static void setUserLang(long id, String lang)
 	{
 		String req = "INSERT INTO user(id, lang) VALUES(?, ?) ON DUPLICATE KEY UPDATE lang=?;";
-		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req))
+		try (Connection conn = DatabaseUtils.getConnection();
+			 PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			statement.setString(2, lang);
@@ -121,8 +121,8 @@ public class DBUtils
 	public static void setPlayerTag(long id, String playerTag)
 	{
 		String req = "INSERT INTO user(id, player) VALUES(?, ?) ON DUPLICATE KEY UPDATE player=?;";
-		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req))
+		try (Connection conn = DatabaseUtils.getConnection();
+			 PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			statement.setString(2, playerTag);
@@ -138,8 +138,8 @@ public class DBUtils
 	public static void setClanTag(long id, String clanTag)
 	{
 		String req = "INSERT INTO user(id, clan) VALUES(?, ?) ON DUPLICATE KEY UPDATE clan=?;";
-		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req))
+		try (Connection conn = DatabaseUtils.getConnection();
+			 PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			statement.setString(2, clanTag);
@@ -155,7 +155,7 @@ public class DBUtils
 	public static void setServerPrefix(long id, String prefix)
 	{
 		String req = "INSERT INTO server(id, prefix) VALUES(?, ?) ON DUPLICATE KEY UPDATE prefix=?;";
-		try (Connection conn = DBUtils.getConnection();
+		try (Connection conn = DatabaseUtils.getConnection();
 			 PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
@@ -172,8 +172,8 @@ public class DBUtils
 	public static void deleteUser(long id)
 	{
 		String req = "DELETE FROM user WHERE id=?;";
-		try (Connection conn = DBUtils.getConnection();
-				PreparedStatement statement = conn.prepareStatement(req))
+		try (Connection conn = DatabaseUtils.getConnection();
+			 PreparedStatement statement = conn.prepareStatement(req))
 		{
 			statement.setLong(1, id);
 			statement.executeUpdate();

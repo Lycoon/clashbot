@@ -1,11 +1,9 @@
 package com.lycoon.clashbot.utils;
 
-import com.lycoon.clashbot.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.awt.*;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
@@ -67,16 +65,19 @@ public class ErrorUtils
 		return index;
 	}
 
+	/*
 	public static void throwCommandError(MessageChannel channel, ResourceBundle i18n, Command cmd)
 	{
+		String prefix = DBUtils.getServerPrefix(event.getGuild().getIdLong());
 		ErrorUtils.sendError(channel, i18n.getString("wrong.usage"),
-				MessageFormat.format(i18n.getString("tip.usage"), cmd.formatFullCommand()));
+				MessageFormat.format(i18n.getString("tip.usage"), cmd.formatFullCommand(prefix)));
 	}
+	*/
 	
 	public static void sendError(MessageChannel channel, String title, String... args)
 	{
 		EmbedBuilder error = new EmbedBuilder();
-		error.setColor(Color.RED);
+		error.setColor(CoreUtils.invalidColor);
 		error.setTitle(title);
 		if (args.length >= 1)
 			error.setDescription(args[0]);

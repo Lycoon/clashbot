@@ -33,7 +33,9 @@ public class FileUtils
 		
 		// Callback function
 		long id = event.getAuthor().getIdLong();
-		CoreUtils.addUserToGenerating(id);
+		if (!CoreUtils.isOwner(id))
+			CoreUtils.addUserToGenerating(id);
+
 		Consumer<Message> sendingCallback = (res) ->
 		{
 			// Deleting picture from disk

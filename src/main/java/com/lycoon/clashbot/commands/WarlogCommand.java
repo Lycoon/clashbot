@@ -48,9 +48,12 @@ public class WarlogCommand
             execute(event, args[1]);
         else
         {
+            String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
             ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-            ErrorUtils.sendError(event.getChannel(), i18n.getString("wrong.usage"),
-                    MessageFormat.format(i18n.getString("tip.usage"), Command.WARLOG.formatFullCommand()));
+            ErrorUtils.sendError(event.getChannel(),
+                    i18n.getString("wrong.usage"),
+                    MessageFormat.format(i18n.getString("tip.usage"),
+                    Command.WARLOG.formatFullCommand(prefix)));
         }
     }
 
@@ -124,7 +127,7 @@ public class WarlogCommand
 
         WarlogModel warlog = null;
         ResourceBundle i18n = LangUtils.getTranslations(lang);
-        String tag = args.length > 1 ? args[1] : DBUtils.getClanTag(event.getAuthor().getIdLong());
+        String tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
 
         if (tag == null)
         {
@@ -161,9 +164,8 @@ public class WarlogCommand
         if (index == -1)
             return;
 
-        List<WarlogItem> wars = warlog.getWars();
-
         // Checking if there are any clan wars
+        List<WarlogItem> wars = warlog.getWars();
         if (wars.size() <= 0)
         {
             ErrorUtils.sendError(channel, i18n.getString("no.warlog"));

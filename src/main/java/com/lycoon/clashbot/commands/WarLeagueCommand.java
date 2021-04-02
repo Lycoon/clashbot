@@ -41,9 +41,12 @@ public class WarLeagueCommand
                 WarLeagueCommand.executeRound(event, args[2]);
             else
             {
+                String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
                 ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-                ErrorUtils.sendError(event.getChannel(), i18n.getString("wrong.usage"),
-                        MessageFormat.format(i18n.getString("tip.usage"), Command.WARLEAGUE_ROUND.formatFullCommand()));
+                ErrorUtils.sendError(event.getChannel(),
+                        i18n.getString("wrong.usage"),
+                        MessageFormat.format(i18n.getString("tip.usage"),
+                        Command.WARLEAGUE_ROUND.formatFullCommand(prefix)));
             }
         }
         else if (args[1].equals("all"))
@@ -218,7 +221,7 @@ public class WarLeagueCommand
 
         WarLeagueGroup leagueGroup = null;
         ResourceBundle i18n = LangUtils.getTranslations(lang);
-        String tag = args.length > 1 ? args[1] : DBUtils.getClanTag(event.getAuthor().getIdLong());
+        String tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
 
         if (tag == null)
         {

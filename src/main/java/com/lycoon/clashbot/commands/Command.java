@@ -19,8 +19,6 @@ public enum Command
     WAR(CommandCategory.CLAN, "war", "cmd.war.desc", "<index> [clanTag]"),
     PLAYER(CommandCategory.PLAYER, "player", "cmd.player.desc", "[playerTag]");
 
-    public static final String PREFIX = "!";
-
     final CommandCategory category;
     final String name, desc;
     String usage;
@@ -55,13 +53,13 @@ public enum Command
         return category;
     }
 
-    public String formatCommand()
+    public String formatCommand(String prefix)
     {
-        return PREFIX + name;
+        return prefix + name;
     }
 
-    public String formatFullCommand()
+    public String formatFullCommand(String prefix)
     {
-        return formatCommand() + (usage == null ? "" : " " + usage);
+        return formatCommand(prefix) + (usage == null ? "" : " " + usage);
     }
 }

@@ -7,7 +7,6 @@ import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -97,7 +96,7 @@ public class ClanCommand
 
         ClanModel clan = null;
         ResourceBundle i18n = LangUtils.getTranslations(lang);
-        String tag = args.length > 0 ? args[0] : DBUtils.getClanTag(event.getAuthor().getIdLong());
+        String tag = args.length > 0 ? args[0] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
 
         if (tag == null)
         {
@@ -160,13 +159,18 @@ public class ClanCommand
         DrawUtils.drawShadowedStringLeft(g2d, MessageFormat.format(i18n.getString("clan.members"), clan.getMembers()), 694, 85, 20);
 
         // Clan location
-        if (clan.getLocation().getIsCountry())
+        if (clan.getLocation() != null)
         {
-            Locale clanLocale = new Locale("", clan.getLocation().getCountryCode().toLowerCase());
-            DrawUtils.drawShadowedStringLeft(g2d, clanLocale.getDisplayCountry(lang), 905, 33, 14f, 2);
+            if (clan.getLocation().getIsCountry())
+            {
+                Locale clanLocale = new Locale("", clan.getLocation().getCountryCode().toLowerCase());
+                DrawUtils.drawShadowedStringLeft(g2d, clanLocale.getDisplayCountry(lang), 905, 33, 14f, 2);
+            }
+            else
+                DrawUtils.drawShadowedStringLeft(g2d, i18n.getString(regions.get(clan.getLocation().getName())), 905, 33, 14f, 2);
         }
         else
-            DrawUtils.drawShadowedStringLeft(g2d, i18n.getString(regions.get(clan.getLocation().getName())), 905, 33, 14f, 2);
+            DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("undefined"), 905, 33, 14f, 2);
 
         // Invitation type
         switch (clan.getType())

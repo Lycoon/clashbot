@@ -58,13 +58,17 @@ public class WarCommand
 
     public static void dispatch(MessageReceivedEvent event, String... args)
     {
+        String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
+        Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
+        i18n = LangUtils.getTranslations(lang);
+
         if (args.length > 2)
-            WarCommand.execute(event, args[1], args[2]);
+            execute(event, lang, args[1], args[2]);
         else if (args.length == 2)
-            WarCommand.execute(event, args[1]);
+            execute(event, lang, args[1]);
         else
             ErrorUtils.sendError(event.getChannel(), i18n.getString("wrong.usage"),
-                    MessageFormat.format(i18n.getString("tip.usage"), Command.WAR.formatFullCommand()));
+                    MessageFormat.format(i18n.getString("tip.usage"), Command.WAR.formatFullCommand(prefix)));
     }
 
     public static ClanWarMember getClanWarMemberByTag(List<ClanWarMember> members, String tag)
@@ -207,8 +211,7 @@ public class WarCommand
             return null;
 
         WarInfo war = null;
-        ResourceBundle i18n = LangUtils.getTranslations(lang);
-        tag = args.length > 1 ? args[1] : DBUtils.getClanTag(event.getAuthor().getIdLong());
+        tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
 
         if (tag == null)
         {
@@ -229,13 +232,9 @@ public class WarCommand
         return war;
     }
 
-    public static void execute(MessageReceivedEvent event, String... args)
+    public static void execute(MessageReceivedEvent event, Locale lang, String... args)
     {
         MessageChannel channel = event.getChannel();
-
-        Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
-        i18n = LangUtils.getTranslations(lang);
-
         WarInfo war = getWar(event, lang, args);
         if (war == null)
             return;
