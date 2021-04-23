@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 
-public class PlayerCommand
-{
+public class PlayerCommand {
     private final static int WIDTH = 932;
     private final static int HEIGHT = 322;
     private final static float FONT_SIZE = 12f;
@@ -36,75 +36,66 @@ public class PlayerCommand
             "Skeleton Spell", "Bat Spell"};
     private final static String[] MACHINES = {"Wall Wrecker", "Battle Blimp", "Stone Slammer", "Siege Barracks"};
 
-    public static void dispatch(MessageReceivedEvent event, String... args)
-    {
-        if (args.length > 1)
-            PlayerCommand.execute(event, args[1]);
-        else
-            PlayerCommand.execute(event);
+    public static void dispatch(MessageReceivedEvent event, String... args) {
+        CompletableFuture.runAsync(() -> {
+            if (args.length > 1)
+                PlayerCommand.execute(event, args[1]);
+            else
+                PlayerCommand.execute(event);
+        });
     }
 
-    public static void drawTroop(Graphics2D g2d, Font font, List<Troop> troops, String troopName, int x, int y)
-    {
+    public static void drawTroop(Graphics2D g2d, Font font, List<Troop> troops, String troopName, int x, int y) {
         Troop troop = GameUtils.getTroopByName(troops, troopName);
 
         // If the player has not unlocked the troop yet
         if (troop == null)
             g2d.drawImage(FileUtils.getImageFromFile("troops/locked/" + troopName + ".png"), x, y, 35, 35, null);
-        else
-        {
+        else {
             g2d.drawImage(FileUtils.getImageFromFile("troops/" + troop.getName() + ".png"), x, y, 35, 35, null);
             if (troop.getLevel().intValue() == troop.getMaxLevel().intValue())
                 g2d.drawImage(FileUtils.getImageFromFile("icons/level-label-max.png"), x + 2, y + 18, 15, 15, null);
-            else
-            {
+            else {
                 if (troop.getLevel() != 1)
                     g2d.drawImage(FileUtils.getImageFromFile("icons/level-label.png"), x + 2, y + 18, 15, 15, null);
             }
-            if (troop.getLevel() != 1)
-            {
+            if (troop.getLevel() != 1) {
                 Rectangle levelRect = new Rectangle(x + 2, y + 18, 15, 15);
                 DrawUtils.drawCenteredString(g2d, levelRect, font.deriveFont(font.getSize() - 4f), troop.getLevel().toString());
             }
         }
     }
 
-    public static void drawTroops(Graphics2D g2d, Font font, List<Troop> troops, int y)
-    {
+    public static void drawTroops(Graphics2D g2d, Font font, List<Troop> troops, int y) {
         for (int i = 0; i < TROOPS.length; i++)
             drawTroop(g2d, font, troops, TROOPS[i], i * 38 + 20, y);
     }
 
-    public static void drawDarkTroops(Graphics2D g2d, Font font, List<Troop> troops, int y)
-    {
+    public static void drawDarkTroops(Graphics2D g2d, Font font, List<Troop> troops, int y) {
         for (int i = 0; i < DARK_TROOPS.length; i++)
             drawTroop(g2d, font, troops, DARK_TROOPS[i], i * 38 + 20, y + 37);
     }
 
-    public static void drawHeroes(Graphics2D g2d, Font font, List<Troop> heroes, int y)
-    {
+    public static void drawHeroes(Graphics2D g2d, Font font, List<Troop> heroes, int y) {
         for (int i = 0; i < HEROES.length; i++)
             drawTroop(g2d, font, heroes, HEROES[i], i * 38 + 400, y + 37);
     }
 
-    public static void drawSpells(Graphics2D g2d, Font font, List<Troop> spells, int y)
-    {
+    public static void drawSpells(Graphics2D g2d, Font font, List<Troop> spells, int y) {
         for (int i = 0; i < 6; i++)
             drawTroop(g2d, font, spells, SPELLS[i], i * 38 + 580, y);
         for (int i = 6; i < SPELLS.length; i++)
             drawTroop(g2d, font, spells, SPELLS[i], (i - 6) * 38 + 580, y + 37);
     }
 
-    public static void drawMachines(Graphics2D g2d, Font font, List<Troop> machines, int y)
-    {
+    public static void drawMachines(Graphics2D g2d, Font font, List<Troop> machines, int y) {
         drawTroop(g2d, font, machines, MACHINES[0], 837, y);
         drawTroop(g2d, font, machines, MACHINES[1], 875, y);
         drawTroop(g2d, font, machines, MACHINES[2], 837, y + 37);
         drawTroop(g2d, font, machines, MACHINES[3], 875, y + 37);
     }
 
-    public static void execute(MessageReceivedEvent event, String... args)
-    {
+    public static void execute(MessageReceivedEvent event, String... args) {
         MessageChannel channel = event.getChannel();
 
         Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
@@ -118,19 +109,14 @@ public class PlayerCommand
         Player player = null;
         String tag = args.length > 0 ? args[0] : DatabaseUtils.getPlayerTag(event.getAuthor().getIdLong());
 
-        if (tag == null)
-        {
+        if (tag == null) {
             ErrorUtils.sendError(channel, i18n.getString("set.player.error"), i18n.getString("set.player.help"));
             return;
         }
 
-        try
-        {
+        try {
             player = ClashBotMain.clashAPI.getPlayer(tag);
-        } catch (IOException ignored)
-        {
-        } catch (ClashAPIException e)
-        {
+        } catch (ClashAPIException | IOException e) {
             ErrorUtils.sendExceptionError(event, i18n, e, tag, "player");
             return;
         }
@@ -161,13 +147,10 @@ public class PlayerCommand
         DrawUtils.drawShadowedString(g2d, i18n.getString("level") + " " + player.getTownHallLevel(), 25, 150, FONT_SIZE + 8f);
 
         // Builder hall
-        if (player.getBuilderHallLevel() != null)
-        {
+        if (player.getBuilderHallLevel() != null) {
             g2d.drawImage(CacheComponents.getBuilderHallImage(player.getBuilderHallLevel()), 265, 85, 95, 95, null);
             DrawUtils.drawShadowedString(g2d, i18n.getString("level") + " " + player.getBuilderHallLevel(), 200, 150, FONT_SIZE + 8f);
-        }
-        else
-        {
+        } else {
             // In case the player has not built the builder hall yet
             DrawUtils.drawShadowedString(g2d, i18n.getString("no.builderhall"), 200, 150, FONT_SIZE + 8f);
         }
@@ -176,25 +159,21 @@ public class PlayerCommand
         // League
         if (player.getLeague() != null)
             g2d.drawImage(FileUtils.getImageFromUrl(player.getLeague().getIconUrls().getMedium()), 383, 30, 90, 90, null);
-        else
-        {
+        else {
             g2d.drawImage(FileUtils.getImageFromFile("icons/noleague.png"), 383, 30, 90, 90, null);
             Rectangle noLeagueRect = new Rectangle(375, 60, 105, 20);
             DrawUtils.drawCenteredString(g2d, noLeagueRect, font.deriveFont(FONT_SIZE - 4f), i18n.getString("no.league"));
         }
 
         // Clan
-        if (player.getClan() != null)
-        {
+        if (player.getClan() != null) {
             g2d.drawImage(FileUtils.getImageFromUrl(player.getClan().getBadgeUrls().getLarge()), 800, 30, 105, 105, null);
 
             Rectangle clanNameRect = new Rectangle(775, 130, 148, 30);
             Rectangle clanRoleRect = new Rectangle(775, 151, 148, 30);
             DrawUtils.drawCenteredString(g2d, clanNameRect, font.deriveFont(FONT_SIZE + 2f), player.getClan().getName());
             DrawUtils.drawCenteredString(g2d, clanRoleRect, font.deriveFont(FONT_SIZE - 2f), i18n.getString(player.getRole()));
-        }
-        else
-        {
+        } else {
             Rectangle noClanRect = new Rectangle(775, 130, 148, 30);
             DrawUtils.drawCenteredString(g2d, noClanRect, font.deriveFont(FONT_SIZE + 2f), i18n.getString("no.clan"));
             g2d.drawImage(FileUtils.getImageFromFile("icons/noclan.png"), 812, 40, 75, 75, null);

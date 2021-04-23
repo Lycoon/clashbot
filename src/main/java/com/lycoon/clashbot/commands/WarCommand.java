@@ -19,27 +19,23 @@ import java.text.DecimalFormatSymbols;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
-class SortMemberByOrder implements Comparator<ClanWarMember>
-{
+class SortMemberByOrder implements Comparator<ClanWarMember> {
     @Override
-    public int compare(ClanWarMember a, ClanWarMember b)
-    {
+    public int compare(ClanWarMember a, ClanWarMember b) {
         return a.getMapPosition() - b.getMapPosition();
     }
 }
 
-class SortAttackByOrder implements Comparator<Attack>
-{
+class SortAttackByOrder implements Comparator<Attack> {
     @Override
-    public int compare(Attack a, Attack b)
-    {
+    public int compare(Attack a, Attack b) {
         return a.getOrder() - b.getOrder();
     }
 }
 
-public class WarCommand
-{
+public class WarCommand {
     private static String tag;
 
     private final static int PADDING = 145;
@@ -56,36 +52,33 @@ public class WarCommand
     private final static Color notUsedAttackColor = new Color(0xfbbf70);
     private final static Color attackColor = new Color(0x4c493a);
 
-    public static void dispatch(MessageReceivedEvent event, String... args)
-    {
+    public static void dispatch(MessageReceivedEvent event, String... args) {
         String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
         Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
         i18n = LangUtils.getTranslations(lang);
 
-        if (args.length > 2)
-            execute(event, lang, args[1], args[2]);
-        else if (args.length == 2)
-            execute(event, lang, args[1]);
-        else
-            ErrorUtils.sendError(event.getChannel(), i18n.getString("wrong.usage"),
-                    MessageFormat.format(i18n.getString("tip.usage"), Command.WAR.formatFullCommand(prefix)));
+        CompletableFuture.runAsync(() -> {
+            if (args.length > 2)
+                execute(event, lang, args[1], args[2]);
+            else if (args.length == 2)
+                execute(event, lang, args[1]);
+            else
+                ErrorUtils.sendError(event.getChannel(), i18n.getString("wrong.usage"),
+                        MessageFormat.format(i18n.getString("tip.usage"), Command.WAR.formatFullCommand(prefix)));
+        });
     }
 
-    public static ClanWarMember getClanWarMemberByTag(List<ClanWarMember> members, String tag)
-    {
-        for (ClanWarMember member : members)
-        {
+    public static ClanWarMember getClanWarMemberByTag(List<ClanWarMember> members, String tag) {
+        for (ClanWarMember member : members) {
             if (member.getTag().equals(tag))
                 return member;
         }
         return null;
     }
 
-    public static List<Attack> getAttacksByOrder(List<ClanWarMember> members)
-    {
+    public static List<Attack> getAttacksByOrder(List<ClanWarMember> members) {
         List<Attack> sortedAttacks = new ArrayList<>();
-        for (ClanWarMember member : members)
-        {
+        for (ClanWarMember member : members) {
             List<Attack> attacks = member.getAttacks();
             if (attacks != null)
                 sortedAttacks.addAll(attacks);
@@ -94,14 +87,11 @@ public class WarCommand
         return sortedAttacks;
     }
 
-    public static int getHighestStars(List<Attack> attacks, Attack atk)
-    {
+    public static int getHighestStars(List<Attack> attacks, Attack atk) {
         int max = 0;
-        for (int i = 0; i < attacks.size() && attacks.get(i).getOrder() < atk.getOrder(); i++)
-        {
+        for (int i = 0; i < attacks.size() && attacks.get(i).getOrder() < atk.getOrder(); i++) {
             Attack curr = attacks.get(i);
-            if (curr.getDefenderTag().equals(atk.getDefenderTag()))
-            {
+            if (curr.getDefenderTag().equals(atk.getDefenderTag())) {
                 if (curr.getStars() > max)
                     max = curr.getStars();
             }
@@ -109,40 +99,32 @@ public class WarCommand
         return max;
     }
 
-    public static int getNewStars(List<Attack> attacks, Attack attack)
-    {
+    public static int getNewStars(List<Attack> attacks, Attack attack) {
         int highestStars = getHighestStars(attacks, attack);
         if (attack.getStars() > highestStars)
             return attack.getStars() - highestStars;
         return 0;
     }
 
-    public static int drawMemberResults(Graphics2D g2d, ClanWarMember member, List<ClanWarMember> opponentMembers, List<Attack> opponentAttacks, boolean rightSide, int y)
-    {
+    public static int drawMemberResults(Graphics2D g2d, ClanWarMember member, List<ClanWarMember> opponentMembers, List<Attack> opponentAttacks, boolean rightSide, int y) {
         int stars = 0;
         List<Attack> attacks = member.getAttacks();
-        for (int j = 0; j < 2; j++)
-        {
+        for (int j = 0; j < 2; j++) {
             if (!rightSide)
                 DrawUtils.drawSimpleString(g2d, MessageFormat.format(i18n.getString("attack.index"), j + 1), 105, y + 55 + j * 47, 8f, attackColor);
             else
                 DrawUtils.drawSimpleStringLeft(g2d, MessageFormat.format(i18n.getString("attack.index"), j + 1), 1100, y + 55 + j * 47, 8f, attackColor);
-            if (attacks != null)
-            {
+            if (attacks != null) {
                 Attack attack;
-                if (j < attacks.size())
-                {
+                if (j < attacks.size()) {
                     // If the player made at least one attack
                     attack = attacks.get(j);
                     ClanWarMember defender = getClanWarMemberByTag(opponentMembers, attack.getDefenderTag());
 
-                    if (!rightSide)
-                    {
+                    if (!rightSide) {
                         DrawUtils.drawShadowedString(g2d, defender.getMapPosition() + ". " + defender.getName(), 105, y + 78 + j * 46, 16f);
                         DrawUtils.drawSimpleStringLeft(g2d, attack.getDestructionPercentage().longValue() + "%", 370, y + 70 + j * 47, 16f, Color.BLACK);
-                    }
-                    else
-                    {
+                    } else {
                         DrawUtils.drawShadowedStringLeft(g2d, defender.getMapPosition() + ". " + defender.getName(), 1100, y + 78 + j * 46, 16f);
                         DrawUtils.drawSimpleString(g2d, attack.getDestructionPercentage().longValue() + "%", 840, y + 70 + j * 47, 16f, Color.BLACK);
                     }
@@ -150,28 +132,22 @@ public class WarCommand
                     int newStars = getNewStars(opponentAttacks, attack);
 
                     // Stars
-                    for (int k = 0; k < 3; k++)
-                    {
-                        if (k + 1 <= attack.getStars())
-                        {
+                    for (int k = 0; k < 3; k++) {
+                        if (k + 1 <= attack.getStars()) {
                             if (k + 1 <= attack.getStars() - newStars)
                                 g2d.drawImage(CacheComponents.alreadyStar, (rightSide ? 750 : 380) + k * 26, y + 48 + j * 45, 28, 28, null);
-                            else
-                            {
+                            else {
                                 stars++;
                                 g2d.drawImage(CacheComponents.newStar, (rightSide ? 750 : 380) + k * 26, y + 48 + j * 45, 28, 28, null);
                             }
-                        }
-                        else
+                        } else
                             g2d.drawImage(CacheComponents.noStar, (rightSide ? 750 : 380) + k * 26, y + 48 + j * 45, 28, 28, null);
                     }
-                }
-                else if (!rightSide)
+                } else if (!rightSide)
                     DrawUtils.drawShadowedString(g2d, i18n.getString("not.used"), 105, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
                 else
                     DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("not.used"), 1100, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
-            }
-            else if (!rightSide)
+            } else if (!rightSide)
                 DrawUtils.drawShadowedString(g2d, i18n.getString("not.used"), 105, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
             else
                 DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("not.used"), 1100, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
@@ -179,8 +155,7 @@ public class WarCommand
         return stars;
     }
 
-    public static void drawMapPosition(Graphics2D g2d, ClanWarMember member, ClanWarMember enemy, int y)
-    {
+    public static void drawMapPosition(Graphics2D g2d, ClanWarMember member, ClanWarMember enemy, int y) {
         g2d.setColor(Color.WHITE);
 
         // Username
@@ -204,8 +179,7 @@ public class WarCommand
         DrawUtils.drawCenteredString(g2d, starRect2, g2d.getFont().deriveFont(26f), String.valueOf(drawMemberResults(g2d, enemy, members, sortedAttacks, true, y)));
     }
 
-    public static WarInfo getWar(MessageReceivedEvent event, Locale lang, String[] args)
-    {
+    public static WarInfo getWar(MessageReceivedEvent event, Locale lang, String[] args) {
         // If rate limitation has exceeded
         if (!CoreUtils.checkThrottle(event, lang))
             return null;
@@ -213,34 +187,28 @@ public class WarCommand
         WarInfo war = null;
         tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
 
-        if (tag == null)
-        {
+        if (tag == null) {
             ErrorUtils.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
             return null;
         }
 
-        try
-        {
+        try {
             war = ClashBotMain.clashAPI.getCurrentWar(tag);
-        } catch (IOException ignored)
-        {
-        } catch (ClashAPIException e)
-        {
+        } catch (IOException ignored) {
+        } catch (ClashAPIException e) {
             ErrorUtils.sendExceptionError(event, i18n, e, tag, "war");
             return null;
         }
         return war;
     }
 
-    public static void execute(MessageReceivedEvent event, Locale lang, String... args)
-    {
+    public static void execute(MessageReceivedEvent event, Locale lang, String... args) {
         MessageChannel channel = event.getChannel();
         WarInfo war = getWar(event, lang, args);
         if (war == null)
             return;
 
-        if (!war.getState().equals("notInWar"))
-        {
+        if (!war.getState().equals("notInWar")) {
             // Checking index validity
             int index = ErrorUtils.checkIndex(event, i18n, args[0], war.getTeamSize() / 5);
             if (index == -1)
@@ -279,8 +247,7 @@ public class WarCommand
             Rectangle statusRect = new Rectangle(0, 55, WIDTH, 20);
             Rectangle timeRect = new Rectangle(0, 95, WIDTH, 20);
             int[] timeLeft;
-            switch (war.getState())
-            {
+            switch (war.getState()) {
                 case "inWar":
                     timeLeft = GameUtils.getTimeLeft(war.getEndTime());
                     DrawUtils.drawSimpleCenteredString(g2d, i18n.getString("war.inwar"), statusRect, 30f, Color.BLACK);
@@ -329,8 +296,7 @@ public class WarCommand
 
             FileUtils.sendImage(event, image, "war", "png");
             g2d.dispose();
-        }
-        else
+        } else
             ErrorUtils.sendError(channel, MessageFormat.format(i18n.getString("exception.404.war"), tag));
     }
 }

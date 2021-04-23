@@ -20,9 +20,9 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 
-public class WarlogCommand
-{
+public class WarlogCommand {
     public static ResourceBundle i18n;
     public static Locale lang;
 
@@ -40,25 +40,24 @@ public class WarlogCommand
     private final static Color versusColor = new Color(0xffffc0);
     private final static Color percentageColor = new Color(0x5e5d60);
 
-    public static void dispatch(MessageReceivedEvent event, String... args)
-    {
-        if (args.length > 2)
-            execute(event, args[1], args[2]);
-        else if (args.length == 2)
-            execute(event, args[1]);
-        else
-        {
-            String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
-            ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-            ErrorUtils.sendError(event.getChannel(),
-                    i18n.getString("wrong.usage"),
-                    MessageFormat.format(i18n.getString("tip.usage"),
-                    Command.WARLOG.formatFullCommand(prefix)));
-        }
+    public static void dispatch(MessageReceivedEvent event, String... args) {
+        CompletableFuture.runAsync(() -> {
+            if (args.length > 2)
+                execute(event, args[1], args[2]);
+            else if (args.length == 2)
+                execute(event, args[1]);
+            else {
+                String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
+                ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
+
+                ErrorUtils.sendError(event.getChannel(),
+                        i18n.getString("wrong.usage"),
+                        MessageFormat.format(i18n.getString("tip.usage"), Command.WARLOG.formatFullCommand(prefix)));
+            }
+        });
     }
 
-    public static Image getImageStatus(String result)
-    {
+    public static Image getImageStatus(String result) {
         if (result == null)
             return CacheComponents.warlogCWL; // CWL
         else if (result.equals("win"))
@@ -69,8 +68,7 @@ public class WarlogCommand
         return CacheComponents.warlogTie; // tie
     }
 
-    public static void drawWar(Graphics2D g2d, WarlogItem war, int y)
-    {
+    public static void drawWar(Graphics2D g2d, WarlogItem war, int y) {
         boolean isCWL = war.getResult() == null;
 
         // Member background
@@ -108,8 +106,7 @@ public class WarlogCommand
         DrawUtils.drawSimpleString(g2d, MessageFormat.format(i18n.getString("warlog.days.ago"), timeLeft[0] / 24), 24, y + 60, 12f, Color.WHITE);
 
         // CWL indication
-        if (isCWL)
-        {
+        if (isCWL) {
             Rectangle cwlRect = new Rectangle(0, y + 20, WIDTH, 15);
             DrawUtils.drawCenteredString(g2d, cwlRect, g2d.getFont().deriveFont(18f), "CWL", versusColor);
         }
@@ -119,8 +116,7 @@ public class WarlogCommand
         DrawUtils.drawCenteredString(g2d, teamSizeRect, g2d.getFont().deriveFont(14f), MessageFormat.format(i18n.getString("team.size.versus"), war.getTeamSize()), versusColor);
     }
 
-    public static WarlogModel getWarlog(MessageReceivedEvent event, Locale lang, String[] args)
-    {
+    public static WarlogModel getWarlog(MessageReceivedEvent event, Locale lang, String[] args) {
         // If rate limitation has exceeded
         if (!CoreUtils.checkThrottle(event, lang))
             return null;
@@ -129,27 +125,22 @@ public class WarlogCommand
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         String tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
 
-        if (tag == null)
-        {
+        if (tag == null) {
             ErrorUtils.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
             return null;
         }
 
-        try
-        {
+        try {
             warlog = ClashBotMain.clashAPI.getWarlog(tag);
-        } catch (IOException ignored)
-        {
-        } catch (ClashAPIException e)
-        {
+        } catch (IOException ignored) {
+        } catch (ClashAPIException e) {
             ErrorUtils.sendExceptionError(event, i18n, e, tag, "warlog");
             return null;
         }
         return warlog;
     }
 
-    public static void execute(MessageReceivedEvent event, String... args)
-    {
+    public static void execute(MessageReceivedEvent event, String... args) {
         MessageChannel channel = event.getChannel();
 
         lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
@@ -166,21 +157,17 @@ public class WarlogCommand
 
         // Checking if there are any clan wars
         List<WarlogItem> wars = warlog.getWars();
-        if (wars.size() <= 0)
-        {
+        if (wars.size() <= 0) {
             ErrorUtils.sendError(channel, i18n.getString("no.warlog"));
             return;
         }
 
         // Computing stats
         int total, wins, losses, draws;
-        total = wins = losses = draws = 0;
-        for (WarlogItem war : wars)
-        {
-            if (war.getResult() != null)
-            {
-                switch (war.getResult())
-                {
+        wins = losses = draws = 0;
+        for (WarlogItem war : wars) {
+            if (war.getResult() != null) {
+                switch (war.getResult()) {
                     case "win":
                         wins++;
                         break;

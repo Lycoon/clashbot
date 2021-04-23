@@ -17,9 +17,9 @@ import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
-public class ClanCommand
-{
+public class ClanCommand {
     private final static int WIDTH = 932;
     private final static int HEIGHT = 322;
     private final static float FONT_SIZE = 12f;
@@ -31,8 +31,7 @@ public class ClanCommand
     private static Color clanTypeInviteOnlyColor = new Color(0xfbbf70);
     private static Color valueColor = new Color(0x444545);
 
-    private final static Map<String, String> regions = new HashMap<String, String>()
-    {{
+    private final static Map<String, String> regions = new HashMap<String, String>() {{
         put("Europe", "europe");
         put("North America", "north.america");
         put("South America", "south.america");
@@ -42,8 +41,7 @@ public class ClanCommand
         put("International", "international");
     }};
 
-    private final static Map<String, String> labels = new HashMap<String, String>()
-    {{
+    private final static Map<String, String> labels = new HashMap<String, String>() {{
         put("Clan Wars", "label.clanwars");
         put("Clan War League", "label.clanwarleague");
         put("Trophy Pushing", "label.trophy");
@@ -62,34 +60,34 @@ public class ClanCommand
         put("Newbie Friendly", "label.newbie");
     }};
 
-    public static void dispatch(MessageReceivedEvent event, String... args)
-    {
-        if (args.length > 1)
-            ClanCommand.execute(event, args[1]);
-        else
-            ClanCommand.execute(event);
+    public static void dispatch(MessageReceivedEvent event, String... args) {
+        CompletableFuture.runAsync(() -> {
+            if (args.length > 1)
+                ClanCommand.execute(event, args[1]);
+            else
+                ClanCommand.execute(event);
+        });
     }
 
-    public static int getAverageTrophies(List<ClanMember> members)
-    {
+    public static int getAverageTrophies(List<ClanMember> members) {
+        if (members.isEmpty())
+            return 0;
+
         int average = 0;
         for (ClanMember member : members)
             average += member.getTrophies();
         return average / members.size();
     }
 
-    public static String getClanChief(List<ClanMember> members)
-    {
-        for (ClanMember member : members)
-        {
+    public static String getClanChief(List<ClanMember> members) {
+        for (ClanMember member : members) {
             if (member.getRole().equals("leader"))
                 return member.getName();
         }
         return "";
     }
 
-    public static ClanModel getClan(MessageReceivedEvent event, Locale lang, String[] args)
-    {
+    public static ClanModel getClan(MessageReceivedEvent event, Locale lang, String[] args) {
         // Checking rate limitation
         if (!CoreUtils.checkThrottle(event, lang))
             return null;
@@ -98,27 +96,22 @@ public class ClanCommand
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         String tag = args.length > 0 ? args[0] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
 
-        if (tag == null)
-        {
+        if (tag == null) {
             ErrorUtils.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
             return null;
         }
 
-        try
-        {
+        try {
             clan = ClashBotMain.clashAPI.getClan(tag);
-        } catch (IOException ignored)
-        {
-        } catch (ClashAPIException e)
-        {
+        } catch (IOException ignored) {
+        } catch (ClashAPIException e) {
             ErrorUtils.sendExceptionError(event, i18n, e, tag, "clan");
             return null;
         }
         return clan;
     }
 
-    public static void execute(MessageReceivedEvent event, String... args)
-    {
+    public static void execute(MessageReceivedEvent event, String... args) {
         MessageChannel channel = event.getChannel();
 
         Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
@@ -159,22 +152,17 @@ public class ClanCommand
         DrawUtils.drawShadowedStringLeft(g2d, MessageFormat.format(i18n.getString("clan.members"), clan.getMembers()), 694, 85, 20);
 
         // Clan location
-        if (clan.getLocation() != null)
-        {
-            if (clan.getLocation().getIsCountry())
-            {
+        if (clan.getLocation() != null) {
+            if (clan.getLocation().getIsCountry()) {
                 Locale clanLocale = new Locale("", clan.getLocation().getCountryCode().toLowerCase());
                 DrawUtils.drawShadowedStringLeft(g2d, clanLocale.getDisplayCountry(lang), 905, 33, 14f, 2);
-            }
-            else
+            } else
                 DrawUtils.drawShadowedStringLeft(g2d, i18n.getString(regions.get(clan.getLocation().getName())), 905, 33, 14f, 2);
-        }
-        else
+        } else
             DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("undefined"), 905, 33, 14f, 2);
 
         // Invitation type
-        switch (clan.getType())
-        {
+        switch (clan.getType()) {
             case "inviteOnly":
                 DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("clan.type.inviteonly"), 905, 67, 12f, 2, clanTypeInviteOnlyColor);
                 break;
@@ -192,17 +180,13 @@ public class ClanCommand
         Rectangle labelsTitleRect = new Rectangle(8, 155, 269, 5);
         DrawUtils.drawCenteredString(g2d, labelsTitleRect, font.deriveFont(16f), i18n.getString("clan.labels.title"));
 
-        if (clan.getLabels().size() <= 0)
-        {
+        if (clan.getLabels().size() <= 0) {
             // If there is no label set
             Rectangle noLabelTitleRect = new Rectangle(8, 230, 269, 5);
             DrawUtils.drawCenteredString(g2d, noLabelTitleRect, font.deriveFont(16f), i18n.getString("clan.labels.notset"));
-        }
-        else
-        {
+        } else {
             // Printing each label
-            for (int i = 0; i < clan.getLabels().size(); i++)
-            {
+            for (int i = 0; i < clan.getLabels().size(); i++) {
                 Label label = clan.getLabels().get(i);
                 g2d.drawImage(FileUtils.getImageFromFile("backgrounds/field-placeholder.png"), 70, 190 + i * 40, 185, 24, null);
                 g2d.drawImage(FileUtils.getImageFromUrl(label.getIconUrls().getMedium()), 25, 185 + i * 40, 35, 35, null);

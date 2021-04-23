@@ -18,61 +18,52 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
-public class WarLeagueCommand
-{
+public class WarLeagueCommand {
     private final static int ROUND_WIDTH = 932;
     private final static int ROUND_HEIGHT = 333;
     private final static float FONT_SIZE = 16f;
 
-    public static void dispatch(MessageReceivedEvent event, String... args)
-    {
-        if (args.length <= 1)
-        {
-            WarLeagueCommand.executeClan(event);
-            return;
-        }
-
-        if (args[1].equals("round"))
-        {
-            if (args.length > 3)
-                WarLeagueCommand.executeRound(event, args[2], args[3]);
-            else if (args.length == 3)
-                WarLeagueCommand.executeRound(event, args[2]);
-            else
-            {
-                String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
-                ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-                ErrorUtils.sendError(event.getChannel(),
-                        i18n.getString("wrong.usage"),
-                        MessageFormat.format(i18n.getString("tip.usage"),
-                        Command.WARLEAGUE_ROUND.formatFullCommand(prefix)));
+    public static void dispatch(MessageReceivedEvent event, String... args) {
+        CompletableFuture.runAsync(() -> {
+            if (args.length <= 1) {
+                WarLeagueCommand.executeClan(event);
+                return;
             }
-        }
-        else if (args[1].equals("all"))
-        {
-            if (args.length > 2)
-                WarLeagueCommand.executeAll(event, args[2]);
-            else
-                WarLeagueCommand.executeAll(event);
-        }
-        else
-            WarLeagueCommand.executeClan(event, args[1]);
+
+            if (args[1].equals("round")) {
+                if (args.length > 3)
+                    WarLeagueCommand.executeRound(event, args[2], args[3]);
+                else if (args.length == 3)
+                    WarLeagueCommand.executeRound(event, args[2]);
+                else {
+                    String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
+                    ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
+                    ErrorUtils.sendError(event.getChannel(),
+                            i18n.getString("wrong.usage"),
+                            MessageFormat.format(i18n.getString("tip.usage"),
+                                    Command.WARLEAGUE_ROUND.formatFullCommand(prefix)));
+                }
+            } else if (args[1].equals("all")) {
+                if (args.length > 2)
+                    WarLeagueCommand.executeAll(event, args[2]);
+                else
+                    WarLeagueCommand.executeAll(event);
+            } else
+                WarLeagueCommand.executeClan(event, args[1]);
+        });
     }
 
-    public static List<WarInfo> getWars(WarLeagueGroup leagueGroup, int roundIndex)
-    {
+    public static List<WarInfo> getWars(WarLeagueGroup leagueGroup, int roundIndex) {
         List<WarInfo> wars = new ArrayList<>();
         Round round = leagueGroup.getRounds().get(roundIndex);
 
-        for (String warTag : round.getWarTags())
-        {
+        for (String warTag : round.getWarTags()) {
             WarInfo warInfo = null;
-            try
-            {
+            try {
                 warInfo = ClashBotMain.clashAPI.getCWLWar(warTag);
-            } catch (IOException | ClashAPIException ignored)
-            {
+            } catch (IOException | ClashAPIException ignored) {
             }
 
             wars.add(warInfo);
@@ -80,8 +71,7 @@ public class WarLeagueCommand
         return wars;
     }
 
-    public static void drawRound(Graphics2D g2d, MessageReceivedEvent event, List<WarInfo> wars, ResourceBundle i18n, int roundIndex)
-    {
+    public static void drawRound(Graphics2D g2d, MessageReceivedEvent event, List<WarInfo> wars, ResourceBundle i18n, int roundIndex) {
         Font font = g2d.getFont().deriveFont(FONT_SIZE);
 
         // Round label
@@ -92,8 +82,7 @@ public class WarLeagueCommand
         int[] timeLeft;
         WarInfo firstWar = wars.get(0);
 
-        switch (firstWar.getState())
-        {
+        switch (firstWar.getState()) {
             case "preparation":
                 timeLeft = GameUtils.getTimeLeft(firstWar.getStartTime());
                 g2d.drawImage(FileUtils.getImageFromFile("backgrounds/cwl/cwl-preparation.png"), 0, 0, null);
@@ -129,34 +118,29 @@ public class WarLeagueCommand
         DrawUtils.drawSimpleCenteredString(g2d, MessageFormat.format(i18n.getString("round.index"), roundIndex + 1), roundLabel, 22f, Color.BLACK);
 
         // Wars
-        for (int i = 0; i < wars.size(); i++)
-        {
+        for (int i = 0; i < wars.size(); i++) {
             WarInfo war = wars.get(i);
             ClanWarModel clan1 = war.getClan();
             ClanWarModel clan2 = war.getEnemy();
 
-            if (war.getState().equals("warEnded"))
-            {
+            if (war.getState().equals("warEnded")) {
                 if (clan2.getStars() > clan1.getStars() ||
                         (clan2.getStars().intValue() == clan1.getStars().intValue() &&
-                                clan2.getDestructionPercentage() > clan1.getDestructionPercentage()))
-                {
+                                clan2.getDestructionPercentage() > clan1.getDestructionPercentage())) {
                     ClanWarModel tmp = clan1;
                     clan1 = clan2;
                     clan2 = tmp;
                 }
             }
 
-            if (clan1 != null && clan2 != null)
-            {
+            if (clan1 != null && clan2 != null) {
                 // Drawing stars
                 Rectangle rectStarClan1 = new Rectangle(383, 93 + i * 60, 50, 20);
                 Rectangle rectStarClan2 = new Rectangle(503, 93 + i * 60, 50, 20);
                 DrawUtils.drawCenteredString(g2d, rectStarClan1, font.deriveFont(18f), clan1.getStars().toString());
                 DrawUtils.drawCenteredString(g2d, rectStarClan2, font.deriveFont(18f), clan2.getStars().toString());
 
-                if (firstWar.getState().equals("inWar"))
-                {
+                if (firstWar.getState().equals("inWar")) {
                     // Drawing clan names
                     DrawUtils.drawShadowedStringLeft(g2d, clan1.getName(), 255, 113 + i * 60, 16f, Color.WHITE);
                     DrawUtils.drawShadowedString(g2d, clan2.getName(), 670, 113 + i * 60, 16f);
@@ -168,9 +152,7 @@ public class WarLeagueCommand
                     // Drawing clan attacks
                     DrawUtils.drawShadowedString(g2d, clan2.getAttacks().toString(), 350, 109 + i * 60, 12f);
                     DrawUtils.drawShadowedString(g2d, clan1.getAttacks().toString(), 569, 109 + i * 60, 12f);
-                }
-                else
-                {
+                } else {
                     // Drawing clan names
                     DrawUtils.drawShadowedStringLeft(g2d, clan1.getName(), 300, 113 + i * 60, 16f, Color.WHITE);
                     DrawUtils.drawShadowedString(g2d, clan2.getName(), 625, 113 + i * 60, 16f);
@@ -183,29 +165,22 @@ public class WarLeagueCommand
         }
     }
 
-    public static void updateStats(ClanWarModel clan, HashMap<String, ClanWarStats> stats)
-    {
-        if (clan != null)
-        {
-            if (stats.containsKey(clan.getTag()))
-            {
+    public static void updateStats(ClanWarModel clan, HashMap<String, ClanWarStats> stats) {
+        if (clan != null) {
+            if (stats.containsKey(clan.getTag())) {
                 ClanWarStats stats1 = stats.get(clan.getTag());
                 stats1.addStars(clan.getStars());
                 stats1.addDestruction(clan.getDestructionPercentage());
                 stats.put(clan.getTag(), stats1);
-            }
-            else
+            } else
                 stats.put(clan.getTag(), new ClanWarStats(clan));
         }
     }
 
-    public static void drawStats(List<RoundWarInfo> rounds)
-    {
+    public static void drawStats(List<RoundWarInfo> rounds) {
         HashMap<String, ClanWarStats> stats = new HashMap<>();
-        for (RoundWarInfo roundWars : rounds)
-        {
-            for (int j = 0; j < roundWars.getWars().size(); j++)
-            {
+        for (RoundWarInfo roundWars : rounds) {
+            for (int j = 0; j < roundWars.getWars().size(); j++) {
                 WarInfo warInfo = roundWars.getWars().get(j);
                 updateStats(warInfo.getClan(), stats);
                 updateStats(warInfo.getEnemy(), stats);
@@ -213,8 +188,7 @@ public class WarLeagueCommand
         }
     }
 
-    public static WarLeagueGroup getLeagueGroup(MessageReceivedEvent event, Locale lang, String[] args)
-    {
+    public static WarLeagueGroup getLeagueGroup(MessageReceivedEvent event, Locale lang, String[] args) {
         // If rate limitation has exceeded
         if (!CoreUtils.checkThrottle(event, lang))
             return null;
@@ -223,27 +197,22 @@ public class WarLeagueCommand
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         String tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
 
-        if (tag == null)
-        {
+        if (tag == null) {
             ErrorUtils.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
             return null;
         }
 
-        try
-        {
+        try {
             leagueGroup = ClashBotMain.clashAPI.getCWLGroup(tag);
-        } catch (IOException ignored)
-        {
-        } catch (ClashAPIException e)
-        {
+        } catch (IOException ignored) {
+        } catch (ClashAPIException e) {
             ErrorUtils.sendExceptionError(event, i18n, e, tag, "warleague");
             return null;
         }
         return leagueGroup;
     }
 
-    public static void executeRound(MessageReceivedEvent event, String... args)
-    {
+    public static void executeRound(MessageReceivedEvent event, String... args) {
         Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
 
@@ -270,12 +239,10 @@ public class WarLeagueCommand
         g2d.dispose();
     }
 
-    public static ClanWarModel getWinner(ClanWarModel clan1, ClanWarModel clan2)
-    {
+    public static ClanWarModel getWinner(ClanWarModel clan1, ClanWarModel clan2) {
         if (clan1.getStars() > clan2.getStars())
             return clan1;
-        else if (clan1.getStars().intValue() == clan2.getStars().intValue())
-        {
+        else if (clan1.getStars().intValue() == clan2.getStars().intValue()) {
             // when stars are equal
             if (clan1.getDestructionPercentage() > clan2.getDestructionPercentage())
                 return clan1;
@@ -286,10 +253,8 @@ public class WarLeagueCommand
         return clan2;
     }
 
-    public static int getWinStars(ClanWarModel clan1, ClanWarModel clan2, WarInfo war)
-    {
-        if (!war.getState().equals("warEnded"))
-        {
+    public static int getWinStars(ClanWarModel clan1, ClanWarModel clan2, WarInfo war) {
+        if (!war.getState().equals("warEnded")) {
             if (getWinner(clan1, clan2) == null)
                 return 0;
 
@@ -299,8 +264,7 @@ public class WarLeagueCommand
         return 0;
     }
 
-    public static void executeAll(MessageReceivedEvent event, String... args)
-    {
+    public static void executeAll(MessageReceivedEvent event, String... args) {
         Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
 
@@ -317,16 +281,13 @@ public class WarLeagueCommand
         HashMap<String, Integer> stars = new HashMap<>();
         HashMap<String, Integer> destruction = new HashMap<>();
 
-        for (ClanWarModel clan : warLeague.getClans())
-        {
+        for (ClanWarModel clan : warLeague.getClans()) {
             stars.put(clan.getName(), 0);
             destruction.put(clan.getName(), 0);
         }
-        for (int i = 0; i < 7; i++)
-        {
+        for (int i = 0; i < 7; i++) {
             List<WarInfo> wars = getWars(warLeague, i);
-            for (WarInfo war : wars)
-            {
+            for (WarInfo war : wars) {
                 ClanWarModel clan1 = war.getClan();
                 ClanWarModel clan2 = war.getEnemy();
 
@@ -340,8 +301,7 @@ public class WarLeagueCommand
             System.out.println();
         }
 
-        for (ClanWarModel clan : warLeague.getClans())
-        {
+        for (ClanWarModel clan : warLeague.getClans()) {
             System.out.println(clan.getName() + ": " + stars.get(clan.getName()) + " étoiles (" + destruction.get(clan.getName()) + "%)");
         }
 
@@ -349,8 +309,7 @@ public class WarLeagueCommand
         g2d.dispose();
     }
 
-    public static void executeClan(MessageReceivedEvent event, String... args)
-    {
+    public static void executeClan(MessageReceivedEvent event, String... args) {
 
     }
 }
