@@ -7,17 +7,18 @@ import com.lycoon.clashbot.utils.CoreUtils;
 import com.lycoon.clashbot.utils.DatabaseUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.awt.*;
 import java.text.MessageFormat;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class EventListener extends ListenerAdapter
-{
-    static boolean isCommand(String arg, String prefix, Command cmd)
-    {
+public class EventListener extends ListenerAdapter {
+    static boolean isCommand(String arg, String prefix, Command cmd) {
         return arg.equalsIgnoreCase(cmd.formatCommand(prefix));
     }
 
@@ -25,43 +26,47 @@ public class EventListener extends ListenerAdapter
         return arg.equalsIgnoreCase(AdminCommand.ADMIN.formatCommand());
     }
 
-    static boolean isMentioned(MessageReceivedEvent event, String message)
-    {
+    static boolean isMentioned(MessageReceivedEvent event, String message) {
         long id = event.getJDA().getSelfUser().getIdLong();
         return message.startsWith("<@" + id + ">") || message.startsWith("<@!" + id + ">");
     }
 
-    static void taggingBot(MessageReceivedEvent event, String prefix)
-    {
+    static void taggingBot(MessageReceivedEvent event, String prefix) {
         ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
         EmbedBuilder builder = new EmbedBuilder();
 
         builder.setColor(Color.GRAY);
         builder.setDescription(CoreUtils.INFO_EMOJI + " " +
                 MessageFormat.format(i18n.getString("bot.mention"),
-                Command.HELP.formatCommand(prefix)));
+                        Command.HELP.formatCommand(prefix)));
 
         CoreUtils.sendMessage(event, i18n, builder);
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent event)
-    {
+    public void onMessageReceived(MessageReceivedEvent event) {
         if (!event.isFromType(ChannelType.TEXT))
             return;
 
         String message = event.getMessage().getContentRaw();
         String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
 
-        if (isMentioned(event, message))
-        {
+        if (isMentioned(event, message)) {
             taggingBot(event, prefix);
             return;
-        }
-        else if (!message.startsWith(prefix))
+        } else if (!message.startsWith(prefix))
             return;
 
         String[] args = message.split(" ");
+
+        TextChannel defaultChannel = event.getGuild().getDefaultChannel();
+
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setColor(Color.GRAY);
+        builder.setTitle(":star_struck: Thanks for inviting");
+        builder.setDescription("Try `!help` to get the list of all available commands");
+
+        Objects.requireNonNull(defaultChannel).sendMessage(builder.build()).queue();
 
         if (isCommand(args[0], prefix, Command.SETLANG)) // !set
             SetCommand.dispatch(event, args);
@@ -93,5 +98,17 @@ public class EventListener extends ListenerAdapter
             return;
 
         ClashBotMain.LOGGER.info(event.getAuthor().getAsTag() + " issued: " + message);
+    }
+
+    @Override
+    public void onGuildJoin(GuildJoinEvent event) {
+        TextChannel defaultChannel = event.getGuild().getDefaultChannel();
+
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setColor(Color.GRAY);
+        builder.setTitle("Thanks for inviting");
+        builder.setDescription("Try `!help` to get the list of all available commands");
+
+        Objects.requireNonNull(defaultChannel).sendMessage(builder.build()).queue();
     }
 }

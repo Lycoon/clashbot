@@ -20,21 +20,33 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
+import static com.lycoon.clashbot.utils.GameUtils.*;
+
 public class PlayerCommand {
     private final static int WIDTH = 932;
-    private final static int HEIGHT = 322;
+    private final static int HEIGHT = 571;
     private final static float FONT_SIZE = 12f;
-    private final static int ARMY_BASE_LINE = 232;
+
+    private final static int COLUMNS = 4;
+    private final static int ARMY_TOPLINE = 238;
+    private final static int ARMY_BOTLINE = 436;
 
     private final static String[] TROOPS = {"Barbarian", "Archer", "Giant", "Goblin", "Wall Breaker", "Balloon",
-            "Wizard", "Healer", "Dragon", "P.E.K.K.A", "Baby Dragon", "Miner", "Electro Dragon", "Yeti"};
-    private final static String[] DARK_TROOPS = {"Minion", "Hog Rider", "Valkyrie", "Golem", "Witch", "Lava Hound",
-            "Bowler", "Ice Golem", "Headhunter"};
-    private final static String[] HEROES = {"Barbarian King", "Archer Queen", "Grand Warden", "Royal Champion"};
+            "Wizard", "Healer", "Dragon", "P.E.K.K.A", "Baby Dragon", "Miner", "Electro Dragon", "Yeti", "Minion",
+            "Hog Rider", "Valkyrie", "Golem", "Witch", "Lava Hound", "Bowler", "Ice Golem", "Headhunter"};
     private final static String[] SPELLS = {"Lightning Spell", "Healing Spell", "Rage Spell", "Jump Spell",
-            "Freeze Spell", "Invisibility Spell", "Clone Spell", "Poison Spell", "Earthquake Spell", "Haste Spell",
+            "Freeze Spell", "Clone Spell", "Invisibility Spell", "Poison Spell", "Earthquake Spell", "Haste Spell",
             "Skeleton Spell", "Bat Spell"};
-    private final static String[] MACHINES = {"Wall Wrecker", "Battle Blimp", "Stone Slammer", "Siege Barracks"};
+    private final static String[] BUILDER_TROOPS = {"Raged Barbarian", "Sneaky Archer", "Boxer Giant", "Beta Minion",
+            "Bomber", "Baby Dragon", "Cannon Cart", "Night Witch", "Drop Ship", "Super P.E.K.K.A", "Hog Glider"};
+    private final static String[] SUPER_TROOPS = {"Super Barbarian", "Super Archer", "Super Giant", "Sneaky Goblin",
+            "Super Wall Breaker", "Super Wizard", "Inferno Dragon", "Super Minion", "Super Valkyrie", "Super Witch",
+            "Ice Hound"};
+    private final static String[] HEROES = {"Barbarian King", "Archer Queen", "Grand Warden", "Royal Champion",
+            "Battle Machine"};
+    private final static String[] MACHINES = {"Wall Wrecker", "Battle Blimp", "Stone Slammer", "Siege Barracks",
+            "Log Launcher"};
+    private final static String[] PETS = {"L.A.S.S.I", "Electro Owl", "Mighty Yak", "Unicorn"};
 
     public static void dispatch(MessageReceivedEvent event, String... args) {
         CompletableFuture.runAsync(() -> {
@@ -45,54 +57,64 @@ public class PlayerCommand {
         });
     }
 
-    public static void drawTroop(Graphics2D g2d, Font font, List<Troop> troops, String troopName, int x, int y) {
-        Troop troop = GameUtils.getTroopByName(troops, troopName);
+    public static void drawSuperTroop(Graphics2D g2d, Font font, Troop troop, String troopName, int x, int y) {
+        if (troop == null || troop.isActiveSuperTroop() == null)
+            g2d.drawImage(FileUtils.getImageFromFile("troops/locked/" + troopName + ".png"), x, y, 44, 44, null);
+        else
+            g2d.drawImage(FileUtils.getImageFromFile("troops/" + troop.getName() + ".png"), x, y, 44, 44, null);
+    }
 
+    public static void drawTroop(Graphics2D g2d, Font font, Troop troop, String troopName, int x, int y) {
         // If the player has not unlocked the troop yet
         if (troop == null)
-            g2d.drawImage(FileUtils.getImageFromFile("troops/locked/" + troopName + ".png"), x, y, 35, 35, null);
+            g2d.drawImage(FileUtils.getImageFromFile("troops/locked/" + troopName + ".png"), x, y, 44, 44, null);
         else {
-            g2d.drawImage(FileUtils.getImageFromFile("troops/" + troop.getName() + ".png"), x, y, 35, 35, null);
+            g2d.drawImage(FileUtils.getImageFromFile("troops/" + troop.getName() + ".png"), x, y, 44, 44, null);
             if (troop.getLevel().intValue() == troop.getMaxLevel().intValue())
-                g2d.drawImage(FileUtils.getImageFromFile("icons/level-label-max.png"), x + 2, y + 18, 15, 15, null);
-            else {
-                if (troop.getLevel() != 1)
-                    g2d.drawImage(FileUtils.getImageFromFile("icons/level-label.png"), x + 2, y + 18, 15, 15, null);
-            }
+                g2d.drawImage(FileUtils.getImageFromFile("icons/level-label-max.png"), x + 1, y + 22, 20, 20, null);
+            else if (troop.getLevel() != 1)
+                g2d.drawImage(FileUtils.getImageFromFile("icons/level-label.png"), x + 1, y + 22, 20, 20, null);
+
             if (troop.getLevel() != 1) {
-                Rectangle levelRect = new Rectangle(x + 2, y + 18, 15, 15);
-                DrawUtils.drawCenteredString(g2d, levelRect, font.deriveFont(font.getSize() - 4f), troop.getLevel().toString());
+                Rectangle levelRect = new Rectangle(x + 1, y + 22, 20, 20);
+                DrawUtils.drawCenteredString(g2d, levelRect, font.deriveFont(font.getSize() - 2f), troop.getLevel().toString());
             }
         }
     }
 
     public static void drawTroops(Graphics2D g2d, Font font, List<Troop> troops, int y) {
-        for (int i = 0; i < TROOPS.length; i++)
-            drawTroop(g2d, font, troops, TROOPS[i], i * 38 + 20, y);
-    }
-
-    public static void drawDarkTroops(Graphics2D g2d, Font font, List<Troop> troops, int y) {
-        for (int i = 0; i < DARK_TROOPS.length; i++)
-            drawTroop(g2d, font, troops, DARK_TROOPS[i], i * 38 + 20, y + 37);
-    }
-
-    public static void drawHeroes(Graphics2D g2d, Font font, List<Troop> heroes, int y) {
-        for (int i = 0; i < HEROES.length; i++)
-            drawTroop(g2d, font, heroes, HEROES[i], i * 38 + 400, y + 37);
+        for (int i = 0, j = 0; i < TROOPS.length; i++, j += i % COLUMNS == 0 ? 1 : 0)
+            drawTroop(g2d, font, getHomeTroopByName(troops, TROOPS[i]), TROOPS[i], (i % COLUMNS) * 50 + 20, y + j * 50);
     }
 
     public static void drawSpells(Graphics2D g2d, Font font, List<Troop> spells, int y) {
-        for (int i = 0; i < 6; i++)
-            drawTroop(g2d, font, spells, SPELLS[i], i * 38 + 580, y);
-        for (int i = 6; i < SPELLS.length; i++)
-            drawTroop(g2d, font, spells, SPELLS[i], (i - 6) * 38 + 580, y + 37);
+        for (int i = 0, j = 0; i < SPELLS.length; i++, j += i % COLUMNS == 0 ? 1 : 0)
+            drawTroop(g2d, font, getTroopByName(spells, SPELLS[i]), SPELLS[i], (i % COLUMNS) * 50 + 250, y + j * 50);
+    }
+
+    public static void drawBuilderTroops(Graphics2D g2d, Font font, List<Troop> builderTroops, int y) {
+        for (int i = 0, j = 0; i < BUILDER_TROOPS.length; i++, j += i % COLUMNS == 0 ? 1 : 0)
+            drawTroop(g2d, font, getBuilderTroopByName(builderTroops, BUILDER_TROOPS[i]), BUILDER_TROOPS[i], (i % COLUMNS) * 50 + 480, y + j * 50);
+    }
+
+    public static void drawSuperTroops(Graphics2D g2d, Font font, List<Troop> superTroops, int y) {
+        for (int i = 0, j = 0; i < SUPER_TROOPS.length; i++, j += i % COLUMNS == 0 ? 1 : 0)
+            drawSuperTroop(g2d, font, getTroopByName(superTroops, SUPER_TROOPS[i]), SUPER_TROOPS[i], (i % COLUMNS) * 50 + 710, y + j * 50);
+    }
+
+    public static void drawHeroes(Graphics2D g2d, Font font, List<Troop> heroes, int y) {
+        for (int i = 0, j = 0; i < HEROES.length; i++, j += i % COLUMNS == 0 ? 1 : 0)
+            drawTroop(g2d, font, getTroopByName(heroes, HEROES[i]), HEROES[i], (i % COLUMNS) * 50 + 250, y + j * 50);
     }
 
     public static void drawMachines(Graphics2D g2d, Font font, List<Troop> machines, int y) {
-        drawTroop(g2d, font, machines, MACHINES[0], 837, y);
-        drawTroop(g2d, font, machines, MACHINES[1], 875, y);
-        drawTroop(g2d, font, machines, MACHINES[2], 837, y + 37);
-        drawTroop(g2d, font, machines, MACHINES[3], 875, y + 37);
+        for (int i = 0, j = 0; i < MACHINES.length; i++, j += i % COLUMNS == 0 ? 1 : 0)
+            drawTroop(g2d, font, getTroopByName(machines, MACHINES[i]), MACHINES[i], (i % COLUMNS) * 50 + 480, y + j * 50);
+    }
+
+    public static void drawPets(Graphics2D g2d, Font font, List<Troop> pets, int y) {
+        for (int i = 0, j = 0; i < PETS.length; i++, j += i % COLUMNS == 0 ? 1 : 0)
+            drawTroop(g2d, font, getTroopByName(pets, PETS[i]), PETS[i], (i % COLUMNS) * 50 + 710, y + j * 50);
     }
 
     public static void execute(MessageReceivedEvent event, String... args) {
@@ -196,18 +218,27 @@ public class PlayerCommand {
         DrawUtils.drawSimpleString(g2d, nf.format(player.getDonationsReceived()), 693, 174, FONT_SIZE, new Color(0x444545));
 
         // Army
-        DrawUtils.drawShadowedString(g2d, i18n.getString("army"), 21, 222, FONT_SIZE + 2f);
+        DrawUtils.drawShadowedString(g2d, i18n.getString("troops"), 21, ARMY_TOPLINE - 12, FONT_SIZE + 2f);
+        DrawUtils.drawShadowedString(g2d, i18n.getString("spells"), 251, ARMY_TOPLINE - 12, FONT_SIZE + 2f);
+        DrawUtils.drawShadowedString(g2d, i18n.getString("label.builderbase"), 481, ARMY_TOPLINE - 12, FONT_SIZE + 2f);
+        DrawUtils.drawShadowedString(g2d, i18n.getString("super.troops"), 711, ARMY_TOPLINE - 12, FONT_SIZE + 2f);
+        DrawUtils.drawShadowedString(g2d, i18n.getString("heroes"), 251, ARMY_BOTLINE - 12, FONT_SIZE + 2f);
+        DrawUtils.drawShadowedString(g2d, i18n.getString("machines"), 481, ARMY_BOTLINE - 12, FONT_SIZE + 2f);
+        DrawUtils.drawShadowedString(g2d, i18n.getString("pets"), 711, ARMY_BOTLINE - 12, FONT_SIZE + 2f);
 
         // Troops
         List<Troop> troops = player.getTroops();
         List<Troop> heroes = player.getHeroes();
         List<Troop> spells = player.getSpells();
 
-        drawTroops(g2d, font, troops, ARMY_BASE_LINE);
-        drawDarkTroops(g2d, font, troops, ARMY_BASE_LINE);
-        drawHeroes(g2d, font, heroes, ARMY_BASE_LINE);
-        drawSpells(g2d, font, spells, ARMY_BASE_LINE);
-        drawMachines(g2d, font, troops, ARMY_BASE_LINE);
+        drawTroops(g2d, font, troops, ARMY_TOPLINE);
+        drawSpells(g2d, font, spells, ARMY_TOPLINE);
+        drawBuilderTroops(g2d, font, troops, ARMY_TOPLINE);
+        drawSuperTroops(g2d, font, troops, ARMY_TOPLINE);
+
+        drawHeroes(g2d, font, heroes, ARMY_BOTLINE);
+        drawMachines(g2d, font, troops, ARMY_BOTLINE);
+        drawPets(g2d, font, troops, ARMY_BOTLINE);
 
         FileUtils.sendImage(event, image, "player", "png");
 

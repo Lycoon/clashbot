@@ -37,10 +37,26 @@ public class GameUtils {
     }
 
     public static Troop getTroopByName(List<Troop> troops, String name) {
-        for (Troop troop : troops) {
+        for (Troop troop : troops)
             if (troop.getName().equals(name))
                 return troop;
-        }
+
+        return null;
+    }
+
+    public static Troop getBuilderTroopByName(List<Troop> troops, String name) {
+        for (Troop troop : troops)
+            if (troop.getVillage().equals("builderBase") && troop.getName().equals(name))
+                return troop;
+
+        return null;
+    }
+
+    public static Troop getHomeTroopByName(List<Troop> troops, String name) {
+        for (Troop troop : troops)
+            if (troop.getVillage().equals("home") && troop.getName().equals(name))
+                return troop;
+
         return null;
     }
 }

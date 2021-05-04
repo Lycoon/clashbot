@@ -8,6 +8,8 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 public class ErrorUtils {
+    private static final String OFFICIAL_TWITTER = "https://twitter.com/ClashofClans";
+
     public static void sendExceptionError(MessageReceivedEvent event, ResourceBundle i18n, Exception e, String... args) {
         MessageChannel channel = event.getChannel();
         switch (e.getMessage()) {
@@ -28,7 +30,7 @@ public class ErrorUtils {
             case "503":
                 sendError(channel,
                         i18n.getString("exception.503"),
-                        i18n.getString("exception.status"));
+                        MessageFormat.format(i18n.getString("exception.status"), OFFICIAL_TWITTER));
                 break;
             default:
                 sendError(channel,

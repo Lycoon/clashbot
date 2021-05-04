@@ -16,5 +16,6 @@ local.properties
 .settings/
 .loadpath
 .recommenders
+logs
 database.properties
 tokens.properties

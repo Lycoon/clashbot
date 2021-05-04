@@ -203,9 +203,9 @@ public class ClanCommand {
         DrawUtils.drawShadowedString(g2d, i18n.getString("clan.trophies.total.builder"), 294, 292, 13f);
 
         DrawUtils.drawSimpleString(g2d, nf.format(clan.getRequiredTrophies()), 503, 198, 12f, valueColor);
-        DrawUtils.drawSimpleString(g2d, nf.format(getAverageTrophies(clan.getMemberList())), 503, 228, 12f, valueColor);
-        DrawUtils.drawSimpleString(g2d, nf.format(clan.getTotalTrophies()), 503, 263, 12f, valueColor);
-        DrawUtils.drawSimpleString(g2d, nf.format(clan.getTotalVersusTrophies()), 503, 293, 12f, valueColor);
+        DrawUtils.drawSimpleString(g2d, nf.format((int) clan.getMemberList().stream().mapToInt(ClanMember::getTrophies).average().orElse(0)), 503, 228, 12f, valueColor);
+        DrawUtils.drawSimpleString(g2d, nf.format(clan.getMemberList().stream().mapToInt(ClanMember::getTrophies).sum()), 503, 263, 12f, valueColor);
+        DrawUtils.drawSimpleString(g2d, nf.format(clan.getMemberList().stream().mapToInt(ClanMember::getVersusTrophies).sum()), 503, 293, 12f, valueColor);
 
         // Clan wars section
         Rectangle clanwarTitleRect = new Rectangle(600, 155, 318, 5);
