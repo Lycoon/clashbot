@@ -13,29 +13,18 @@ public class ErrorUtils {
     public static void sendExceptionError(MessageReceivedEvent event, ResourceBundle i18n, Exception e, String... args) {
         MessageChannel channel = event.getChannel();
         switch (e.getMessage()) {
-            case "400":
-                sendError(channel, i18n.getString("exception.other"));
-                break;
-            case "403":
-                sendError(channel, i18n.getString("exception.403"));
-                break;
-            case "404":
-                sendError(channel,
-                        MessageFormat.format(i18n.getString("exception.404." + args[1]), args[0]),
-                        i18n.getString("exception.format"));
-                break;
-            case "429":
-                sendError(channel, i18n.getString("exception.429"));
-                break;
-            case "503":
-                sendError(channel,
-                        i18n.getString("exception.503"),
-                        MessageFormat.format(i18n.getString("exception.status"), OFFICIAL_TWITTER));
-                break;
-            default:
-                sendError(channel,
-                        i18n.getString("exception.other"),
-                        i18n.getString("exception.contact"));
+            case "400" -> sendError(channel, i18n.getString("exception.other"));
+            case "403" -> sendError(channel, i18n.getString("exception.403"));
+            case "404" -> sendError(channel,
+                    MessageFormat.format(i18n.getString("exception.404." + args[1]), args[0]),
+                    i18n.getString("exception.format"));
+            case "429" -> sendError(channel, i18n.getString("exception.429"));
+            case "503" -> sendError(channel,
+                    i18n.getString("exception.503"),
+                    MessageFormat.format(i18n.getString("exception.status"), OFFICIAL_TWITTER));
+            default -> sendError(channel,
+                    i18n.getString("exception.other"),
+                    i18n.getString("exception.contact"));
         }
     }
 

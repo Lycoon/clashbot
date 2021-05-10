@@ -57,7 +57,7 @@ public class PlayerCommand {
         });
     }
 
-    public static void drawSuperTroop(Graphics2D g2d, Font font, Troop troop, String troopName, int x, int y) {
+    public static void drawSuperTroop(Graphics2D g2d, Troop troop, String troopName, int x, int y) {
         if (troop == null || troop.isActiveSuperTroop() == null)
             g2d.drawImage(FileUtils.getImageFromFile("troops/locked/" + troopName + ".png"), x, y, 44, 44, null);
         else
@@ -99,7 +99,7 @@ public class PlayerCommand {
 
     public static void drawSuperTroops(Graphics2D g2d, Font font, List<Troop> superTroops, int y) {
         for (int i = 0, j = 0; i < SUPER_TROOPS.length; i++, j += i % COLUMNS == 0 ? 1 : 0)
-            drawSuperTroop(g2d, font, getTroopByName(superTroops, SUPER_TROOPS[i]), SUPER_TROOPS[i], (i % COLUMNS) * 50 + 710, y + j * 50);
+            drawSuperTroop(g2d, getTroopByName(superTroops, SUPER_TROOPS[i]), SUPER_TROOPS[i], (i % COLUMNS) * 50 + 710, y + j * 50);
     }
 
     public static void drawHeroes(Graphics2D g2d, Font font, List<Troop> heroes, int y) {

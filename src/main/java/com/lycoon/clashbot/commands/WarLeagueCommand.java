@@ -83,7 +83,7 @@ public class WarLeagueCommand {
         WarInfo firstWar = wars.get(0);
 
         switch (firstWar.getState()) {
-            case "preparation":
+            case "preparation" -> {
                 timeLeft = GameUtils.getTimeLeft(firstWar.getStartTime());
                 g2d.drawImage(FileUtils.getImageFromFile("backgrounds/cwl/cwl-preparation.png"), 0, 0, null);
                 DrawUtils.drawSimpleCenteredString(g2d,
@@ -91,8 +91,8 @@ public class WarLeagueCommand {
                                 MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
                         timeRect, 19f, Color.BLACK);
                 DrawUtils.drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.preparation"));
-                break;
-            case "warEnded":
+            }
+            case "warEnded" -> {
                 timeLeft = GameUtils.getTimeLeft(firstWar.getEndTime());
                 g2d.drawImage(FileUtils.getImageFromFile("backgrounds/cwl/cwl-ended.png"), 0, 0, null);
                 DrawUtils.drawSimpleCenteredString(g2d,
@@ -100,11 +100,12 @@ public class WarLeagueCommand {
                                 MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
                         timeRect, 19f, Color.BLACK);
                 DrawUtils.drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.ended"));
-                break;
-            case "notInWar":
+            }
+            case "notInWar" -> {
                 ErrorUtils.sendError(event.getChannel(), i18n.getString("exception.warleague.notinwar"));
                 return;
-            default:
+            }
+            default -> {
                 // inWar
                 timeLeft = GameUtils.getTimeLeft(firstWar.getEndTime());
                 g2d.drawImage(FileUtils.getImageFromFile("backgrounds/cwl/cwl-inwar.png"), 0, 0, null);
@@ -113,7 +114,7 @@ public class WarLeagueCommand {
                                 MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
                         timeRect, 19f, Color.BLACK);
                 DrawUtils.drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.inwar"));
-                break;
+            }
         }
         DrawUtils.drawSimpleCenteredString(g2d, MessageFormat.format(i18n.getString("round.index"), roundIndex + 1), roundLabel, 22f, Color.BLACK);
 

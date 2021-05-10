@@ -248,31 +248,31 @@ public class WarCommand {
             Rectangle timeRect = new Rectangle(0, 95, WIDTH, 20);
             int[] timeLeft;
             switch (war.getState()) {
-                case "inWar":
+                case "inWar" -> {
                     timeLeft = GameUtils.getTimeLeft(war.getEndTime());
                     DrawUtils.drawSimpleCenteredString(g2d, i18n.getString("war.inwar"), statusRect, 30f, Color.BLACK);
                     DrawUtils.drawSimpleCenteredString(g2d,
                             MessageFormat.format(i18n.getString("war.timeleft"),
                                     MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
                             timeRect, 22f, Color.BLACK);
-                    break;
-                case "preparation":
+                }
+                case "preparation" -> {
                     timeLeft = GameUtils.getTimeLeft(war.getStartTime());
                     DrawUtils.drawSimpleCenteredString(g2d, i18n.getString("war.preparation"), statusRect, 30f, Color.BLACK);
                     DrawUtils.drawSimpleCenteredString(g2d,
                             MessageFormat.format(i18n.getString("war.timeleft"),
                                     MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
                             timeRect, 22f, Color.BLACK);
-                    break;
-                default:
+                }
+                default -> {
                     //warEnded
                     timeLeft = GameUtils.getTimeLeft(war.getEndTime());
-
                     DrawUtils.drawSimpleCenteredString(g2d, i18n.getString("war.ended"), statusRect, 30f, Color.BLACK);
                     DrawUtils.drawSimpleCenteredString(g2d,
                             MessageFormat.format(i18n.getString("war.since"),
                                     MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
                             timeRect, 22f, Color.BLACK);
+                }
             }
 
             for (int i = 0; i < SIZE; i++)

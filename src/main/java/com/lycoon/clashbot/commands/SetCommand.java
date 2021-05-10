@@ -10,20 +10,16 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.awt.*;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class SetCommand
-{
-    public static void dispatch(MessageReceivedEvent event, String... args)
-    {
+public class SetCommand {
+    public static void dispatch(MessageReceivedEvent event, String... args) {
         String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
-        if (args.length <= 2)
-        {
+        if (args.length <= 2) {
             ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
             ErrorUtils.sendError(event.getChannel(),
                     i18n.getString("wrong.usage"),
@@ -33,39 +29,28 @@ public class SetCommand
 
         String type = args[1].toLowerCase();
         switch (type) {
-            case "player":
-                executePlayer(event, args[2]);
-                break;
-            case "clan":
-                executeClan(event, args[2]);
-                break;
-            case "lang":
-                executeLang(event, args[2], prefix);
-                break;
-            case "prefix":
-                executePrefix(event, args[2]);
-                break;
-            default:
+            case "player" -> executePlayer(event, args[2]);
+            case "clan" -> executeClan(event, args[2]);
+            case "lang" -> executeLang(event, args[2], prefix);
+            case "prefix" -> executePrefix(event, args[2]);
+            default -> {
                 ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
                 ErrorUtils.sendError(event.getChannel(),
                         i18n.getString("wrong.usage"),
                         MessageFormat.format(i18n.getString("info.help"), Command.HELP.formatFullCommand(prefix)));
+            }
         }
     }
 
-    public static void executePrefix(MessageReceivedEvent event, String prefix)
-    {
+    public static void executePrefix(MessageReceivedEvent event, String prefix) {
         ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-        if (!Objects.requireNonNull(event.getMember()).hasPermission(Permission.MANAGE_SERVER))
-        {
+        if (!Objects.requireNonNull(event.getMember()).hasPermission(Permission.MANAGE_SERVER)) {
             // Insufficient permission
             ErrorUtils.sendError(event.getChannel(),
                     i18n.getString("exception.permission"),
                     i18n.getString("exception.prefix.permission"));
             return;
-        }
-        else if (prefix.length() > 3)
-        {
+        } else if (prefix.length() > 3) {
             // Too long prefix
             ErrorUtils.sendError(event.getChannel(), i18n.getString("exception.prefix.long"));
             return;
@@ -80,15 +65,12 @@ public class SetCommand
         CoreUtils.sendMessage(event, i18n, builder);
     }
 
-    public static void executePlayer(MessageReceivedEvent event, String tag)
-    {
+    public static void executePlayer(MessageReceivedEvent event, String tag) {
         ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-        try
-        {
+        try {
             // Checks if the player exists
             ClashBotMain.clashAPI.getPlayer(tag);
-        } catch (ClashAPIException | IOException e)
-        {
+        } catch (ClashAPIException | IOException e) {
             ErrorUtils.sendExceptionError(event, i18n, e, tag, "player");
             return;
         }
@@ -102,17 +84,13 @@ public class SetCommand
         CoreUtils.sendMessage(event, i18n, builder);
     }
 
-    public static void executeClan(MessageReceivedEvent event, String tag)
-    {
+    public static void executeClan(MessageReceivedEvent event, String tag) {
         ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
 
-        try
-        {
+        try {
             // Checks if the clan exists
             ClashBotMain.clashAPI.getClan(tag);
-        }
-        catch (ClashAPIException | IOException e)
-        {
+        } catch (ClashAPIException | IOException e) {
             ErrorUtils.sendExceptionError(event, i18n, e, tag, "clan");
             return;
         }
@@ -126,11 +104,9 @@ public class SetCommand
         CoreUtils.sendMessage(event, i18n, builder);
     }
 
-    public static void executeLang(MessageReceivedEvent event, String language, String prefix)
-    {
+    public static void executeLang(MessageReceivedEvent event, String language, String prefix) {
         long id = event.getAuthor().getIdLong();
-        if (LangUtils.isSupportedLanguage(language))
-        {
+        if (LangUtils.isSupportedLanguage(language)) {
             DatabaseUtils.setUserLang(id, language);
             Locale lang = new Locale(language);
             ResourceBundle i18n = LangUtils.getTranslations(lang);
@@ -141,12 +117,10 @@ public class SetCommand
                     MessageFormat.format(i18n.getString("lang.success"), lang.getDisplayLanguage(lang)));
             builder.setDescription(
                     MessageFormat.format(i18n.getString("lang.info.other"),
-                    Command.SETLANG.formatFullCommand(prefix)));
+                            Command.SETLANG.formatFullCommand(prefix)));
 
             CoreUtils.sendMessage(event, i18n, builder);
-        }
-        else
-        {
+        } else {
             Locale lang = LangUtils.getLanguage(id);
             ResourceBundle i18n = LangUtils.getTranslations(lang);
 
@@ -158,10 +132,8 @@ public class SetCommand
             int length = LangUtils.LANGUAGES.length;
             double perColumn = Math.ceil(length / 3D);
             StringBuilder str = new StringBuilder();
-            for (int i = 0; i < length; i++)
-            {
-                if (i != 0 && i % perColumn == 0)
-                {
+            for (int i = 0; i < length; i++) {
+                if (i != 0 && i % perColumn == 0) {
                     builder.addField(str.toString(), "", true);
                     str = new StringBuilder();
                 }

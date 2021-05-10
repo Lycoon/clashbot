@@ -23,15 +23,11 @@ public class HelpCommand
     public static void drawCategory(CommandCategory category, Command[] commands)
     {
         StringBuilder categoryField = new StringBuilder();
-        for (int i = 0; i < commands.length; i++)
-        {
-            Command cmd = commands[i];
-            if (cmd.getCategory().equals(category))
-            {
+        for (Command cmd : commands)
+            if (cmd.getCategory().equals(category)) {
                 categoryField.append("▫ `").append(cmd.formatFullCommand(prefix)).append("` ");
                 categoryField.append(i18n.getString(cmd.getDescription())).append("\n");
             }
-        }
         builder.addField(i18n.getString(category.toString()), categoryField.toString(), false);
     }
 

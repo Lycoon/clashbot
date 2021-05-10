@@ -15,11 +15,14 @@ plugins {
 mainClassName = "com.lycoon.clashbot.core.ClashBotMain"
 
 jar {
+    exclude 'META-INF/*'
+
     manifest {
         attributes "Main-Class": "$mainClassName"
     }
 
     from {
+        exclude '**/module-info.class'
         configurations.runtimeClasspath
                 .findAll { !it.name.endsWith('pom') }
                 .collect{ it.isDirectory() ? it : zipTree(it) }
@@ -48,11 +51,11 @@ dependencies {
     implementation 'net.dv8tion:JDA:4.2.0_203' // DiscordJDA (Discord API)
     implementation name:'ClashAPI', ext:'jar' // ClashAPI (Custom Clash of Clans API)
 
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
-    compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.21'
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
-    compile group: 'ch.qos.logback', name: 'logback-access', version: '1.2.3'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
+    implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.21'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
+    implementation group: 'ch.qos.logback', name: 'logback-access', version: '1.2.3'
 
     testImplementation 'junit:junit:4.12'// Use JUnit test framework
 }

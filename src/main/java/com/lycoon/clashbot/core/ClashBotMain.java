@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class ClashBotMain {
-    private static final String CONFIG = "tokens.properties";
+    static final String CONFIG = "tokens.properties";
 
     public static Logger LOGGER = LoggerFactory.getLogger(ClashBotMain.class.getName());
     public static long[] owners = {138282927502000128L, 198485955701768192L};

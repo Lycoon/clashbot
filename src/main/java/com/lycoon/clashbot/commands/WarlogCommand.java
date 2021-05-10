@@ -166,17 +166,13 @@ public class WarlogCommand {
         int total, wins, losses, draws;
         wins = losses = draws = 0;
         for (WarlogItem war : wars) {
-            if (war.getResult() != null) {
-                switch (war.getResult()) {
-                    case "win":
-                        wins++;
-                        break;
-                    case "lose":
-                        losses++;
-                        break;
-                    default:
-                        draws++;
-                }
+            if (war.getResult() == null)
+                continue;
+
+            switch (war.getResult()) {
+                case "win" -> wins++;
+                case "lose" -> losses++;
+                default -> draws++;
             }
         }
         total = wins + losses + draws;

@@ -1,7 +1,6 @@
 package com.lycoon.clashbot.event;
 
 import com.lycoon.clashbot.commands.*;
-import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
 import com.lycoon.clashbot.utils.DatabaseUtils;
@@ -10,12 +9,15 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.awt.*;
 import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.ResourceBundle;
+
+import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;
 
 public class EventListener extends ListenerAdapter {
     static boolean isCommand(String arg, String prefix, Command cmd) {
@@ -59,15 +61,6 @@ public class EventListener extends ListenerAdapter {
 
         String[] args = message.split(" ");
 
-        TextChannel defaultChannel = event.getGuild().getDefaultChannel();
-
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setColor(Color.GRAY);
-        builder.setTitle(":star_struck: Thanks for inviting");
-        builder.setDescription("Try `!help` to get the list of all available commands");
-
-        Objects.requireNonNull(defaultChannel).sendMessage(builder.build()).queue();
-
         if (isCommand(args[0], prefix, Command.SETLANG)) // !set
             SetCommand.dispatch(event, args);
         else if (isCommand(args[0], prefix, Command.LANG)) // !lang
@@ -97,18 +90,18 @@ public class EventListener extends ListenerAdapter {
         else
             return;
 
-        ClashBotMain.LOGGER.info(event.getAuthor().getAsTag() + " issued: " + message);
+        LOGGER.info(event.getAuthor().getAsTag() + " issued: " + message);
     }
 
     @Override
     public void onGuildJoin(GuildJoinEvent event) {
         TextChannel defaultChannel = event.getGuild().getDefaultChannel();
-
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.GRAY);
-        builder.setTitle("Thanks for inviting");
-        builder.setDescription("Try `!help` to get the list of all available commands");
+        builder.setTitle("Hi, thanks for inviting me!");
+        builder.setDescription("Run `!help` to get the list of all available commands :scroll:");
 
-        Objects.requireNonNull(defaultChannel).sendMessage(builder.build()).queue();
+        try { Objects.requireNonNull(defaultChannel).sendMessage(builder.build()).queue(); }
+        catch (MissingAccessException ignored) {}
     }
 }

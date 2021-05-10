@@ -7,7 +7,6 @@ import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
@@ -24,14 +23,14 @@ public class ClanCommand {
     private final static int HEIGHT = 322;
     private final static float FONT_SIZE = 12f;
 
-    private static Color backgroundColor = new Color(0xe7e7e1);
-    private static Color clanNameColor = new Color(0xfeffaf);
-    private static Color clanTypeOpenColor = new Color(0xaede91);
-    private static Color clanTypeClosedColor = new Color(0xd87878);
-    private static Color clanTypeInviteOnlyColor = new Color(0xfbbf70);
-    private static Color valueColor = new Color(0x444545);
+    private static final Color backgroundColor = new Color(0xe7e7e1);
+    private static final Color clanNameColor = new Color(0xfeffaf);
+    private static final Color clanTypeOpenColor = new Color(0xaede91);
+    private static final Color clanTypeClosedColor = new Color(0xd87878);
+    private static final Color clanTypeInviteOnlyColor = new Color(0xfbbf70);
+    private static final Color valueColor = new Color(0x444545);
 
-    private final static Map<String, String> regions = new HashMap<String, String>() {{
+    private final static Map<String, String> regions = new HashMap<>() {{
         put("Europe", "europe");
         put("North America", "north.america");
         put("South America", "south.america");
@@ -41,7 +40,7 @@ public class ClanCommand {
         put("International", "international");
     }};
 
-    private final static Map<String, String> labels = new HashMap<String, String>() {{
+    private final static Map<String, String> labels = new HashMap<>() {{
         put("Clan Wars", "label.clanwars");
         put("Clan War League", "label.clanwarleague");
         put("Trophy Pushing", "label.trophy");
@@ -69,21 +68,11 @@ public class ClanCommand {
         });
     }
 
-    public static int getAverageTrophies(List<ClanMember> members) {
-        if (members.isEmpty())
-            return 0;
-
-        int average = 0;
-        for (ClanMember member : members)
-            average += member.getTrophies();
-        return average / members.size();
-    }
-
     public static String getClanChief(List<ClanMember> members) {
-        for (ClanMember member : members) {
+        for (ClanMember member : members)
             if (member.getRole().equals("leader"))
                 return member.getName();
-        }
+
         return "";
     }
 
@@ -112,8 +101,6 @@ public class ClanCommand {
     }
 
     public static void execute(MessageReceivedEvent event, String... args) {
-        MessageChannel channel = event.getChannel();
-
         Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         NumberFormat nf = NumberFormat.getInstance(lang);
@@ -163,14 +150,9 @@ public class ClanCommand {
 
         // Invitation type
         switch (clan.getType()) {
-            case "inviteOnly":
-                DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("clan.type.inviteonly"), 905, 67, 12f, 2, clanTypeInviteOnlyColor);
-                break;
-            case "open":
-                DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("clan.type.open"), 905, 67, 12f, 2, clanTypeOpenColor);
-                break;
-            default:
-                DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("clan.type.closed"), 905, 67, 12f, 2, clanTypeClosedColor);
+            case "inviteOnly" -> DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("clan.type.inviteonly"), 905, 67, 12f, 2, clanTypeInviteOnlyColor);
+            case "open" -> DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("clan.type.open"), 905, 67, 12f, 2, clanTypeOpenColor);
+            default -> DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("clan.type.closed"), 905, 67, 12f, 2, clanTypeClosedColor);
         }
 
         // War frequency

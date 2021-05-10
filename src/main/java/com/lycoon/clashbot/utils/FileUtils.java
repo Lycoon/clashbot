@@ -1,13 +1,13 @@
 package com.lycoon.clashbot.utils;
 
-import com.lycoon.clashbot.core.ClashBotMain;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -58,7 +58,7 @@ public class FileUtils {
             CoreUtils.removeUserFromGenerating(id);
         };
         event.getChannel().sendFile(outputfile).queue(sendingCallback);
-        ClashBotMain.LOGGER.info(outputfile.getName() + " sent to " + event.getAuthor().getAsTag() + " on " + event.getGuild().getIdLong());
+        LOGGER.info(outputfile.getName() + " sent to " + event.getAuthor().getAsTag() + " on " + event.getGuild().getIdLong());
     }
 
     public static Image getImageFromFile(String file) {
