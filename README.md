@@ -1,5 +1,6 @@
-# Clashbot
-Clashbot is a verified Discord bot generating pictures from Clash of Clans ingame info. Invite it by clicking [here](https://discord.com/api/oauth2/authorize?client_id=734481969630543883&permissions=51200&scope=bot).
+![Clashbot banner](/src/main/resources/icons/clashbot-banner.png)
+
+Clashbot is a verified Discord bot generating pictures from Clash of Clans ingame info. Invite it by clicking [here](https://discord.com/api/oauth2/authorize?client_id=734481969630543883&permissions=2147780672&scope=bot).
 
 # Features
 The bot proposes several features including: language choice, saving default tags, accessing clan and player profiles, clan warlogs, current clanwars, warleague rounds...
