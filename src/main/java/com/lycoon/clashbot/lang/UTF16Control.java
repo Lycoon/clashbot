@@ -5,44 +5,35 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
-public class UTF16Control extends Control 
-{
+public class UTF16Control extends Control {
     public ResourceBundle newBundle
-        (String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
-            throws IllegalAccessException, InstantiationException, IOException
-    {
+            (String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
+            throws IOException {
         String bundleName = toBundleName(baseName, locale);
         String resourceName = toResourceName(bundleName, "properties");
         ResourceBundle bundle = null;
         InputStream stream = null;
-        if (reload) 
-        {
+        if (reload) {
             URL url = loader.getResource(resourceName);
-            if (url != null) 
-            {
+            if (url != null) {
                 URLConnection connection = url.openConnection();
-                if (connection != null) 
-                {
+                if (connection != null) {
                     connection.setUseCaches(false);
                     stream = connection.getInputStream();
                 }
             }
-        } 
-        else
+        } else
             stream = loader.getResourceAsStream(resourceName);
-        if (stream != null) 
-        {
-            try 
-            {
-                bundle = new PropertyResourceBundle(new InputStreamReader(stream, "UTF-8"));
-            } 
-            finally 
-            {
+        if (stream != null) {
+            try {
+                bundle = new PropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
+            } finally {
                 stream.close();
             }
         }

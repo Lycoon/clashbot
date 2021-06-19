@@ -37,8 +37,8 @@ public class ClashBotMain {
         builder.addEventListeners(new EventListener());
         builder.setActivity(Activity.playing("Clash of Clans"));
         builder.setStatus(OnlineStatus.ONLINE);
-        jda = builder.build();
 
+        jda = builder.build();
         clashAPI = new ClashAPI(tokens.getProperty("clash-of-clans"));
         cached = CacheComponents.getInstance();
     }
