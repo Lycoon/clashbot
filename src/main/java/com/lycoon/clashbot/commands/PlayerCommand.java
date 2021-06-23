@@ -24,7 +24,7 @@ import static com.lycoon.clashbot.utils.GameUtils.*;
 
 public class PlayerCommand {
     private final static int WIDTH = 932;
-    private final static int HEIGHT = 571;
+    private final static int HEIGHT = 559;
     private final static float FONT_SIZE = 12f;
 
     private final static int COLUMNS = 4;

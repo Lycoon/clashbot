@@ -150,6 +150,8 @@ public class WarlogCommand {
         if (warlog == null)
             return;
 
+        System.out.println("Warlog is not null");
+
         // Checking index validity
         int index = ErrorUtils.checkIndex(event, i18n, args[0], warlog.getWars().size() / SIZE);
         if (index == -1)
