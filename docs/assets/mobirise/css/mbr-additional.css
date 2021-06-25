@@ -13,6 +13,12 @@
   margin-left: 15%;
 }
 
+@media screen and (max-width: 786px) {
+  .clashbot-logo {
+    margin: 0 auto;
+  }
+}
+
 .btn {
   border-width: 2px;
 }
