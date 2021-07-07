@@ -17,7 +17,7 @@ public class InfoCommand {
     private static final String API_CODE = "https://github.com/Lycoon/clash-api";
     private static final String DISCORD_INVITE = "https://discord.gg/Cy86PDA";
     private static final String PAYPAL = "https://www.patreon.com/clashbot";
-    private static final String VERSION = "1.1.4";
+    private static final String VERSION = "1.2.1";
 
     public static void dispatch(MessageReceivedEvent event, String... args) {
         execute(event);
