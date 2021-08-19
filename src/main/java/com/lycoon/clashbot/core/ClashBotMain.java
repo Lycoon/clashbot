@@ -32,8 +32,8 @@ public class ClashBotMain {
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
         }
-
         JDABuilder builder = JDABuilder.createDefault(tokens.getProperty("discord"));
+
         builder.addEventListeners(new EventListener());
         builder.setActivity(Activity.playing("Clash of Clans"));
         builder.setStatus(OnlineStatus.ONLINE);

@@ -12,12 +12,12 @@ import java.util.ResourceBundle;
 public class InfoCommand {
     private static final String TWITTER = "@LycoonMC";
     private static final String DISCORD = "Lycoon#7542";
-    private static final String WEBSITE = "https://lycoon.github.io/clash-bot/";
-    private static final String BOT_CODE = "https://github.com/Lycoon/clash-bot";
+    private static final String WEBSITE = "https://lycoon.github.io/clashbot/";
+    private static final String BOT_CODE = "https://github.com/Lycoon/clashbot";
     private static final String API_CODE = "https://github.com/Lycoon/clash-api";
     private static final String DISCORD_INVITE = "https://discord.gg/Cy86PDA";
     private static final String PAYPAL = "https://www.patreon.com/clashbot";
-    private static final String VERSION = "1.2.1";
+    private static final String VERSION = "1.2.2";
 
     public static void dispatch(MessageReceivedEvent event, String... args) {
         execute(event);
