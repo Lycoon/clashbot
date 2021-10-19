@@ -212,7 +212,7 @@ public class WarlogCommand {
         for (int i = 0; i < SIZE; i++)
             drawWar(g2d, wars.get((index - 1) * SIZE + i), 118 + i * WAR_ITEM_HEIGHT + i * PADDING);
 
-        FileUtils.sendImage(event, image, "warlog", "png");
+        FileUtils.sendImage(event, image);
         g2d.dispose();
     }
 }

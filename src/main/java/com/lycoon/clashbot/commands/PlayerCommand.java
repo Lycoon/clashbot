@@ -97,7 +97,7 @@ public class PlayerCommand {
             drawTroop(g2d, font, getBuilderTroopByName(builderTroops, BUILDER_TROOPS[i]), BUILDER_TROOPS[i], (i % COLUMNS) * 50 + 480, y + j * 50);
     }
 
-    public static void drawSuperTroops(Graphics2D g2d, Font font, List<Troop> superTroops, int y) {
+    public static void drawSuperTroops(Graphics2D g2d, List<Troop> superTroops, int y) {
         for (int i = 0, j = 0; i < SUPER_TROOPS.length; i++, j += i % COLUMNS == 0 ? 1 : 0)
             drawSuperTroop(g2d, getTroopByName(superTroops, SUPER_TROOPS[i]), SUPER_TROOPS[i], (i % COLUMNS) * 50 + 710, y + j * 50);
     }
@@ -128,7 +128,7 @@ public class PlayerCommand {
         if (!CoreUtils.checkThrottle(event, lang))
             return;
 
-        Player player = null;
+        Player player;
         String tag = args.length > 0 ? args[0] : DatabaseUtils.getPlayerTag(event.getAuthor().getIdLong());
 
         if (tag == null) {
@@ -234,13 +234,13 @@ public class PlayerCommand {
         drawTroops(g2d, font, troops, ARMY_TOPLINE);
         drawSpells(g2d, font, spells, ARMY_TOPLINE);
         drawBuilderTroops(g2d, font, troops, ARMY_TOPLINE);
-        drawSuperTroops(g2d, font, troops, ARMY_TOPLINE);
+        drawSuperTroops(g2d, troops, ARMY_TOPLINE);
 
         drawHeroes(g2d, font, heroes, ARMY_BOTLINE);
         drawMachines(g2d, font, troops, ARMY_BOTLINE);
         drawPets(g2d, font, troops, ARMY_BOTLINE);
 
-        FileUtils.sendImage(event, image, "player", "png");
+        FileUtils.sendImage(event, image);
 
         g2d.dispose();
     }

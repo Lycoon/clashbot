@@ -294,7 +294,7 @@ public class WarCommand {
             DrawUtils.drawSimpleCenteredString(g2d, df.format(war.getClan().getDestructionPercentage()) + "%", destructionRect1, 26f, Color.BLACK);
             DrawUtils.drawSimpleCenteredString(g2d, df.format(war.getEnemy().getDestructionPercentage()) + "%", destructionRect2, 26f, Color.BLACK);
 
-            FileUtils.sendImage(event, image, "war", "png");
+            FileUtils.sendImage(event, image);
             g2d.dispose();
         } else
             ErrorUtils.sendError(channel, MessageFormat.format(i18n.getString("exception.404.war"), tag));

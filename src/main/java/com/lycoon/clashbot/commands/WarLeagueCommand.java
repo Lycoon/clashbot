@@ -236,7 +236,7 @@ public class WarLeagueCommand {
         List<WarInfo> roundWars = getWars(warLeague, index - 1);
         drawRound(g2d, event, roundWars, i18n, index - 1);
 
-        FileUtils.sendImage(event, image, "cwl", "png");
+        FileUtils.sendImage(event, image);
         g2d.dispose();
     }
 
@@ -306,7 +306,7 @@ public class WarLeagueCommand {
             System.out.println(clan.getName() + ": " + stars.get(clan.getName()) + " étoiles (" + destruction.get(clan.getName()) + "%)");
         }
 
-        FileUtils.sendImage(event, image, "cwl-all", "png");
+        FileUtils.sendImage(event, image);
         g2d.dispose();
     }
 

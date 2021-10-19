@@ -203,7 +203,7 @@ public class ClanCommand {
         DrawUtils.drawSimpleString(g2d, clan.isWarLogPublic() ? nf.format(clan.getWarLosses()) : i18n.getString("warlog.private"), 826, 228, 12f, valueColor);
         DrawUtils.drawSimpleString(g2d, clan.isWarLogPublic() ? nf.format(clan.getWarTies()) : i18n.getString("warlog.private"), 826, 263, 12f, valueColor);
 
-        FileUtils.sendImage(event, image, clan.getTag(), "png");
+        FileUtils.sendImage(event, image);
 
         g2d.dispose();
     }

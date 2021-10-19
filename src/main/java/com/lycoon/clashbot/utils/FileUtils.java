@@ -8,28 +8,18 @@ import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 public class FileUtils {
-    public static void sendImage(MessageReceivedEvent event, BufferedImage image, String file, String extension) {
-        ZonedDateTime date = ZonedDateTime.now(ZoneId.of("UTC"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-        String time = formatter.format(date);
-
+    public static void sendImage(MessageReceivedEvent event, BufferedImage image) {
         // Generating the picture
-        String filename = time + file + "." + extension;
-        File outputfile = new File("outputs/" + filename);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
-            ImageIO.write(image, extension, outputfile);
+            ImageIO.write(image, "jpg", bos);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,13 +31,6 @@ public class FileUtils {
 
         Consumer<Message> sendingCallback = (res) ->
         {
-            // Deleting picture from disk
-            try {
-                Files.delete(Paths.get(outputfile.getPath()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
             // Bot rate limitation
             try {
                 Thread.sleep(CoreUtils.threshold);
@@ -57,8 +40,8 @@ public class FileUtils {
 
             CoreUtils.removeUserFromGenerating(id);
         };
-        event.getChannel().sendFile(outputfile).queue(sendingCallback);
-        LOGGER.info(outputfile.getName() + " sent to " + event.getAuthor().getAsTag() + " on " + event.getGuild().getIdLong());
+        event.getChannel().sendFile(bos.toByteArray(), "clashbot_generated.jpg").queue(sendingCallback);
+        LOGGER.info("Picture sent to " + event.getAuthor().getAsTag() + " on " + event.getGuild().getIdLong());
     }
 
     public static Image getImageFromFile(String file) {
