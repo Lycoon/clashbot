@@ -16,6 +16,10 @@ jobs:
         with:
           java-version: '16'
           distribution: 'temurin'
-
+          
+      - uses: actions/labeler@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots verify
