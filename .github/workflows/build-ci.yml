@@ -21,6 +21,12 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           
+      - name: maven-settings-xml-action
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          repositories: '[{ "id": "github", "url": "https://maven.pkg.github.com/lycoon/clash-api" }, { "id": "central", "url": "https://repo1.maven.org/maven2" }]'
+          servers: '[{ "id": "github", "username": "Lycoon", "password": "${{ secrets.PASSWORD }}" }]'
+          
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots verify
         
