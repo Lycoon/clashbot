@@ -38,4 +38,4 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           source: "clashbot.jar"
-          target: "app"
+          target: "/home/clashbot/app"
