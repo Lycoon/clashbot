@@ -37,5 +37,5 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           port: 22
-          source: "*.jar"
+          source: "target/*.jar"
           target: "/home/clashbot/app"
