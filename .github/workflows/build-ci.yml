@@ -28,7 +28,7 @@ jobs:
           servers: '[{ "id": "github", "username": "Lycoon", "password": "${{ secrets.PASSWORD }}" }]'
           
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots verify
+        run: mvn -B package --file pom.xml
         
       - name: Upload application
         uses: appleboy/scp-action@master
