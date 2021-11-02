@@ -33,9 +33,9 @@ jobs:
       - name: Upload application
         uses: appleboy/scp-action@master
         with:
+          port: 22
+          key: ${{ secrets.KEY }}
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          port: 22
-          source: "target/*.jar"
-          target: "/home/clashbot/app"
+          source: ${{ secrets.SOURCE_DIRECTORY }}
+          target: ${{ secrets.TARGET_DIRECTORY }}
