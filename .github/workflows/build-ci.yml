@@ -37,6 +37,6 @@ jobs:
           key: ${{ secrets.KEY }}
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          source: ${{ secrets.SOURCE_DIRECTORY }}
-          target: ${{ secrets.TARGET_DIRECTORY }}
+          source: target/*.jar
+          target: /home/clashbot/app
           strip_components: 1
