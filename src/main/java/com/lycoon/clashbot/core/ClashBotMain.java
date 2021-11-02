@@ -23,6 +23,9 @@ public class ClashBotMain {
     public static CacheComponents cached;
     public static JDA jda;
 
+    /*
+     * Clashbot entry point
+     */
     public static void main(String[] args) throws LoginException {
         Properties tokens = new Properties();
         try {
