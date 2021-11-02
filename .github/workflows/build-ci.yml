@@ -39,3 +39,4 @@ jobs:
           username: ${{ secrets.USERNAME }}
           source: ${{ secrets.SOURCE_DIRECTORY }}
           target: ${{ secrets.TARGET_DIRECTORY }}
+          strip_components: 1
