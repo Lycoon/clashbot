@@ -1,5 +1,7 @@
 ![Clashbot banner](/src/main/resources/icons/clashbot-banner.png)
 
+[![Java CI](https://github.com/Lycoon/clashbot/actions/workflows/build-ci.yml/badge.svg?event=push)](https://github.com/Lycoon/clashbot/actions/workflows/build-ci.yml)
+
 Clashbot is a verified Discord bot generating pictures from Clash of Clans ingame info. Invite it by clicking [here](https://discord.com/api/oauth2/authorize?client_id=734481969630543883&permissions=2147780672&scope=bot).
 
 # Features
