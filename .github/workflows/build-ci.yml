@@ -49,6 +49,6 @@ jobs:
           key: ${{ secrets.KEY }}
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          script:
+          script: |
             cd /home/clashbot/app
             mv clashbot.jar clashbot-release.jar
