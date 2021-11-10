@@ -1,6 +1,7 @@
 package com.lycoon.clashbot.core;
 
 import com.lycoon.clashapi.core.ClashAPI;
+import com.lycoon.clashbot.commands.CommandConfig;
 import com.lycoon.clashbot.event.EventListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -26,7 +27,7 @@ public class ClashBotMain {
     /*
      * Clashbot entry point
      */
-    public static void main(String[] args) throws LoginException {
+    public static void main(String[] args) throws LoginException, InterruptedException {
         Properties tokens = new Properties();
         try {
             // Loading secret tokens
@@ -40,8 +41,12 @@ public class ClashBotMain {
         builder.addEventListeners(new EventListener());
         builder.setActivity(Activity.playing("Clash of Clans"));
         builder.setStatus(OnlineStatus.ONLINE);
+        jda = builder.build().awaitReady();
 
-        jda = builder.build();
+        // Creating commands
+        CommandConfig commandConfig = new CommandConfig(jda);
+        commandConfig.createCommands();
+
         clashAPI = new ClashAPI(tokens.getProperty("clash-of-clans"));
         cached = CacheComponents.getInstance();
     }
