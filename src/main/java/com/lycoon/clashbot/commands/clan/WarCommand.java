@@ -22,20 +22,6 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-class SortMemberByOrder implements Comparator<ClanWarMember> {
-    @Override
-    public int compare(ClanWarMember a, ClanWarMember b) {
-        return a.getMapPosition() - b.getMapPosition();
-    }
-}
-
-class SortAttackByOrder implements Comparator<Attack> {
-    @Override
-    public int compare(Attack a, Attack b) {
-        return a.getOrder() - b.getOrder();
-    }
-}
-
 public class WarCommand {
     private static String tag;
 
@@ -52,6 +38,20 @@ public class WarCommand {
     private final static Color clanNameColor = new Color(0xfeffaf);
     private final static Color notUsedAttackColor = new Color(0xfbbf70);
     private final static Color attackColor = new Color(0x4c493a);
+
+    static class SortMemberByOrder implements Comparator<ClanWarMember> {
+        @Override
+        public int compare(ClanWarMember a, ClanWarMember b) {
+            return a.getMapPosition() - b.getMapPosition();
+        }
+    }
+
+    static class SortAttackByOrder implements Comparator<Attack> {
+        @Override
+        public int compare(Attack a, Attack b) {
+            return a.getOrder() - b.getOrder();
+        }
+    }
 
     public static void dispatch(MessageReceivedEvent event, String... args) {
         String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
@@ -115,43 +115,51 @@ public class WarCommand {
                 DrawUtils.drawSimpleString(g2d, MessageFormat.format(i18n.getString("attack.index"), j + 1), 105, y + 55 + j * 47, 8f, attackColor);
             else
                 DrawUtils.drawSimpleStringLeft(g2d, MessageFormat.format(i18n.getString("attack.index"), j + 1), 1100, y + 55 + j * 47, 8f, attackColor);
-            if (attacks != null) {
-                Attack attack;
-                if (j < attacks.size()) {
-                    // If the player made at least one attack
-                    attack = attacks.get(j);
-                    ClanWarMember defender = getClanWarMemberByTag(opponentMembers, attack.getDefenderTag());
 
-                    if (!rightSide) {
-                        DrawUtils.drawShadowedString(g2d, defender.getMapPosition() + ". " + defender.getName(), 105, y + 78 + j * 46, 16f);
-                        DrawUtils.drawSimpleStringLeft(g2d, attack.getDestructionPercentage().longValue() + "%", 370, y + 70 + j * 47, 16f, Color.BLACK);
-                    } else {
-                        DrawUtils.drawShadowedStringLeft(g2d, defender.getMapPosition() + ". " + defender.getName(), 1100, y + 78 + j * 46, 16f);
-                        DrawUtils.drawSimpleString(g2d, attack.getDestructionPercentage().longValue() + "%", 840, y + 70 + j * 47, 16f, Color.BLACK);
-                    }
-
-                    int newStars = getNewStars(opponentAttacks, attack);
-
-                    // Stars
-                    for (int k = 0; k < 3; k++) {
-                        if (k + 1 <= attack.getStars()) {
-                            if (k + 1 <= attack.getStars() - newStars)
-                                g2d.drawImage(CacheComponents.alreadyStar, (rightSide ? 750 : 380) + k * 26, y + 48 + j * 45, 28, 28, null);
-                            else {
-                                stars++;
-                                g2d.drawImage(CacheComponents.newStar, (rightSide ? 750 : 380) + k * 26, y + 48 + j * 45, 28, 28, null);
-                            }
-                        } else
-                            g2d.drawImage(CacheComponents.noStar, (rightSide ? 750 : 380) + k * 26, y + 48 + j * 45, 28, 28, null);
-                    }
-                } else if (!rightSide)
+            if (attacks == null) {
+                if (!rightSide)
                     DrawUtils.drawShadowedString(g2d, i18n.getString("not.used"), 105, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
                 else
                     DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("not.used"), 1100, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
-            } else if (!rightSide)
-                DrawUtils.drawShadowedString(g2d, i18n.getString("not.used"), 105, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
-            else
-                DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("not.used"), 1100, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
+                continue;
+            }
+
+            if (j >= attacks.size()){
+                if (!rightSide)
+                    DrawUtils.drawShadowedString(g2d, i18n.getString("not.used"), 105, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
+                else
+                    DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("not.used"), 1100, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
+                continue;
+            }
+
+            // If the player made at least one attack
+            Attack attack = attacks.get(j);
+            ClanWarMember defender = getClanWarMemberByTag(opponentMembers, attack.getDefenderTag());
+
+            if (!rightSide) {
+                DrawUtils.drawShadowedString(g2d, defender != null ? defender.getMapPosition() + ". " + defender.getName() : "Unknown", 105, y + 78 + j * 46, 16f);
+                DrawUtils.drawSimpleStringLeft(g2d, attack.getDestructionPercentage().longValue() + "%", 370, y + 70 + j * 47, 16f, Color.BLACK);
+            } else {
+                DrawUtils.drawShadowedStringLeft(g2d, defender != null ? defender.getMapPosition() + ". " + defender.getName() : "Unknown", 1100, y + 78 + j * 46, 16f);
+                DrawUtils.drawSimpleString(g2d, attack.getDestructionPercentage().longValue() + "%", 840, y + 70 + j * 47, 16f, Color.BLACK);
+            }
+
+            int newStars = getNewStars(opponentAttacks, attack);
+
+            // Stars
+            for (int starIndex = 0; starIndex < 3; starIndex++) {
+                if (starIndex + 1 > attack.getStars()) {
+                    g2d.drawImage(CacheComponents.noStar, (rightSide ? 750 : 380) + starIndex * 26, y + 48 + j * 45, 28, 28, null);
+                    continue;
+                }
+
+                if (starIndex + 1 <= attack.getStars() - newStars)
+                    g2d.drawImage(CacheComponents.alreadyStar, (rightSide ? 750 : 380) + starIndex * 26, y + 48 + j * 45, 28, 28, null);
+                else {
+                    stars++;
+                    g2d.drawImage(CacheComponents.newStar, (rightSide ? 750 : 380) + starIndex * 26, y + 48 + j * 45, 28, 28, null);
+                }
+            }
         }
         return stars;
     }
