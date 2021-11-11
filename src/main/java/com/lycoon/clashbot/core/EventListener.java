@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -27,21 +28,26 @@ import java.util.ResourceBundle;
 import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;
 
 public class EventListener extends ListenerAdapter {
-    static boolean isCommand(String arg, String prefix, Command cmd) {
-        return arg.equalsIgnoreCase(cmd.formatCommand(prefix));
+    static boolean isCommand(String arg, Command cmd) {
+        return arg.equalsIgnoreCase(cmd.toString());
+    }
+
+    static boolean isOldCommand(String arg, String prefix, Command cmd) {
+        return arg.equalsIgnoreCase(cmd.formatFullCommand(prefix));
     }
 
     static boolean isAdminCommand(String arg) {
         return arg.equalsIgnoreCase(AdminCommand.ADMIN.formatCommand());
     }
 
+
     static boolean isMentioned(MessageReceivedEvent event, String message) {
         long id = event.getJDA().getSelfUser().getIdLong();
         return message.startsWith("<@" + id + ">") || message.startsWith("<@!" + id + ">");
     }
 
-    static void taggingBot(MessageReceivedEvent event, String prefix) {
-        ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
+    static void taggingBot(SlashCommandEvent event, String prefix) {
+        ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
         EmbedBuilder builder = new EmbedBuilder();
 
         builder.setColor(Color.GRAY);
@@ -52,6 +58,36 @@ public class EventListener extends ListenerAdapter {
         CoreUtils.sendMessage(event, i18n, builder);
     }
 
+    @Override
+    public void onSlashCommand(SlashCommandEvent event) {
+        String cmd = event.getName();
+        event.deferReply().queue();
+
+        if (isCommand(cmd, Command.SETLANG))
+            SetCommand.call(event);
+        else if (isCommand(cmd, Command.PLAYER))
+            PlayerCommand.call(event);
+        else if (isCommand(cmd, Command.CLAN))
+            ClanCommand.call(event);
+        else if (isCommand(cmd, Command.WAR))
+            WarCommand.call(event);
+        else if (isCommand(cmd, Command.WARLOG))
+            WarlogCommand.call(event);
+        else if (isCommand(cmd, Command.LANG))
+            LangCommand.call(event);
+        else if (isCommand(cmd, Command.INFO))
+            InfoCommand.call(event);
+        else if (isCommand(cmd, Command.HELP))
+            HelpCommand.call(event);
+        else if (isCommand(cmd, Command.CLEAR))
+            ClearCommand.call(event);
+        else if (isCommand(cmd, Command.INVITE))
+            InviteCommand.call(event);
+        else if (isCommand(cmd, Command.STATS))
+            StatsCommand.call(event);
+    }
+
+    /*
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         if (!event.isFromType(ChannelType.TEXT))
@@ -68,29 +104,29 @@ public class EventListener extends ListenerAdapter {
 
         String[] args = message.split(" ");
 
-        if (isCommand(args[0], prefix, Command.SETLANG)) // !set
+        if (isOldCommand(args[0], prefix, Command.SETLANG)) // !set
             SetCommand.dispatch(event, args);
-        else if (isCommand(args[0], prefix, Command.LANG)) // !lang
+        else if (isOldCommand(args[0], prefix, Command.LANG)) // !lang
             LangCommand.dispatch(event, args);
-        else if (isCommand(args[0], prefix, Command.PLAYER)) // !player
+        else if (isOldCommand(args[0], prefix, Command.PLAYER)) // !player
             PlayerCommand.dispatch(event, args);
-        else if (isCommand(args[0], prefix, Command.CLAN)) // !player
+        else if (isOldCommand(args[0], prefix, Command.CLAN)) // !player
             ClanCommand.dispatch(event, args);
-        else if (isCommand(args[0], prefix, Command.WAR)) // !war
+        else if (isOldCommand(args[0], prefix, Command.WAR)) // !war
             WarCommand.dispatch(event, args);
-        else if (isCommand(args[0], prefix, Command.WARLOG)) // !warlog
+        else if (isOldCommand(args[0], prefix, Command.WARLOG)) // !warlog
             WarlogCommand.dispatch(event, args);
-        else if (isCommand(args[0], prefix, Command.WARLEAGUE_ROUND)) // !warleague
+        else if (isOldCommand(args[0], prefix, Command.WARLEAGUE_ROUND)) // !warleague
             WarLeagueCommand.dispatch(event, args);
-        else if (isCommand(args[0], prefix, Command.INFO)) // !info
+        else if (isOldCommand(args[0], prefix, Command.INFO)) // !info
             InfoCommand.dispatch(event, args);
-        else if (isCommand(args[0], prefix, Command.HELP)) // !help
+        else if (isOldCommand(args[0], prefix, Command.HELP)) // !help
             HelpCommand.dispatch(event, args);
-        else if (isCommand(args[0], prefix, Command.CLEAR)) // !clear
+        else if (isOldCommand(args[0], prefix, Command.CLEAR)) // !clear
             ClearCommand.dispatch(event, args);
-        else if (isCommand(args[0], prefix, Command.INVITE)) // !invite
+        else if (isOldCommand(args[0], prefix, Command.INVITE)) // !invite
             InviteCommand.dispatch(event, args);
-        else if (isCommand(args[0], prefix, Command.STATS)) // !stats
+        else if (isOldCommand(args[0], prefix, Command.STATS)) // !stats
             StatsCommand.dispatch(event, args);
         else if (isAdminCommand(args[0])) // !admin
             ServersCommand.dispatch(event, args);
@@ -99,6 +135,7 @@ public class EventListener extends ListenerAdapter {
 
         LOGGER.info(event.getAuthor().getAsTag() + " issued: " + message);
     }
+    */
 
     @Override
     public void onGuildJoin(GuildJoinEvent event) {

@@ -38,6 +38,7 @@ public enum Command
         this.desc = desc;
     }
 
+    @Override
     public String toString()
     {
         return name;

@@ -7,6 +7,7 @@ import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;
 
 import com.lycoon.clashbot.lang.LangUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
@@ -45,18 +46,18 @@ public class CoreUtils {
         return threshold;
     }
 
-    public static boolean checkThrottle(MessageReceivedEvent event, Locale lang) {
+    public static boolean checkThrottle(SlashCommandEvent event, Locale lang) {
         ResourceBundle i18n = LangUtils.getTranslations(lang);
 
         NumberFormat nf = NumberFormat.getNumberInstance(lang);
         DecimalFormat df = (DecimalFormat) nf;
         df.applyPattern("#.#");
 
-        long timeDifference = getLastTimeDifference(event.getAuthor().getIdLong());
+        long timeDifference = getLastTimeDifference(event.getMember().getIdLong());
         boolean isValid = timeDifference >= threshold;
 
         if (!isValid)
-            ErrorUtils.sendError(event.getChannel(),
+            ErrorUtils.sendError(event,
                     i18n.getString("exception.rate.exceeded"),
                     MessageFormat.format(
                             i18n.getString("exception.rate.exceeded.left"),
@@ -73,15 +74,15 @@ public class CoreUtils {
         return false;
     }
 
-    public static void sendMessage(MessageReceivedEvent event, ResourceBundle i18n, EmbedBuilder builder) {
+    public static void sendMessage(SlashCommandEvent event, ResourceBundle i18n, EmbedBuilder builder) {
         try {
             event.getChannel().sendMessage(builder.build()).queue();
         } catch (InsufficientPermissionException e) {
             LOGGER.debug(e.getMessage());
-            event.getAuthor().openPrivateChannel().queue(
+            event.getMember().getUser().openPrivateChannel().queue(
                     // Success
                     (channel) ->
-                            ErrorUtils.sendError(channel, INFO_EMOJI + " " +
+                            ErrorUtils.sendError(event, INFO_EMOJI + " " +
                                     i18n.getString("exception.permission.title"), MessageFormat.format(
                                     i18n.getString("exception.permission.tip"),
                                     event.getGuild().getName(), InviteCommand.INVITE)),

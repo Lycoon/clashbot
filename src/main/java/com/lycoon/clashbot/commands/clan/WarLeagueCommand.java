@@ -11,6 +11,7 @@ import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.core.RoundWarInfo;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
@@ -26,9 +27,9 @@ public class WarLeagueCommand {
     private final static int ROUND_HEIGHT = 333;
     private final static float FONT_SIZE = 16f;
 
-    public static void dispatch(MessageReceivedEvent event, String... args) {
+    public static void call(SlashCommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (args.length <= 1) {
+            /*if (event.getOptions().size() <= 1) {
                 WarLeagueCommand.executeClan(event);
                 return;
             }
@@ -40,19 +41,20 @@ public class WarLeagueCommand {
                     WarLeagueCommand.executeRound(event, args[2]);
                 else {
                     String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
-                    ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
+                    ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
                     ErrorUtils.sendError(event.getChannel(),
                             i18n.getString("wrong.usage"),
                             MessageFormat.format(i18n.getString("tip.usage"),
                                     Command.WARLEAGUE_ROUND.formatFullCommand(prefix)));
                 }
-            } else if (args[1].equals("all")) {
+            }else if (args[1].equals("all")) {
                 if (args.length > 2)
                     WarLeagueCommand.executeAll(event, args[2]);
                 else
                     WarLeagueCommand.executeAll(event);
-            } else
-                WarLeagueCommand.executeClan(event, args[1]);
+            }
+            else
+                WarLeagueCommand.executeClan(event, args[1]);*/
         });
     }
 
@@ -72,7 +74,7 @@ public class WarLeagueCommand {
         return wars;
     }
 
-    public static void drawRound(Graphics2D g2d, MessageReceivedEvent event, List<WarInfo> wars, ResourceBundle i18n, int roundIndex) {
+    public static void drawRound(Graphics2D g2d, SlashCommandEvent event, List<WarInfo> wars, ResourceBundle i18n, int roundIndex) {
         Font font = g2d.getFont().deriveFont(FONT_SIZE);
 
         // Round label
@@ -103,7 +105,7 @@ public class WarLeagueCommand {
                 DrawUtils.drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.ended"));
             }
             case "notInWar" -> {
-                ErrorUtils.sendError(event.getChannel(), i18n.getString("exception.warleague.notinwar"));
+                ErrorUtils.sendError(event, i18n.getString("exception.warleague.notinwar"));
                 return;
             }
             default -> {
@@ -190,17 +192,17 @@ public class WarLeagueCommand {
         }
     }
 
-    public static WarLeagueGroup getLeagueGroup(MessageReceivedEvent event, Locale lang, String[] args) {
+    public static WarLeagueGroup getLeagueGroup(SlashCommandEvent event, Locale lang, String[] args) {
         // If rate limitation has exceeded
         if (!CoreUtils.checkThrottle(event, lang))
             return null;
 
         WarLeagueGroup leagueGroup = null;
         ResourceBundle i18n = LangUtils.getTranslations(lang);
-        String tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
+        String tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getMember().getIdLong());
 
         if (tag == null) {
-            ErrorUtils.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
+            ErrorUtils.sendError(event, i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
             return null;
         }
 
@@ -214,8 +216,8 @@ public class WarLeagueCommand {
         return leagueGroup;
     }
 
-    public static void executeRound(MessageReceivedEvent event, String... args) {
-        Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
+    public static void executeRound(SlashCommandEvent event, String... args) {
+        Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
 
         // Checking index validity
@@ -266,8 +268,8 @@ public class WarLeagueCommand {
         return 0;
     }
 
-    public static void executeAll(MessageReceivedEvent event, String... args) {
-        Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
+    public static void executeAll(SlashCommandEvent event, String... args) {
+        Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
 
         WarLeagueGroup warLeague = getLeagueGroup(event, lang, args);
@@ -311,7 +313,7 @@ public class WarLeagueCommand {
         g2d.dispose();
     }
 
-    public static void executeClan(MessageReceivedEvent event, String... args) {
+    public static void executeClan(SlashCommandEvent event, String... args) {
 
     }
 }

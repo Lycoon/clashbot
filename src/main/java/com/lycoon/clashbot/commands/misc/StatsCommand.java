@@ -5,6 +5,7 @@ import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
@@ -17,12 +18,12 @@ import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 public class StatsCommand {
-    public static void dispatch(MessageReceivedEvent event, String... args) {
+    public static void call(SlashCommandEvent event) {
         execute(event);
     }
 
-    public static void execute(MessageReceivedEvent event) {
-        Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
+    public static void execute(SlashCommandEvent event) {
+        Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         NumberFormat nf = NumberFormat.getInstance(lang);
 
@@ -30,9 +31,8 @@ public class StatsCommand {
         builder.setColor(Color.GRAY);
         builder.setTitle("Stats panel");
 
-        List<Guild> guilds = ClashBotMain.jda.getGuilds();
-
         int members = 0;
+        List<Guild> guilds = ClashBotMain.jda.getGuilds();
         for (Guild guild : guilds) members += guild.getMemberCount();
 
         String general = "";

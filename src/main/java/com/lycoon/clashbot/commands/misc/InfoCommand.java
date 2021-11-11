@@ -3,6 +3,7 @@ package com.lycoon.clashbot.commands.misc;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
@@ -19,12 +20,12 @@ public class InfoCommand {
     private static final String PAYPAL = "https://www.patreon.com/clashbot";
     private static final String VERSION = "1.2.2";
 
-    public static void dispatch(MessageReceivedEvent event, String... args) {
+    public static void call(SlashCommandEvent event) {
         execute(event);
     }
 
-    public static void execute(MessageReceivedEvent event) {
-        ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
+    public static void execute(SlashCommandEvent event) {
+        ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
         EmbedBuilder builder = new EmbedBuilder();
 
         builder.setColor(Color.GRAY);
