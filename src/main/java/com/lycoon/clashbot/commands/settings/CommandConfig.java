@@ -1,4 +1,4 @@
-package com.lycoon.clashbot.commands;
+package com.lycoon.clashbot.commands.settings;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;

@@ -19,7 +19,7 @@ public class FileUtils {
         // Generating the picture
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
-            ImageIO.write(image, "jpg", bos);
+            ImageIO.write(image, "png", bos);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -40,7 +40,7 @@ public class FileUtils {
 
             CoreUtils.removeUserFromGenerating(id);
         };
-        event.getChannel().sendFile(bos.toByteArray(), "clashbot_generated.jpg").queue(sendingCallback);
+        event.getChannel().sendFile(bos.toByteArray(), "clashbot.png").queue(sendingCallback);
         LOGGER.info("Picture sent to " + event.getAuthor().getAsTag() + " on " + event.getGuild().getIdLong());
     }
 

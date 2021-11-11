@@ -1,6 +1,6 @@
 package com.lycoon.clashbot.utils;
 
-import com.lycoon.clashbot.commands.InviteCommand;
+import com.lycoon.clashbot.commands.misc.InviteCommand;
 import com.lycoon.clashbot.core.ClashBotMain;
 
 import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;

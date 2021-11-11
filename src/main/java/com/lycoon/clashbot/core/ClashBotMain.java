@@ -1,8 +1,7 @@
 package com.lycoon.clashbot.core;
 
 import com.lycoon.clashapi.core.ClashAPI;
-import com.lycoon.clashbot.commands.CommandConfig;
-import com.lycoon.clashbot.event.EventListener;
+import com.lycoon.clashbot.commands.settings.CommandConfig;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;

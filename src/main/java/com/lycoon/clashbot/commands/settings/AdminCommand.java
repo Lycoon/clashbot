@@ -1,4 +1,4 @@
-package com.lycoon.clashbot.commands;
+package com.lycoon.clashbot.commands.settings;
 
 public enum AdminCommand
 {

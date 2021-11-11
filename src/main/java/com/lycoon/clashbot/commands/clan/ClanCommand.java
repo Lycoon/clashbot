@@ -1,4 +1,4 @@
-package com.lycoon.clashbot.commands;
+package com.lycoon.clashbot.commands.clan;
 
 import com.lycoon.clashapi.cocmodels.clan.ClanMember;
 import com.lycoon.clashapi.cocmodels.clan.ClanModel;

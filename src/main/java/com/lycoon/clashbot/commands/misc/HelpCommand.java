@@ -1,5 +1,7 @@
-package com.lycoon.clashbot.commands;
+package com.lycoon.clashbot.commands.misc;
 
+import com.lycoon.clashbot.commands.Command;
+import com.lycoon.clashbot.commands.CommandCategory;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
 import com.lycoon.clashbot.utils.DatabaseUtils;

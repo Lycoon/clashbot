@@ -1,9 +1,10 @@
-package com.lycoon.clashbot.commands;
+package com.lycoon.clashbot.commands.clan;
 
 import com.lycoon.clashapi.cocmodels.clanwar.ClanWarModel;
 import com.lycoon.clashapi.cocmodels.clanwar.WarlogItem;
 import com.lycoon.clashapi.cocmodels.clanwar.WarlogModel;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;

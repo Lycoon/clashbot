@@ -1,6 +1,7 @@
-package com.lycoon.clashbot.commands;
+package com.lycoon.clashbot.commands.settings;
 
 import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;

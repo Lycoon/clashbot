@@ -1,6 +1,13 @@
-package com.lycoon.clashbot.event;
+package com.lycoon.clashbot.core;
 
 import com.lycoon.clashbot.commands.*;
+import com.lycoon.clashbot.commands.clan.ClanCommand;
+import com.lycoon.clashbot.commands.clan.WarCommand;
+import com.lycoon.clashbot.commands.clan.WarLeagueCommand;
+import com.lycoon.clashbot.commands.clan.WarlogCommand;
+import com.lycoon.clashbot.commands.misc.*;
+import com.lycoon.clashbot.commands.settings.AdminCommand;
+import com.lycoon.clashbot.commands.settings.SetCommand;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
 import com.lycoon.clashbot.utils.DatabaseUtils;
