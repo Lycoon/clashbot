@@ -12,7 +12,6 @@ public class ErrorUtils {
     private static final String OFFICIAL_TWITTER = "https://twitter.com/ClashofClans";
 
     public static void sendExceptionError(SlashCommandEvent event, ResourceBundle i18n, Exception e, String... args) {
-        MessageChannel channel = event.getChannel();
         switch (e.getMessage()) {
             case "400" -> sendError(event, i18n.getString("exception.other"));
             case "403" -> sendError(event, i18n.getString("exception.403"));

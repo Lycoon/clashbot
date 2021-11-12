@@ -76,7 +76,7 @@ public class CoreUtils {
 
     public static void sendMessage(SlashCommandEvent event, ResourceBundle i18n, EmbedBuilder builder) {
         try {
-            event.getChannel().sendMessage(builder.build()).queue();
+            event.getHook().sendMessageEmbeds(builder.build()).queue();
         } catch (InsufficientPermissionException e) {
             LOGGER.debug(e.getMessage());
             event.getMember().getUser().openPrivateChannel().queue(
@@ -85,7 +85,7 @@ public class CoreUtils {
                             ErrorUtils.sendError(event, INFO_EMOJI + " " +
                                     i18n.getString("exception.permission.title"), MessageFormat.format(
                                     i18n.getString("exception.permission.tip"),
-                                    event.getGuild().getName(), InviteCommand.INVITE)),
+                                    event.getGuild().getName(), ClashBotMain.INVITE)),
 
                     // Failure
                     (err) -> LOGGER.debug(err.getMessage()));

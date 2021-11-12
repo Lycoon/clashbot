@@ -14,7 +14,6 @@ import java.util.ResourceBundle;
 
 public class HelpCommand
 {
-    private static String prefix;
     private static ResourceBundle i18n;
     private static EmbedBuilder builder;
 
@@ -28,7 +27,7 @@ public class HelpCommand
         StringBuilder categoryField = new StringBuilder();
         for (Command cmd : commands)
             if (cmd.getCategory().equals(category)) {
-                categoryField.append("▫ `").append(cmd.formatFullCommand(prefix)).append("` ");
+                categoryField.append("▫ `").append(cmd.formatCommand()).append("` ");
                 categoryField.append(i18n.getString(cmd.getDescription())).append("\n");
             }
         builder.addField(i18n.getString(category.toString()), categoryField.toString(), false);
@@ -37,7 +36,6 @@ public class HelpCommand
     public static void execute(SlashCommandEvent event)
     {
         i18n = LangUtils.getTranslations(event.getMember().getIdLong());
-        prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
         builder = new EmbedBuilder();
 
         builder.setColor(Color.GRAY);

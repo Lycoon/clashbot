@@ -1,5 +1,6 @@
 package com.lycoon.clashbot.commands.misc;
 
+import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -12,7 +13,6 @@ import java.util.ResourceBundle;
 
 public class InviteCommand
 {
-    public static final String INVITE = "https://discord.com/api/oauth2/authorize?client_id=734481969630543883&permissions=2147780672&scope=bot";
     static final String INVITE_EMOJI = "<:invite:825345488152690718>";
 
     public static void call(SlashCommandEvent event)
@@ -28,7 +28,7 @@ public class InviteCommand
         builder.setColor(Color.GRAY);
         builder.setDescription(INVITE_EMOJI + " " + MessageFormat.format(
                 i18n.getString("cmd.invite.panel"),
-                INVITE));
+                ClashBotMain.INVITE));
 
         CoreUtils.sendMessage(event, i18n, builder);
     }

@@ -1,5 +1,6 @@
 package com.lycoon.clashbot.commands.misc;
 
+import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -14,11 +15,8 @@ public class InfoCommand {
     private static final String TWITTER = "@LycoonMC";
     private static final String DISCORD = "Lycoon#7542";
     private static final String WEBSITE = "https://lycoon.github.io/clashbot/";
-    private static final String BOT_CODE = "https://github.com/Lycoon/clashbot";
-    private static final String API_CODE = "https://github.com/Lycoon/clash-api";
     private static final String DISCORD_INVITE = "https://discord.gg/Cy86PDA";
-    private static final String PAYPAL = "https://www.patreon.com/clashbot";
-    private static final String VERSION = "1.2.2";
+    private static final String PATREON = "https://www.patreon.com/clashbot";
 
     public static void call(SlashCommandEvent event) {
         execute(event);
@@ -35,8 +33,8 @@ public class InfoCommand {
                         + MessageFormat.format(i18n.getString("info.author"), TWITTER, DISCORD) + "\n"
                         + MessageFormat.format(i18n.getString("info.website"), WEBSITE) + "\n"
                         + MessageFormat.format(i18n.getString("info.discord.invite"), DISCORD_INVITE) + "\n"
-                        + MessageFormat.format(i18n.getString("info.support"), PAYPAL) + "\n\n"
-                        + "Version " + VERSION
+                        + MessageFormat.format(i18n.getString("info.support"), PATREON) + "\n\n"
+                        + "Version " + ClashBotMain.VERSION
         );
 
         CoreUtils.sendMessage(event, i18n, builder);

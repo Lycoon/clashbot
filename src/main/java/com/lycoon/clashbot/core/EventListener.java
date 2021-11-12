@@ -13,6 +13,7 @@ import com.lycoon.clashbot.utils.CoreUtils;
 import com.lycoon.clashbot.utils.DatabaseUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -33,7 +34,7 @@ public class EventListener extends ListenerAdapter {
     }
 
     static boolean isOldCommand(String arg, String prefix, Command cmd) {
-        return arg.equalsIgnoreCase(cmd.formatFullCommand(prefix));
+        return arg.equalsIgnoreCase(prefix + cmd.toString());
     }
 
     static boolean isAdminCommand(String arg) {
@@ -46,22 +47,53 @@ public class EventListener extends ListenerAdapter {
         return message.startsWith("<@" + id + ">") || message.startsWith("<@!" + id + ">");
     }
 
-    static void taggingBot(SlashCommandEvent event, String prefix) {
+    static void taggingBot(SlashCommandEvent event) {
         ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
         EmbedBuilder builder = new EmbedBuilder();
 
         builder.setColor(Color.GRAY);
         builder.setDescription(CoreUtils.INFO_EMOJI + " " +
                 MessageFormat.format(i18n.getString("bot.mention"),
-                        Command.HELP.formatCommand(prefix)));
+                        "prefix"));
 
         CoreUtils.sendMessage(event, i18n, builder);
     }
 
+    static void warnOldCommands(MessageReceivedEvent event) {
+        EmbedBuilder builder = new EmbedBuilder();
+
+        builder.setColor(Color.YELLOW);
+        builder.setTitle("Switching to slash commands");
+        builder.setDescription("Starting from January 1st 2022, old Clashbot command system will be dropped in favour of slash commands. " +
+                "This is done in compliance with Discord terms as they address privacy concerns dealing with interactions in a more elegant way.\n\n" +
+                "⚠ Click [here](" + ClashBotMain.INVITE + ") to reinvite with new permissions\n" +
+                "➡ Start using slash commands typing `/help` in the chat");
+
+        event.getChannel().sendMessage(builder.build()).queue();
+    }
+
+    static MessageEmbed warnNotInGuild(SlashCommandEvent event) {
+        EmbedBuilder builder = new EmbedBuilder();
+
+        builder.setColor(Color.YELLOW);
+        builder.setTitle("Commands must be executed in guilds");
+        builder.setDescription("Clashbot does not currently support commands in DMs. Please invite me in your guild or join one where I am in. I will be glad to help.");
+
+        return builder.build();
+    }
+
     @Override
     public void onSlashCommand(SlashCommandEvent event) {
+        if (!event.isFromGuild())
+        {
+            event.replyEmbeds(warnNotInGuild(event)).queue();
+            return;
+        }
+
+        System.out.println(event.getName() + " BEFORE");
         String cmd = event.getName();
         event.deferReply().queue();
+        System.out.println(event.getName() + " AFTER");
 
         if (isCommand(cmd, Command.SETLANG))
             SetCommand.call(event);
@@ -87,7 +119,10 @@ public class EventListener extends ListenerAdapter {
             StatsCommand.call(event);
     }
 
-    /*
+    /**
+     * TO DELETE: On 1st December 2021
+     * @param event
+     */
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         if (!event.isFromType(ChannelType.TEXT))
@@ -96,46 +131,22 @@ public class EventListener extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
         String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
 
-        if (isMentioned(event, message)) {
-            taggingBot(event, prefix);
-            return;
-        } else if (!message.startsWith(prefix))
+        if (!message.startsWith(prefix))
             return;
 
         String[] args = message.split(" ");
-
-        if (isOldCommand(args[0], prefix, Command.SETLANG)) // !set
-            SetCommand.dispatch(event, args);
-        else if (isOldCommand(args[0], prefix, Command.LANG)) // !lang
-            LangCommand.dispatch(event, args);
-        else if (isOldCommand(args[0], prefix, Command.PLAYER)) // !player
-            PlayerCommand.dispatch(event, args);
-        else if (isOldCommand(args[0], prefix, Command.CLAN)) // !player
-            ClanCommand.dispatch(event, args);
-        else if (isOldCommand(args[0], prefix, Command.WAR)) // !war
-            WarCommand.dispatch(event, args);
-        else if (isOldCommand(args[0], prefix, Command.WARLOG)) // !warlog
-            WarlogCommand.dispatch(event, args);
-        else if (isOldCommand(args[0], prefix, Command.WARLEAGUE_ROUND)) // !warleague
-            WarLeagueCommand.dispatch(event, args);
-        else if (isOldCommand(args[0], prefix, Command.INFO)) // !info
-            InfoCommand.dispatch(event, args);
-        else if (isOldCommand(args[0], prefix, Command.HELP)) // !help
-            HelpCommand.dispatch(event, args);
-        else if (isOldCommand(args[0], prefix, Command.CLEAR)) // !clear
-            ClearCommand.dispatch(event, args);
-        else if (isOldCommand(args[0], prefix, Command.INVITE)) // !invite
-            InviteCommand.dispatch(event, args);
-        else if (isOldCommand(args[0], prefix, Command.STATS)) // !stats
-            StatsCommand.dispatch(event, args);
-        else if (isAdminCommand(args[0])) // !admin
-            ServersCommand.dispatch(event, args);
-        else
-            return;
+        if (isOldCommand(args[0], prefix, Command.SETLANG) || isOldCommand(args[0], prefix, Command.LANG)
+                || isOldCommand(args[0], prefix, Command.PLAYER) || isOldCommand(args[0], prefix, Command.CLAN)
+                || isOldCommand(args[0], prefix, Command.WAR) || isOldCommand(args[0], prefix, Command.WARLOG)
+                || isOldCommand(args[0], prefix, Command.WARLEAGUE_ROUND) || isOldCommand(args[0], prefix, Command.INFO)
+                || isOldCommand(args[0], prefix, Command.HELP) || isOldCommand(args[0], prefix, Command.CLEAR)
+                || isOldCommand(args[0], prefix, Command.INVITE) || isOldCommand(args[0], prefix, Command.STATS))
+        {
+            warnOldCommands(event);
+        }
 
         LOGGER.info(event.getAuthor().getAsTag() + " issued: " + message);
     }
-    */
 
     @Override
     public void onGuildJoin(GuildJoinEvent event) {
@@ -143,7 +154,7 @@ public class EventListener extends ListenerAdapter {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.GRAY);
         builder.setTitle("Hi, thanks for inviting me!");
-        builder.setDescription("Run `!help` to get the list of all available commands :scroll:");
+        builder.setDescription("Run `/help` to get the list of all available commands :scroll:");
 
         try { Objects.requireNonNull(defaultChannel).sendMessage(builder.build()).queue(); }
         catch (MissingAccessException ignored) {}

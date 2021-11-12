@@ -10,13 +10,12 @@ public enum Command
     CLEAR(CommandCategory.SETTINGS, "clear", "cmd.clear.desc"),
     SETTAG(CommandCategory.SETTINGS, "set", "cmd.settag.desc", "<clan|player> <tag>"),
     SETLANG(CommandCategory.SETTINGS, "set", "cmd.setlang.desc", "lang <language>"),
-    SETPREFIX(CommandCategory.SETTINGS, "set", "cmd.setprefix.desc", "prefix <prefix>"),
     CLAN(CommandCategory.CLAN, "clan", "cmd.clan.desc", "[clanTag]"),
-    WARLEAGUE_ROUND(CommandCategory.CLAN, "warleague", "cmd.warleague.round.desc", "round <index> [clanTag]"),
+    WARLEAGUE_ROUND(CommandCategory.CLAN, "warleague", "cmd.warleague.round.desc", "round <page> [clanTag]"),
     //WARLEAGUE_ALL   (CommandCategory.CLAN,     "warleague", "cmd.warleague.all.desc",   "all [clanTag]"),
     //WARLEAGUE_CLAN  (CommandCategory.CLAN,     "warleague", "cmd.warleague.clan.desc",  "[clanTag]"),
-    WARLOG(CommandCategory.CLAN, "warlog", "cmd.warlog.desc", "<index> [clanTag]"),
-    WAR(CommandCategory.CLAN, "war", "cmd.war.desc", "<index> [clanTag]"),
+    WARLOG(CommandCategory.CLAN, "warlog", "cmd.warlog.desc", "<page> [clanTag]"),
+    WAR(CommandCategory.CLAN, "war", "cmd.war.desc", "<page> [clanTag]"),
     PLAYER(CommandCategory.PLAYER, "player", "cmd.player.desc", "[playerTag]");
 
     final CommandCategory category;
@@ -54,13 +53,8 @@ public enum Command
         return category;
     }
 
-    public String formatCommand(String prefix)
+    public String formatCommand()
     {
-        return prefix + name;
-    }
-
-    public String formatFullCommand(String prefix)
-    {
-        return formatCommand(prefix) + (usage == null ? "" : " " + usage);
+        return "/" + name + (usage == null ? "" : " " + usage);
     }
 }
