@@ -37,28 +37,6 @@ public class EventListener extends ListenerAdapter {
         return arg.equalsIgnoreCase(prefix + cmd.toString());
     }
 
-    static boolean isAdminCommand(String arg) {
-        return arg.equalsIgnoreCase(AdminCommand.ADMIN.formatCommand());
-    }
-
-
-    static boolean isMentioned(MessageReceivedEvent event, String message) {
-        long id = event.getJDA().getSelfUser().getIdLong();
-        return message.startsWith("<@" + id + ">") || message.startsWith("<@!" + id + ">");
-    }
-
-    static void taggingBot(SlashCommandEvent event) {
-        ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
-        EmbedBuilder builder = new EmbedBuilder();
-
-        builder.setColor(Color.GRAY);
-        builder.setDescription(CoreUtils.INFO_EMOJI + " " +
-                MessageFormat.format(i18n.getString("bot.mention"),
-                        "prefix"));
-
-        CoreUtils.sendMessage(event, i18n, builder);
-    }
-
     static void warnOldCommands(MessageReceivedEvent event) {
         EmbedBuilder builder = new EmbedBuilder();
 
@@ -72,7 +50,7 @@ public class EventListener extends ListenerAdapter {
         event.getChannel().sendMessage(builder.build()).queue();
     }
 
-    static MessageEmbed warnNotInGuild(SlashCommandEvent event) {
+    static MessageEmbed warnNotInGuild() {
         EmbedBuilder builder = new EmbedBuilder();
 
         builder.setColor(Color.YELLOW);
@@ -86,14 +64,12 @@ public class EventListener extends ListenerAdapter {
     public void onSlashCommand(SlashCommandEvent event) {
         if (!event.isFromGuild())
         {
-            event.replyEmbeds(warnNotInGuild(event)).queue();
+            event.replyEmbeds(warnNotInGuild()).queue();
             return;
         }
 
-        System.out.println(event.getName() + " BEFORE");
         String cmd = event.getName();
         event.deferReply().queue();
-        System.out.println(event.getName() + " AFTER");
 
         if (isCommand(cmd, Command.SETLANG))
             SetCommand.call(event);
@@ -105,6 +81,8 @@ public class EventListener extends ListenerAdapter {
             WarCommand.call(event);
         else if (isCommand(cmd, Command.WARLOG))
             WarlogCommand.call(event);
+        else if (isCommand(cmd, Command.WARLEAGUE))
+            WarLeagueCommand.call(event);
         else if (isCommand(cmd, Command.LANG))
             LangCommand.call(event);
         else if (isCommand(cmd, Command.INFO))
@@ -119,8 +97,20 @@ public class EventListener extends ListenerAdapter {
             StatsCommand.call(event);
     }
 
+    @Override
+    public void onGuildJoin(GuildJoinEvent event) {
+        TextChannel defaultChannel = event.getGuild().getDefaultChannel();
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setColor(Color.GRAY);
+        builder.setTitle("Hi, thanks for inviting me!");
+        builder.setDescription("Run `/help` to get the list of all available commands :scroll:");
+
+        try { Objects.requireNonNull(defaultChannel).sendMessage(builder.build()).queue(); }
+        catch (MissingAccessException ignored) {}
+    }
+
     /**
-     * TO DELETE: On 1st December 2021
+     * TO DELETE: On January 1st 2022
      * @param event
      */
     @Override
@@ -138,7 +128,7 @@ public class EventListener extends ListenerAdapter {
         if (isOldCommand(args[0], prefix, Command.SETLANG) || isOldCommand(args[0], prefix, Command.LANG)
                 || isOldCommand(args[0], prefix, Command.PLAYER) || isOldCommand(args[0], prefix, Command.CLAN)
                 || isOldCommand(args[0], prefix, Command.WAR) || isOldCommand(args[0], prefix, Command.WARLOG)
-                || isOldCommand(args[0], prefix, Command.WARLEAGUE_ROUND) || isOldCommand(args[0], prefix, Command.INFO)
+                || isOldCommand(args[0], prefix, Command.WARLEAGUE) || isOldCommand(args[0], prefix, Command.INFO)
                 || isOldCommand(args[0], prefix, Command.HELP) || isOldCommand(args[0], prefix, Command.CLEAR)
                 || isOldCommand(args[0], prefix, Command.INVITE) || isOldCommand(args[0], prefix, Command.STATS))
         {
@@ -146,17 +136,5 @@ public class EventListener extends ListenerAdapter {
         }
 
         LOGGER.info(event.getAuthor().getAsTag() + " issued: " + message);
-    }
-
-    @Override
-    public void onGuildJoin(GuildJoinEvent event) {
-        TextChannel defaultChannel = event.getGuild().getDefaultChannel();
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setColor(Color.GRAY);
-        builder.setTitle("Hi, thanks for inviting me!");
-        builder.setDescription("Run `/help` to get the list of all available commands :scroll:");
-
-        try { Objects.requireNonNull(defaultChannel).sendMessage(builder.build()).queue(); }
-        catch (MissingAccessException ignored) {}
     }
 }

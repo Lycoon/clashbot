@@ -46,8 +46,8 @@ public class ClashBotMain {
         jda = builder.build().awaitReady();
 
         // Creating commands
-        CommandConfig commandConfig = new CommandConfig(jda);
-        commandConfig.createCommands();
+        /*CommandConfig commandConfig = new CommandConfig(jda);
+        commandConfig.createCommands();*/
 
         clashAPI = new ClashAPI(tokens.getProperty("clash-of-clans"));
         cached = CacheComponents.getInstance();

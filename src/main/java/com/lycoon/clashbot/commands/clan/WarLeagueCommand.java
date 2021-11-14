@@ -29,32 +29,19 @@ public class WarLeagueCommand {
 
     public static void call(SlashCommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            /*if (event.getOptions().size() <= 1) {
-                WarLeagueCommand.executeClan(event);
+            if (event.getOptions().isEmpty())
+            {
+                ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
+                ErrorUtils.sendError(event,
+                        i18n.getString("wrong.usage"),
+                        MessageFormat.format(i18n.getString("tip.usage"), "prefix"));
                 return;
             }
 
-            if (args[1].equals("round")) {
-                if (args.length > 3)
-                    WarLeagueCommand.executeRound(event, args[2], args[3]);
-                else if (args.length == 3)
-                    WarLeagueCommand.executeRound(event, args[2]);
-                else {
-                    String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
-                    ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
-                    ErrorUtils.sendError(event.getChannel(),
-                            i18n.getString("wrong.usage"),
-                            MessageFormat.format(i18n.getString("tip.usage"),
-                                    Command.WARLEAGUE_ROUND.formatFullCommand(prefix)));
-                }
-            }else if (args[1].equals("all")) {
-                if (args.length > 2)
-                    WarLeagueCommand.executeAll(event, args[2]);
-                else
-                    WarLeagueCommand.executeAll(event);
-            }
+            if (event.getOptions().size() == 1)
+                executeRound(event, event.getOption("page").getAsString());
             else
-                WarLeagueCommand.executeClan(event, args[1]);*/
+                executeRound(event, event.getOption("page").getAsString(), event.getOption("clan_tag").getAsString());
         });
     }
 

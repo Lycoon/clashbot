@@ -1,14 +1,14 @@
 package com.lycoon.clashbot.utils;
 
-import com.lycoon.clashbot.commands.misc.InviteCommand;
 import com.lycoon.clashbot.core.ClashBotMain;
 
 import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;
 
 import com.lycoon.clashbot.lang.LangUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import java.awt.*;
@@ -18,16 +18,16 @@ import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class CoreUtils {
-    public static final Color validColor = Color.decode("#48bd73");
-    public static final Color invalidColor = Color.decode("#c24646");
+    public static final Color validColor = new Color(0x48bd73);
+    public static final Color invalidColor = new Color(0xc24646);
     public static final String INFO_EMOJI = "<:info:825346959514533928>";
 
-    static Duration rateTime = Duration.ofSeconds(6);
-    static long threshold = rateTime.toMillis();
+    static long threshold = Duration.ofSeconds(5).toMillis();
     static HashMap<Long, ZonedDateTime> generating = new HashMap<>();
 
     public static void addUserToGenerating(long id) {
@@ -56,12 +56,10 @@ public class CoreUtils {
         long timeDifference = getLastTimeDifference(event.getMember().getIdLong());
         boolean isValid = timeDifference >= threshold;
 
-        if (!isValid)
-            ErrorUtils.sendError(event,
-                    i18n.getString("exception.rate.exceeded"),
-                    MessageFormat.format(
-                            i18n.getString("exception.rate.exceeded.left"),
-                            df.format((threshold - timeDifference) / 1000.0)));
+        if (!isValid) {
+            ErrorUtils.sendError(event, i18n.getString("exception.rate.exceeded"),
+                    MessageFormat.format(i18n.getString("exception.rate.exceeded.left"), df.format((threshold - timeDifference) / 1000.0)));
+        }
 
         return isValid;
     }

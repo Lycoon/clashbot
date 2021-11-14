@@ -11,7 +11,7 @@ public enum Command
     SETTAG(CommandCategory.SETTINGS, "set", "cmd.settag.desc", "<clan|player> <tag>"),
     SETLANG(CommandCategory.SETTINGS, "set", "cmd.setlang.desc", "lang <language>"),
     CLAN(CommandCategory.CLAN, "clan", "cmd.clan.desc", "[clanTag]"),
-    WARLEAGUE_ROUND(CommandCategory.CLAN, "warleague", "cmd.warleague.round.desc", "round <page> [clanTag]"),
+    WARLEAGUE(CommandCategory.CLAN, "warleague", "cmd.warleague.round.desc", "<page> [clanTag]"),
     //WARLEAGUE_ALL   (CommandCategory.CLAN,     "warleague", "cmd.warleague.all.desc",   "all [clanTag]"),
     //WARLEAGUE_CLAN  (CommandCategory.CLAN,     "warleague", "cmd.warleague.clan.desc",  "[clanTag]"),
     WARLOG(CommandCategory.CLAN, "warlog", "cmd.warlog.desc", "<page> [clanTag]"),
