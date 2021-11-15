@@ -71,7 +71,7 @@ public class EventListener extends ListenerAdapter {
         String cmd = event.getName();
         event.deferReply().queue();
 
-        if (isCommand(cmd, Command.SETLANG))
+        if (isCommand(cmd, Command.SET_LANG))
             SetCommand.call(event);
         else if (isCommand(cmd, Command.PLAYER))
             PlayerCommand.call(event);
@@ -93,8 +93,6 @@ public class EventListener extends ListenerAdapter {
             ClearCommand.call(event);
         else if (isCommand(cmd, Command.INVITE))
             InviteCommand.call(event);
-        else if (isCommand(cmd, Command.STATS))
-            StatsCommand.call(event);
     }
 
     @Override
@@ -125,12 +123,12 @@ public class EventListener extends ListenerAdapter {
             return;
 
         String[] args = message.split(" ");
-        if (isOldCommand(args[0], prefix, Command.SETLANG) || isOldCommand(args[0], prefix, Command.LANG)
+        if (isOldCommand(args[0], prefix, Command.SET_LANG) || isOldCommand(args[0], prefix, Command.LANG)
                 || isOldCommand(args[0], prefix, Command.PLAYER) || isOldCommand(args[0], prefix, Command.CLAN)
                 || isOldCommand(args[0], prefix, Command.WAR) || isOldCommand(args[0], prefix, Command.WARLOG)
                 || isOldCommand(args[0], prefix, Command.WARLEAGUE) || isOldCommand(args[0], prefix, Command.INFO)
                 || isOldCommand(args[0], prefix, Command.HELP) || isOldCommand(args[0], prefix, Command.CLEAR)
-                || isOldCommand(args[0], prefix, Command.INVITE) || isOldCommand(args[0], prefix, Command.STATS))
+                || isOldCommand(args[0], prefix, Command.INVITE))
         {
             warnOldCommands(event);
         }

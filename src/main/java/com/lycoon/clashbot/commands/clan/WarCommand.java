@@ -4,6 +4,7 @@ import com.lycoon.clashapi.cocmodels.clanwar.Attack;
 import com.lycoon.clashapi.cocmodels.clanwar.ClanWarMember;
 import com.lycoon.clashapi.cocmodels.clanwar.WarInfo;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
@@ -198,7 +199,8 @@ public class WarCommand {
         tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getMember().getIdLong());
 
         if (tag == null) {
-            ErrorUtils.sendError(event, i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
+            ErrorUtils.sendError(event, i18n.getString("set.clan.error"),
+                    MessageFormat.format(i18n.getString("cmd.general.tip"), Command.SET_CLAN.formatCommand()));
             return null;
         }
 

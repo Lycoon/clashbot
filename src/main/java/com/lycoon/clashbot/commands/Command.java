@@ -2,14 +2,14 @@ package com.lycoon.clashbot.commands;
 
 public enum Command
 {
-    STATS(CommandCategory.MISC, "stats", "cmd.stats.desc"),
     INVITE(CommandCategory.MISC, "invite", "cmd.invite.desc"),
     LANG(CommandCategory.MISC, "lang", "cmd.lang.desc"),
     INFO(CommandCategory.MISC, "info", "cmd.info.desc"),
     HELP(CommandCategory.MISC, "help", "cmd.help.desc"),
     CLEAR(CommandCategory.SETTINGS, "clear", "cmd.clear.desc"),
-    SETTAG(CommandCategory.SETTINGS, "set", "cmd.settag.desc", "<clan|player> <tag>"),
-    SETLANG(CommandCategory.SETTINGS, "set", "cmd.setlang.desc", "lang <language>"),
+    SET_PLAYER(CommandCategory.SETTINGS, "set", "cmd.setplayer.desc", "player <playerTag>"),
+    SET_CLAN(CommandCategory.SETTINGS, "set", "cmd.setclan.desc", "clan <clanTag>"),
+    SET_LANG(CommandCategory.SETTINGS, "set", "cmd.setlang.desc", "lang <language>"),
     CLAN(CommandCategory.CLAN, "clan", "cmd.clan.desc", "[clanTag]"),
     WARLEAGUE(CommandCategory.CLAN, "warleague", "cmd.warleague.round.desc", "<page> [clanTag]"),
     //WARLEAGUE_ALL   (CommandCategory.CLAN,     "warleague", "cmd.warleague.all.desc",   "all [clanTag]"),

@@ -33,9 +33,6 @@ public class CommandConfig {
         CommandData langCommand = new CommandData("lang", "Shows your current language");
         jda.upsertCommand(langCommand).queue();
 
-        CommandData statsCommand = new CommandData("stats", "Shows various data about bot");
-        jda.upsertCommand(statsCommand).queue();
-
         CommandData helpCommand = new CommandData("help", "Shows commands and their usage");
         jda.upsertCommand(helpCommand).queue();
 

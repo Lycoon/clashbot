@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -131,7 +132,8 @@ public class PlayerCommand {
         String tag = args.length > 0 ? args[0] : DatabaseUtils.getPlayerTag(event.getMember().getIdLong());
 
         if (tag == null) {
-            ErrorUtils.sendError(event, i18n.getString("set.player.error"), i18n.getString("set.player.help"));
+            ErrorUtils.sendError(event, i18n.getString("set.player.error"),
+                    MessageFormat.format(i18n.getString("cmd.general.tip"), Command.SET_PLAYER.formatCommand()));
             return;
         }
 

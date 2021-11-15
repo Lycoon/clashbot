@@ -44,6 +44,10 @@ public class SetCommand {
 
     public static void executePlayer(SlashCommandEvent event, String tag) {
         ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
+        if (!tag.startsWith("#")){
+            tag = "#" + tag;
+        }
+
         try {
             // Checks if the player exists
             ClashBotMain.clashAPI.getPlayer(tag);
@@ -63,6 +67,9 @@ public class SetCommand {
 
     public static void executeClan(SlashCommandEvent event, String tag) {
         ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
+        if (!tag.startsWith("#")){
+            tag = "#" + tag;
+        }
 
         try {
             // Checks if the clan exists
@@ -94,7 +101,7 @@ public class SetCommand {
                     MessageFormat.format(i18n.getString("lang.success"), lang.getDisplayLanguage(lang)));
             builder.setDescription(
                     MessageFormat.format(i18n.getString("lang.info.other"),
-                            "prefix"));
+                            Command.SET_LANG.formatCommand()));
 
             CoreUtils.sendMessage(event, i18n, builder);
         } else {

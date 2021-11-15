@@ -31,7 +31,7 @@ public class LangCommand
                 i18n.getString("lang.flag") + "  " + MessageFormat.format(
                         i18n.getString("lang.current"), lang.getDisplayLanguage(lang)));
         builder.setDescription(MessageFormat.format(
-                i18n.getString("lang.info.other"), Command.SETLANG.formatCommand()));
+                i18n.getString("lang.info.other"), Command.SET_LANG.formatCommand()));
 
         CoreUtils.sendMessage(event, i18n, builder);
     }
