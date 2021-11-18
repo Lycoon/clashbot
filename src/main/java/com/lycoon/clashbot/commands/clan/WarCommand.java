@@ -1,15 +1,16 @@
-package com.lycoon.clashbot.commands;
+package com.lycoon.clashbot.commands.clan;
 
 import com.lycoon.clashapi.cocmodels.clanwar.Attack;
 import com.lycoon.clashapi.cocmodels.clanwar.ClanWarMember;
 import com.lycoon.clashapi.cocmodels.clanwar.WarInfo;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -20,20 +21,6 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-
-class SortMemberByOrder implements Comparator<ClanWarMember> {
-    @Override
-    public int compare(ClanWarMember a, ClanWarMember b) {
-        return a.getMapPosition() - b.getMapPosition();
-    }
-}
-
-class SortAttackByOrder implements Comparator<Attack> {
-    @Override
-    public int compare(Attack a, Attack b) {
-        return a.getOrder() - b.getOrder();
-    }
-}
 
 public class WarCommand {
     private static String tag;
@@ -52,19 +39,35 @@ public class WarCommand {
     private final static Color notUsedAttackColor = new Color(0xfbbf70);
     private final static Color attackColor = new Color(0x4c493a);
 
-    public static void dispatch(MessageReceivedEvent event, String... args) {
-        String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
-        Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
-        i18n = LangUtils.getTranslations(lang);
+    static class SortMemberByOrder implements Comparator<ClanWarMember> {
+        @Override
+        public int compare(ClanWarMember a, ClanWarMember b) {
+            return a.getMapPosition() - b.getMapPosition();
+        }
+    }
 
+    static class SortAttackByOrder implements Comparator<Attack> {
+        @Override
+        public int compare(Attack a, Attack b) {
+            return a.getOrder() - b.getOrder();
+        }
+    }
+
+    public static void call(SlashCommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (args.length > 2)
-                execute(event, lang, args[1], args[2]);
-            else if (args.length == 2)
-                execute(event, lang, args[1]);
+            Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
+
+            if (event.getOptions().isEmpty()) {
+                i18n = LangUtils.getTranslations(lang);
+                ErrorUtils.sendError(event, i18n.getString("wrong.usage"),
+                        MessageFormat.format(i18n.getString("tip.usage"), "prefix"));
+                return;
+            }
+
+            if (event.getOptions().size() == 1)
+                execute(event, lang, Objects.requireNonNull(event.getOption("page")).getAsString());
             else
-                ErrorUtils.sendError(event.getChannel(), i18n.getString("wrong.usage"),
-                        MessageFormat.format(i18n.getString("tip.usage"), Command.WAR.formatFullCommand(prefix)));
+                execute(event, lang, Objects.requireNonNull(event.getOption("page")).getAsString(), Objects.requireNonNull(event.getOption("clan_tag")).getAsString());
         });
     }
 
@@ -114,43 +117,51 @@ public class WarCommand {
                 DrawUtils.drawSimpleString(g2d, MessageFormat.format(i18n.getString("attack.index"), j + 1), 105, y + 55 + j * 47, 8f, attackColor);
             else
                 DrawUtils.drawSimpleStringLeft(g2d, MessageFormat.format(i18n.getString("attack.index"), j + 1), 1100, y + 55 + j * 47, 8f, attackColor);
-            if (attacks != null) {
-                Attack attack;
-                if (j < attacks.size()) {
-                    // If the player made at least one attack
-                    attack = attacks.get(j);
-                    ClanWarMember defender = getClanWarMemberByTag(opponentMembers, attack.getDefenderTag());
 
-                    if (!rightSide) {
-                        DrawUtils.drawShadowedString(g2d, defender.getMapPosition() + ". " + defender.getName(), 105, y + 78 + j * 46, 16f);
-                        DrawUtils.drawSimpleStringLeft(g2d, attack.getDestructionPercentage().longValue() + "%", 370, y + 70 + j * 47, 16f, Color.BLACK);
-                    } else {
-                        DrawUtils.drawShadowedStringLeft(g2d, defender.getMapPosition() + ". " + defender.getName(), 1100, y + 78 + j * 46, 16f);
-                        DrawUtils.drawSimpleString(g2d, attack.getDestructionPercentage().longValue() + "%", 840, y + 70 + j * 47, 16f, Color.BLACK);
-                    }
-
-                    int newStars = getNewStars(opponentAttacks, attack);
-
-                    // Stars
-                    for (int k = 0; k < 3; k++) {
-                        if (k + 1 <= attack.getStars()) {
-                            if (k + 1 <= attack.getStars() - newStars)
-                                g2d.drawImage(CacheComponents.alreadyStar, (rightSide ? 750 : 380) + k * 26, y + 48 + j * 45, 28, 28, null);
-                            else {
-                                stars++;
-                                g2d.drawImage(CacheComponents.newStar, (rightSide ? 750 : 380) + k * 26, y + 48 + j * 45, 28, 28, null);
-                            }
-                        } else
-                            g2d.drawImage(CacheComponents.noStar, (rightSide ? 750 : 380) + k * 26, y + 48 + j * 45, 28, 28, null);
-                    }
-                } else if (!rightSide)
+            if (attacks == null) {
+                if (!rightSide)
                     DrawUtils.drawShadowedString(g2d, i18n.getString("not.used"), 105, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
                 else
                     DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("not.used"), 1100, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
-            } else if (!rightSide)
-                DrawUtils.drawShadowedString(g2d, i18n.getString("not.used"), 105, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
-            else
-                DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("not.used"), 1100, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
+                continue;
+            }
+
+            if (j >= attacks.size()){
+                if (!rightSide)
+                    DrawUtils.drawShadowedString(g2d, i18n.getString("not.used"), 105, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
+                else
+                    DrawUtils.drawShadowedStringLeft(g2d, i18n.getString("not.used"), 1100, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
+                continue;
+            }
+
+            // If the player made at least one attack
+            Attack attack = attacks.get(j);
+            ClanWarMember defender = getClanWarMemberByTag(opponentMembers, attack.getDefenderTag());
+
+            if (!rightSide) {
+                DrawUtils.drawShadowedString(g2d, defender != null ? defender.getMapPosition() + ". " + defender.getName() : "Unknown", 105, y + 78 + j * 46, 16f);
+                DrawUtils.drawSimpleStringLeft(g2d, attack.getDestructionPercentage().longValue() + "%", 370, y + 70 + j * 47, 16f, Color.BLACK);
+            } else {
+                DrawUtils.drawShadowedStringLeft(g2d, defender != null ? defender.getMapPosition() + ". " + defender.getName() : "Unknown", 1100, y + 78 + j * 46, 16f);
+                DrawUtils.drawSimpleString(g2d, attack.getDestructionPercentage().longValue() + "%", 840, y + 70 + j * 47, 16f, Color.BLACK);
+            }
+
+            int newStars = getNewStars(opponentAttacks, attack);
+
+            // Stars
+            for (int starIndex = 0; starIndex < 3; starIndex++) {
+                if (starIndex + 1 > attack.getStars()) {
+                    g2d.drawImage(CacheComponents.noStar, (rightSide ? 750 : 380) + starIndex * 26, y + 48 + j * 45, 28, 28, null);
+                    continue;
+                }
+
+                if (starIndex + 1 <= attack.getStars() - newStars)
+                    g2d.drawImage(CacheComponents.alreadyStar, (rightSide ? 750 : 380) + starIndex * 26, y + 48 + j * 45, 28, 28, null);
+                else {
+                    stars++;
+                    g2d.drawImage(CacheComponents.newStar, (rightSide ? 750 : 380) + starIndex * 26, y + 48 + j * 45, 28, 28, null);
+                }
+            }
         }
         return stars;
     }
@@ -179,16 +190,17 @@ public class WarCommand {
         DrawUtils.drawCenteredString(g2d, starRect2, g2d.getFont().deriveFont(26f), String.valueOf(drawMemberResults(g2d, enemy, members, sortedAttacks, true, y)));
     }
 
-    public static WarInfo getWar(MessageReceivedEvent event, Locale lang, String[] args) {
+    public static WarInfo getWar(SlashCommandEvent event, Locale lang, String[] args) {
         // If rate limitation has exceeded
         if (!CoreUtils.checkThrottle(event, lang))
             return null;
 
         WarInfo war = null;
-        tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
+        tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getMember().getIdLong());
 
         if (tag == null) {
-            ErrorUtils.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
+            ErrorUtils.sendError(event, i18n.getString("set.clan.error"),
+                    MessageFormat.format(i18n.getString("cmd.general.tip"), Command.SET_CLAN.formatCommand()));
             return null;
         }
 
@@ -202,7 +214,7 @@ public class WarCommand {
         return war;
     }
 
-    public static void execute(MessageReceivedEvent event, Locale lang, String... args) {
+    public static void execute(SlashCommandEvent event, Locale lang, String... args) {
         MessageChannel channel = event.getChannel();
         WarInfo war = getWar(event, lang, args);
         if (war == null)
@@ -297,6 +309,6 @@ public class WarCommand {
             FileUtils.sendImage(event, image);
             g2d.dispose();
         } else
-            ErrorUtils.sendError(channel, MessageFormat.format(i18n.getString("exception.404.war"), tag));
+            ErrorUtils.sendError(event, MessageFormat.format(i18n.getString("exception.404.war"), tag));
     }
 }

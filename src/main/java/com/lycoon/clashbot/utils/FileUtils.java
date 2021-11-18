@@ -1,6 +1,7 @@
 package com.lycoon.clashbot.utils;
 
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;
@@ -15,17 +16,17 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public class FileUtils {
-    public static void sendImage(MessageReceivedEvent event, BufferedImage image) {
+    public static void sendImage(SlashCommandEvent event, BufferedImage image) {
         // Generating the picture
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
-            ImageIO.write(image, "jpg", bos);
+            ImageIO.write(image, "png", bos);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         // Callback function
-        long id = event.getAuthor().getIdLong();
+        long id = event.getMember().getIdLong();
         if (!CoreUtils.isOwner(id))
             CoreUtils.addUserToGenerating(id);
 
@@ -40,8 +41,8 @@ public class FileUtils {
 
             CoreUtils.removeUserFromGenerating(id);
         };
-        event.getChannel().sendFile(bos.toByteArray(), "clashbot_generated.jpg").queue(sendingCallback);
-        LOGGER.info("Picture sent to " + event.getAuthor().getAsTag() + " on " + event.getGuild().getIdLong());
+        event.getHook().sendFile(bos.toByteArray(), "clashbot.png").queue(sendingCallback);
+        LOGGER.info("Picture sent to " + event.getMember().getUser().getAsTag() + " on " + event.getGuild().getIdLong());
     }
 
     public static Image getImageFromFile(String file) {

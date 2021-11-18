@@ -1,14 +1,16 @@
-package com.lycoon.clashbot.commands;
+package com.lycoon.clashbot.commands.clan;
 
 import com.lycoon.clashapi.cocmodels.clanwar.ClanWarModel;
 import com.lycoon.clashapi.cocmodels.clanwar.WarlogItem;
 import com.lycoon.clashapi.cocmodels.clanwar.WarlogModel;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
@@ -40,20 +42,21 @@ public class WarlogCommand {
     private final static Color versusColor = new Color(0xffffc0);
     private final static Color percentageColor = new Color(0x5e5d60);
 
-    public static void dispatch(MessageReceivedEvent event, String... args) {
+    public static void call(SlashCommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (args.length > 2)
-                execute(event, args[1], args[2]);
-            else if (args.length == 2)
-                execute(event, args[1]);
-            else {
-                String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
-                ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-
-                ErrorUtils.sendError(event.getChannel(),
+            if (event.getOptions().isEmpty())
+            {
+                ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
+                ErrorUtils.sendError(event,
                         i18n.getString("wrong.usage"),
-                        MessageFormat.format(i18n.getString("tip.usage"), Command.WARLOG.formatFullCommand(prefix)));
+                        MessageFormat.format(i18n.getString("tip.usage"), "prefix"));
+                return;
             }
+
+            if (event.getOptions().size() == 1)
+                execute(event, event.getOption("page").getAsString());
+            else
+                execute(event, event.getOption("page").getAsString(), event.getOption("clan_tag").getAsString());
         });
     }
 
@@ -116,17 +119,18 @@ public class WarlogCommand {
         DrawUtils.drawCenteredString(g2d, teamSizeRect, g2d.getFont().deriveFont(14f), MessageFormat.format(i18n.getString("team.size.versus"), war.getTeamSize()), versusColor);
     }
 
-    public static WarlogModel getWarlog(MessageReceivedEvent event, Locale lang, String[] args) {
+    public static WarlogModel getWarlog(SlashCommandEvent event, Locale lang, String[] args) {
         // If rate limitation has exceeded
         if (!CoreUtils.checkThrottle(event, lang))
             return null;
 
         WarlogModel warlog = null;
         ResourceBundle i18n = LangUtils.getTranslations(lang);
-        String tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
+        String tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getMember().getIdLong());
 
         if (tag == null) {
-            ErrorUtils.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
+            ErrorUtils.sendError(event, i18n.getString("set.clan.error"),
+                    MessageFormat.format(i18n.getString("cmd.general.tip"), Command.SET_CLAN.formatCommand()));
             return null;
         }
 
@@ -140,17 +144,15 @@ public class WarlogCommand {
         return warlog;
     }
 
-    public static void execute(MessageReceivedEvent event, String... args) {
+    public static void execute(SlashCommandEvent event, String... args) {
         MessageChannel channel = event.getChannel();
 
-        lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
+        lang = LangUtils.getLanguage(event.getMember().getIdLong());
         i18n = LangUtils.getTranslations(lang);
 
         WarlogModel warlog = getWarlog(event, lang, args);
         if (warlog == null)
             return;
-
-        System.out.println("Warlog is not null");
 
         // Checking index validity
         int index = ErrorUtils.checkIndex(event, i18n, args[0], warlog.getWars().size() / SIZE);
@@ -160,7 +162,7 @@ public class WarlogCommand {
         // Checking if there are any clan wars
         List<WarlogItem> wars = warlog.getWars();
         if (wars.size() <= 0) {
-            ErrorUtils.sendError(channel, i18n.getString("no.warlog"));
+            ErrorUtils.sendError(event, i18n.getString("no.warlog"));
             return;
         }
 

@@ -1,12 +1,14 @@
-package com.lycoon.clashbot.commands;
+package com.lycoon.clashbot.commands.clan;
 
 import com.lycoon.clashapi.cocmodels.clan.ClanMember;
 import com.lycoon.clashapi.cocmodels.clan.ClanModel;
 import com.lycoon.clashapi.cocmodels.clan.Label;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
@@ -59,12 +61,12 @@ public class ClanCommand {
         put("Newbie Friendly", "label.newbie");
     }};
 
-    public static void dispatch(MessageReceivedEvent event, String... args) {
+    public static void call(SlashCommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (args.length > 1)
-                ClanCommand.execute(event, args[1]);
+            if (event.getOptions().isEmpty())
+                execute(event);
             else
-                ClanCommand.execute(event);
+                execute(event, Objects.requireNonNull(event.getOption("clan_tag")).getAsString());
         });
     }
 
@@ -76,17 +78,18 @@ public class ClanCommand {
         return "";
     }
 
-    public static ClanModel getClan(MessageReceivedEvent event, Locale lang, String[] args) {
+    public static ClanModel getClan(SlashCommandEvent event, Locale lang, String[] args) {
         // Checking rate limitation
         if (!CoreUtils.checkThrottle(event, lang))
             return null;
 
         ClanModel clan = null;
         ResourceBundle i18n = LangUtils.getTranslations(lang);
-        String tag = args.length > 0 ? args[0] : DatabaseUtils.getClanTag(event.getAuthor().getIdLong());
+        String tag = args.length > 0 ? args[0] : DatabaseUtils.getClanTag(event.getMember().getIdLong());
 
         if (tag == null) {
-            ErrorUtils.sendError(event.getChannel(), i18n.getString("set.clan.error"), i18n.getString("set.clan.help"));
+            ErrorUtils.sendError(event, i18n.getString("set.clan.error"),
+                    MessageFormat.format(i18n.getString("cmd.general.tip"), Command.SET_CLAN.formatCommand()));
             return null;
         }
 
@@ -100,8 +103,8 @@ public class ClanCommand {
         return clan;
     }
 
-    public static void execute(MessageReceivedEvent event, String... args) {
-        Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
+    public static void execute(SlashCommandEvent event, String... args) {
+        Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         NumberFormat nf = NumberFormat.getInstance(lang);
 

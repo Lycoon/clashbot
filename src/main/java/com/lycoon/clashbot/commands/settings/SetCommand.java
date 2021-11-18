@@ -1,6 +1,7 @@
-package com.lycoon.clashbot.commands;
+package com.lycoon.clashbot.commands.settings;
 
 import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
@@ -8,6 +9,7 @@ import com.lycoon.clashbot.utils.DatabaseUtils;
 import com.lycoon.clashbot.utils.ErrorUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.IOException;
@@ -17,56 +19,32 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class SetCommand {
-    public static void dispatch(MessageReceivedEvent event, String... args) {
-        String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
-        if (args.length <= 2) {
-            ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-            ErrorUtils.sendError(event.getChannel(),
+    public static void call(SlashCommandEvent event) {
+        if (event.getSubcommandName() == null) {
+            ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
+            ErrorUtils.sendError(event,
                     i18n.getString("wrong.usage"),
-                    MessageFormat.format(i18n.getString("info.help"), Command.HELP.formatFullCommand(prefix)));
+                    MessageFormat.format(i18n.getString("info.help"), "prefix"));
             return;
         }
 
-        String type = args[1].toLowerCase();
+        String type = event.getSubcommandName();
         switch (type) {
-            case "player" -> executePlayer(event, args[2]);
-            case "clan" -> executeClan(event, args[2]);
-            case "lang" -> executeLang(event, args[2], prefix);
-            case "prefix" -> executePrefix(event, args[2]);
+            case "player" -> executePlayer(event, event.getOption("player_tag").getAsString());
+            case "clan" -> executeClan(event, event.getOption("clan_tag").getAsString());
+            case "lang" -> executeLang(event, event.getOption("language").getAsString());
             default -> {
-                ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-                ErrorUtils.sendError(event.getChannel(),
+                ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
+                ErrorUtils.sendError(event,
                         i18n.getString("wrong.usage"),
-                        MessageFormat.format(i18n.getString("info.help"), Command.HELP.formatFullCommand(prefix)));
+                        MessageFormat.format(i18n.getString("info.help"), "prefix"));
             }
         }
     }
 
-    public static void executePrefix(MessageReceivedEvent event, String prefix) {
-        ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
-        if (!Objects.requireNonNull(event.getMember()).hasPermission(Permission.MANAGE_SERVER)) {
-            // Insufficient permission
-            ErrorUtils.sendError(event.getChannel(),
-                    i18n.getString("exception.permission"),
-                    i18n.getString("exception.prefix.permission"));
-            return;
-        } else if (prefix.length() > 3) {
-            // Too long prefix
-            ErrorUtils.sendError(event.getChannel(), i18n.getString("exception.prefix.long"));
-            return;
-        }
+    public static void executePlayer(SlashCommandEvent event, String tag) {
+        ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
 
-        DatabaseUtils.setServerPrefix(event.getGuild().getIdLong(), prefix);
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setColor(CoreUtils.validColor);
-        builder.setTitle(MessageFormat.format(i18n.getString("set.prefix.success"), prefix));
-        builder.setFooter(i18n.getString("set.prefix.tip"));
-
-        CoreUtils.sendMessage(event, i18n, builder);
-    }
-
-    public static void executePlayer(MessageReceivedEvent event, String tag) {
-        ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
         try {
             // Checks if the player exists
             ClashBotMain.clashAPI.getPlayer(tag);
@@ -75,7 +53,7 @@ public class SetCommand {
             return;
         }
 
-        DatabaseUtils.setPlayerTag(event.getAuthor().getIdLong(), tag);
+        DatabaseUtils.setPlayerTag(event.getMember().getIdLong(), tag);
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(CoreUtils.validColor);
         builder.setTitle(MessageFormat.format(i18n.getString("set.player.success"), tag));
@@ -84,8 +62,8 @@ public class SetCommand {
         CoreUtils.sendMessage(event, i18n, builder);
     }
 
-    public static void executeClan(MessageReceivedEvent event, String tag) {
-        ResourceBundle i18n = LangUtils.getTranslations(event.getAuthor().getIdLong());
+    public static void executeClan(SlashCommandEvent event, String tag) {
+        ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
 
         try {
             // Checks if the clan exists
@@ -95,7 +73,7 @@ public class SetCommand {
             return;
         }
 
-        DatabaseUtils.setClanTag(event.getAuthor().getIdLong(), tag);
+        DatabaseUtils.setClanTag(event.getMember().getIdLong(), tag);
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(CoreUtils.validColor);
         builder.setTitle(MessageFormat.format(i18n.getString("set.clan.success"), tag));
@@ -104,8 +82,8 @@ public class SetCommand {
         CoreUtils.sendMessage(event, i18n, builder);
     }
 
-    public static void executeLang(MessageReceivedEvent event, String language, String prefix) {
-        long id = event.getAuthor().getIdLong();
+    public static void executeLang(SlashCommandEvent event, String language) {
+        long id = event.getMember().getIdLong();
         if (LangUtils.isSupportedLanguage(language)) {
             DatabaseUtils.setUserLang(id, language);
             Locale lang = new Locale(language);
@@ -117,7 +95,7 @@ public class SetCommand {
                     MessageFormat.format(i18n.getString("lang.success"), lang.getDisplayLanguage(lang)));
             builder.setDescription(
                     MessageFormat.format(i18n.getString("lang.info.other"),
-                            Command.SETLANG.formatFullCommand(prefix)));
+                            Command.SET_LANG.formatCommand()));
 
             CoreUtils.sendMessage(event, i18n, builder);
         } else {

@@ -2,6 +2,7 @@ package com.lycoon.clashbot.utils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.text.MessageFormat;
@@ -10,37 +11,36 @@ import java.util.ResourceBundle;
 public class ErrorUtils {
     private static final String OFFICIAL_TWITTER = "https://twitter.com/ClashofClans";
 
-    public static void sendExceptionError(MessageReceivedEvent event, ResourceBundle i18n, Exception e, String... args) {
-        MessageChannel channel = event.getChannel();
+    public static void sendExceptionError(SlashCommandEvent event, ResourceBundle i18n, Exception e, String... args) {
         switch (e.getMessage()) {
-            case "400" -> sendError(channel, i18n.getString("exception.other"));
-            case "403" -> sendError(channel, i18n.getString("exception.403"));
-            case "404" -> sendError(channel,
+            case "400" -> sendError(event, i18n.getString("exception.other"));
+            case "403" -> sendError(event, i18n.getString("exception.403"));
+            case "404" -> sendError(event,
                     MessageFormat.format(i18n.getString("exception.404." + args[1]), args[0]),
                     i18n.getString("exception.format"));
-            case "429" -> sendError(channel, i18n.getString("exception.429"));
-            case "503" -> sendError(channel,
+            case "429" -> sendError(event, i18n.getString("exception.429"));
+            case "503" -> sendError(event,
                     i18n.getString("exception.503"),
                     MessageFormat.format(i18n.getString("exception.status"), OFFICIAL_TWITTER));
-            default -> sendError(channel,
+            default -> sendError(event,
                     i18n.getString("exception.other"),
                     i18n.getString("exception.contact"));
         }
     }
 
-    public static int checkIndex(MessageReceivedEvent event, ResourceBundle i18n, String arg, int max) {
+    public static int checkIndex(SlashCommandEvent event, ResourceBundle i18n, String arg, int max) {
         int index;
         try {
             index = Integer.parseInt(arg);
             if (index < 1 || index > max) {
-                ErrorUtils.sendError(event.getChannel(),
+                ErrorUtils.sendError(event,
                         i18n.getString("wrong.usage"),
                         MessageFormat.format(i18n.getString("exception.index"), 1, max));
                 return -1;
             }
         } catch (NumberFormatException e) {
             ErrorUtils.sendError(
-                    event.getChannel(),
+                    event,
                     i18n.getString("wrong.usage"),
                     MessageFormat.format(i18n.getString("exception.index"), 1, max));
             return -1;
@@ -57,7 +57,7 @@ public class ErrorUtils {
 	}
 	*/
 
-    public static void sendError(MessageChannel channel, String title, String... args) {
+    public static void sendError(SlashCommandEvent event, String title, String... args) {
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(CoreUtils.invalidColor);
         error.setTitle(title);
@@ -67,7 +67,7 @@ public class ErrorUtils {
         if (args.length >= 2)
             error.setFooter(args[1]);
 
-        channel.sendMessage(error.build()).queue();
+        event.getHook().sendMessageEmbeds(error.build()).queue();
         error.clear();
     }
 }

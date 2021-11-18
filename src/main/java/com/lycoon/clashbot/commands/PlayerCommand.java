@@ -8,11 +8,13 @@ import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -48,12 +50,12 @@ public class PlayerCommand {
             "Log Launcher"};
     private final static String[] PETS = {"L.A.S.S.I", "Electro Owl", "Mighty Yak", "Unicorn"};
 
-    public static void dispatch(MessageReceivedEvent event, String... args) {
+    public static void call(SlashCommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (args.length > 1)
-                PlayerCommand.execute(event, args[1]);
+            if (event.getOptions().isEmpty())
+                execute(event);
             else
-                PlayerCommand.execute(event);
+                execute(event, event.getOption("player_tag").getAsString());
         });
     }
 
@@ -117,10 +119,8 @@ public class PlayerCommand {
             drawTroop(g2d, font, getTroopByName(pets, PETS[i]), PETS[i], (i % COLUMNS) * 50 + 710, y + j * 50);
     }
 
-    public static void execute(MessageReceivedEvent event, String... args) {
-        MessageChannel channel = event.getChannel();
-
-        Locale lang = LangUtils.getLanguage(event.getAuthor().getIdLong());
+    public static void execute(SlashCommandEvent event, String... args) {
+        Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         NumberFormat nf = NumberFormat.getInstance(lang);
 
@@ -129,10 +129,11 @@ public class PlayerCommand {
             return;
 
         Player player;
-        String tag = args.length > 0 ? args[0] : DatabaseUtils.getPlayerTag(event.getAuthor().getIdLong());
+        String tag = args.length > 0 ? args[0] : DatabaseUtils.getPlayerTag(event.getMember().getIdLong());
 
         if (tag == null) {
-            ErrorUtils.sendError(channel, i18n.getString("set.player.error"), i18n.getString("set.player.help"));
+            ErrorUtils.sendError(event, i18n.getString("set.player.error"),
+                    MessageFormat.format(i18n.getString("cmd.general.tip"), Command.SET_PLAYER.formatCommand()));
             return;
         }
 
