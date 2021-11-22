@@ -8,7 +8,6 @@ Clashbot is a verified Discord bot generating pictures from Clash of Clans ingam
 The bot proposes several features including: language choice, saving default tags, accessing clan and player profiles, clan warlogs, current clanwars, warleague rounds...
 
 ### Miscellaneous
-- `/stats` - shows various data about bot.
 - `/invite` - shows bot's invite link.
 - `/lang` - shows your current language.
 - `/info` - shows bot information.
@@ -16,12 +15,13 @@ The bot proposes several features including: language choice, saving default tag
 
 ### Settings
 - `/clear` - deletes all the data the bot database has about you.
-- `/set <clan|player> <tag>` sets your default clan or player tag.
+- `/set clan <clanTag>` sets your default clan tag.
+- `/set player <playerTag>` sets your default player tag.
 - `/set lang <language>` - sets your default language.
 
 ### Clan
 - `/clan [clanTag]` - shows clan profile.
-- `/warleague round <page> [clanTag]` - shows specified warleague round.
+- `/warleague <page> [clanTag]` - shows specified warleague round.
 - `/warlog <page> [clanTag]` - shows clan's warlog.
 - `/war <page> [clanTag]` - shows current war occurring in the clan.
 
