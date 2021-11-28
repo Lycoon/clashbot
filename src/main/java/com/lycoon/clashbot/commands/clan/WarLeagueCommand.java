@@ -27,11 +27,15 @@ public class WarLeagueCommand {
     private final static int ROUND_HEIGHT = 333;
     private final static float FONT_SIZE = 16f;
 
+    private static ResourceBundle i18n;
+
     public static void call(SlashCommandEvent event) {
+        Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
+        i18n = LangUtils.getTranslations(lang);
+
         CompletableFuture.runAsync(() -> {
             if (event.getOptions().isEmpty())
             {
-                ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
                 ErrorUtils.sendError(event,
                         i18n.getString("wrong.usage"),
                         MessageFormat.format(i18n.getString("tip.usage"), "prefix"));
