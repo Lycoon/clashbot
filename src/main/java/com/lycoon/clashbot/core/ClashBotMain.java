@@ -45,10 +45,6 @@ public class ClashBotMain {
         builder.setActivity(Activity.playing("Clash of Clans"));
         jda = builder.build().awaitReady();
 
-        // Creating commands
-        /*CommandConfig commandConfig = new CommandConfig(jda);
-        commandConfig.createCommands();*/
-
         clashAPI = new ClashAPI(tokens.getProperty("clash-of-clans"));
         cached = CacheComponents.getInstance();
     }

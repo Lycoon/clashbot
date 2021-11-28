@@ -44,9 +44,6 @@ public class SetCommand {
 
     public static void executePlayer(SlashCommandEvent event, String tag) {
         ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
-        if (!tag.startsWith("#")){
-            tag = "#" + tag;
-        }
 
         try {
             // Checks if the player exists
@@ -67,9 +64,6 @@ public class SetCommand {
 
     public static void executeClan(SlashCommandEvent event, String tag) {
         ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
-        if (!tag.startsWith("#")){
-            tag = "#" + tag;
-        }
 
         try {
             // Checks if the clan exists

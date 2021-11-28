@@ -1,5 +1,6 @@
 package com.lycoon.clashbot.commands;
 
+import com.lycoon.clashbot.core.ClashBotMain;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -18,27 +19,24 @@ public class CommandConfig {
 
     public void createCommands()
     {
-        var commands = jda.retrieveCommands().complete();
-        for (var cmd : commands) {
-            System.out.println(cmd.getName() + ": " + cmd.getDescription());
-        }
+        ClashBotMain.LOGGER.info("Creating commands...");
 
         // Miscellaneous
         CommandData infoCommand = new CommandData("info", "Shows bot information");
-        jda.upsertCommand(infoCommand).queue();
+        jda.upsertCommand(infoCommand).complete();
 
         CommandData inviteCommand = new CommandData("invite", "Shows bot's invite link");
-        jda.upsertCommand(inviteCommand).queue();
+        jda.upsertCommand(inviteCommand).complete();
 
         CommandData langCommand = new CommandData("lang", "Shows your current language");
-        jda.upsertCommand(langCommand).queue();
+        jda.upsertCommand(langCommand).complete();
 
         CommandData helpCommand = new CommandData("help", "Shows commands and their usage");
-        jda.upsertCommand(helpCommand).queue();
+        jda.upsertCommand(helpCommand).complete();
 
         // Settings
         CommandData clearCommand = new CommandData("clear", "Deletes all the data the bot database has about you");
-        jda.upsertCommand(clearCommand).queue();
+        jda.upsertCommand(clearCommand).complete();
 
         CommandData setCommand = new CommandData("set", "Shows clan profile");
         SubcommandData setClanSubcommand = new SubcommandData("clan", "Sets default clan tag");
@@ -51,31 +49,33 @@ public class CommandConfig {
         setLangSubcommand.addOption(OptionType.STRING, "language", "Default language code", true);
 
         setCommand.addSubcommands(setClanSubcommand, setPlayerSubcommand, setLangSubcommand);
-        jda.upsertCommand(setCommand).queue();
+        jda.upsertCommand(setCommand).complete();
 
         // Clan
         CommandData clanCommand = new CommandData("clan", "Shows clan profile");
         clanCommand.addOption(OptionType.STRING, "clan_tag", "Clan tag from the profile starting with a #", false);
-        jda.upsertCommand(clanCommand).queue();
+        jda.upsertCommand(clanCommand).complete();
 
         CommandData warCommand = new CommandData("war", "Shows current war occurring in the clan");
         warCommand.addOption(OptionType.INTEGER, "page", "Page number you want to access", true);
         warCommand.addOption(OptionType.STRING, "clan_tag", "Clan tag from the profile starting with a #", false);
-        jda.upsertCommand(warCommand).queue();
+        jda.upsertCommand(warCommand).complete();
 
         CommandData warlogCommand = new CommandData("warlog", "Shows clan warlog");
         warlogCommand.addOption(OptionType.INTEGER, "page", "Page number you want to access", true);
         warlogCommand.addOption(OptionType.STRING, "clan_tag", "Clan tag from the profile starting with a #", false);
-        jda.upsertCommand(warlogCommand).queue();
+        jda.upsertCommand(warlogCommand).complete();
 
         CommandData warleagueCommand = new CommandData("warleague", "Shows current warleague occurring in the clan");
         warleagueCommand.addOption(OptionType.INTEGER, "page", "Page number you want to access", true);
         warleagueCommand.addOption(OptionType.STRING, "clan_tag", "Clan tag from the profile starting with a #", false);
-        jda.upsertCommand(warleagueCommand).queue();
+        jda.upsertCommand(warleagueCommand).complete();
 
         // Player
         CommandData playerCommand = new CommandData("player", "Shows player profile");
         playerCommand.addOption(OptionType.STRING, "player_tag", "Player tag from the profile starting with a #", false);
-        jda.upsertCommand(playerCommand).queue();
+        jda.upsertCommand(playerCommand).complete();
+
+        ClashBotMain.LOGGER.info("Commands created successfully");
     }
 }

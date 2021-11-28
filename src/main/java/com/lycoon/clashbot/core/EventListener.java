@@ -109,7 +109,6 @@ public class EventListener extends ListenerAdapter {
 
     /**
      * TO DELETE: On January 1st 2022
-     * @param event
      */
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
