@@ -54,11 +54,12 @@ public class WarCommand {
     }
 
     public static void call(SlashCommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
+        Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
+        i18n = LangUtils.getTranslations(lang);
 
-            if (event.getOptions().isEmpty()) {
-                i18n = LangUtils.getTranslations(lang);
+        CompletableFuture.runAsync(() -> {
+            if (event.getOptions().isEmpty())
+            {
                 ErrorUtils.sendError(event, i18n.getString("wrong.usage"),
                         MessageFormat.format(i18n.getString("tip.usage"), "prefix"));
                 return;
