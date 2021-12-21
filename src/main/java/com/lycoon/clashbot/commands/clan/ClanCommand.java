@@ -1,15 +1,14 @@
 package com.lycoon.clashbot.commands.clan;
 
-import com.lycoon.clashapi.cocmodels.clan.ClanMember;
-import com.lycoon.clashapi.cocmodels.clan.ClanModel;
-import com.lycoon.clashapi.cocmodels.clan.Label;
+import com.lycoon.clashapi.models.clan.ClanMember;
+import com.lycoon.clashapi.models.clan.Clan;
+import com.lycoon.clashapi.models.common.Label;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -78,12 +77,12 @@ public class ClanCommand {
         return "";
     }
 
-    public static ClanModel getClan(SlashCommandEvent event, Locale lang, String[] args) {
+    public static Clan getClan(SlashCommandEvent event, Locale lang, String[] args) {
         // Checking rate limitation
         if (!CoreUtils.checkThrottle(event, lang))
             return null;
 
-        ClanModel clan = null;
+        Clan clan = null;
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         String tag = args.length > 0 ? args[0] : DatabaseUtils.getClanTag(event.getMember().getIdLong());
 
@@ -108,7 +107,7 @@ public class ClanCommand {
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         NumberFormat nf = NumberFormat.getInstance(lang);
 
-        ClanModel clan = getClan(event, lang, args);
+        Clan clan = getClan(event, lang, args);
         if (clan == null)
             return;
 
@@ -143,7 +142,7 @@ public class ClanCommand {
 
         // Clan location
         if (clan.getLocation() != null) {
-            if (clan.getLocation().getIsCountry()) {
+            if (clan.getLocation().isCountry()) {
                 Locale clanLocale = new Locale("", clan.getLocation().getCountryCode().toLowerCase());
                 DrawUtils.drawShadowedStringLeft(g2d, clanLocale.getDisplayCountry(lang), 905, 33, 14f, 2);
             } else
@@ -188,9 +187,9 @@ public class ClanCommand {
         DrawUtils.drawShadowedString(g2d, i18n.getString("clan.trophies.total.builder"), 294, 292, 13f);
 
         DrawUtils.drawSimpleString(g2d, nf.format(clan.getRequiredTrophies()), 503, 198, 12f, valueColor);
-        DrawUtils.drawSimpleString(g2d, nf.format((int) clan.getMemberList().stream().mapToInt(ClanMember::getTrophies).average().orElse(0)), 503, 228, 12f, valueColor);
-        DrawUtils.drawSimpleString(g2d, nf.format(clan.getMemberList().stream().mapToInt(ClanMember::getTrophies).sum()), 503, 263, 12f, valueColor);
-        DrawUtils.drawSimpleString(g2d, nf.format(clan.getMemberList().stream().mapToInt(ClanMember::getVersusTrophies).sum()), 503, 293, 12f, valueColor);
+        DrawUtils.drawSimpleString(g2d, nf.format((int) clan.getMemberList().stream().mapToInt(Clan::getRequiredTrophies).average().orElse(0)), 503, 228, 12f, valueColor);
+        DrawUtils.drawSimpleString(g2d, nf.format(clan.getMemberList().stream().mapToInt(Clan::getRequiredTrophies).sum()), 503, 263, 12f, valueColor);
+        DrawUtils.drawSimpleString(g2d, nf.format(clan.getMemberList().stream().mapToInt(Clan::getRequiredVersusTrophies).sum()), 503, 293, 12f, valueColor);
 
         // Clan wars section
         Rectangle clanwarTitleRect = new Rectangle(600, 155, 318, 5);

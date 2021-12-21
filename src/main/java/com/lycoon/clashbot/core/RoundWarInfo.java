@@ -3,23 +3,23 @@ package com.lycoon.clashbot.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lycoon.clashapi.cocmodels.clanwar.WarInfo;
+import com.lycoon.clashapi.models.war.War;
 
 public class RoundWarInfo
 {
-	List<WarInfo> wars = new ArrayList<WarInfo>();
+	List<War> wars = new ArrayList<War>();
 	
-	public List<WarInfo> getWars()
+	public List<War> getWars()
 	{
 		return wars;
 	}
 	
-	public void setWars(List<WarInfo> wars)
+	public void setWars(List<War> wars)
 	{
 		this.wars = wars;
 	}
 	
-	public void addWarInfo(WarInfo warInfo)
+	public void addWarInfo(War warInfo)
 	{
 		wars.add(warInfo);
 	}

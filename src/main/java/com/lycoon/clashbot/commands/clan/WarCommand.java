@@ -1,8 +1,8 @@
 package com.lycoon.clashbot.commands.clan;
 
-import com.lycoon.clashapi.cocmodels.clanwar.Attack;
-import com.lycoon.clashapi.cocmodels.clanwar.ClanWarMember;
-import com.lycoon.clashapi.cocmodels.clanwar.WarInfo;
+import com.lycoon.clashapi.models.war.WarAttack;
+import com.lycoon.clashapi.models.war.WarMember;
+import com.lycoon.clashapi.models.war.War;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.CacheComponents;
@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class WarCommand {
@@ -31,24 +31,24 @@ public class WarCommand {
     private final static int HEIGHT = 894;
     private final static float FONT_SIZE = 16f;
 
-    private static List<ClanWarMember> members, enemyMembers;
-    private static List<Attack> sortedAttacks, sortedEnemyAttacks;
+    private static List<WarMember> members, enemyMembers;
+    private static List<WarAttack> sortedAttacks, sortedEnemyAttacks;
     private static ResourceBundle i18n;
     private final static Color backgroundColor = new Color(0xe7e7e1);
     private final static Color clanNameColor = new Color(0xfeffaf);
     private final static Color notUsedAttackColor = new Color(0xfbbf70);
     private final static Color attackColor = new Color(0x4c493a);
 
-    static class SortMemberByOrder implements Comparator<ClanWarMember> {
+    static class SortMemberByOrder implements Comparator<WarMember> {
         @Override
-        public int compare(ClanWarMember a, ClanWarMember b) {
+        public int compare(WarMember a, WarMember b) {
             return a.getMapPosition() - b.getMapPosition();
         }
     }
 
-    static class SortAttackByOrder implements Comparator<Attack> {
+    static class SortAttackByOrder implements Comparator<WarAttack> {
         @Override
-        public int compare(Attack a, Attack b) {
+        public int compare(WarAttack a, WarAttack b) {
             return a.getOrder() - b.getOrder();
         }
     }
@@ -71,18 +71,18 @@ public class WarCommand {
         });
     }
 
-    public static ClanWarMember getClanWarMemberByTag(List<ClanWarMember> members, String tag) {
-        for (ClanWarMember member : members) {
+    public static WarMember getClanWarMemberByTag(List<WarMember> members, String tag) {
+        for (WarMember member : members) {
             if (member.getTag().equals(tag))
                 return member;
         }
         return null;
     }
 
-    public static List<Attack> getAttacksByOrder(List<ClanWarMember> members) {
-        List<Attack> sortedAttacks = new ArrayList<>();
-        for (ClanWarMember member : members) {
-            List<Attack> attacks = member.getAttacks();
+    public static List<WarAttack> getAttacksByOrder(List<WarMember> members) {
+        List<WarAttack> sortedAttacks = new ArrayList<>();
+        for (WarMember member : members) {
+            List<WarAttack> attacks = member.getAttacks();
             if (attacks != null)
                 sortedAttacks.addAll(attacks);
         }
@@ -90,10 +90,10 @@ public class WarCommand {
         return sortedAttacks;
     }
 
-    public static int getHighestStars(List<Attack> attacks, Attack atk) {
+    public static int getHighestStars(List<WarAttack> attacks, WarAttack atk) {
         int max = 0;
         for (int i = 0; i < attacks.size() && attacks.get(i).getOrder() < atk.getOrder(); i++) {
-            Attack curr = attacks.get(i);
+            WarAttack curr = attacks.get(i);
             if (curr.getDefenderTag().equals(atk.getDefenderTag())) {
                 if (curr.getStars() > max)
                     max = curr.getStars();
@@ -102,16 +102,16 @@ public class WarCommand {
         return max;
     }
 
-    public static int getNewStars(List<Attack> attacks, Attack attack) {
+    public static int getNewStars(List<WarAttack> attacks, WarAttack attack) {
         int highestStars = getHighestStars(attacks, attack);
         if (attack.getStars() > highestStars)
             return attack.getStars() - highestStars;
         return 0;
     }
 
-    public static int drawMemberResults(Graphics2D g2d, ClanWarMember member, List<ClanWarMember> opponentMembers, List<Attack> opponentAttacks, boolean rightSide, int y) {
+    public static int drawMemberResults(Graphics2D g2d, WarMember member, List<WarMember> opponentMembers, List<WarAttack> opponentAttacks, boolean rightSide, int y) {
         int stars = 0;
-        List<Attack> attacks = member.getAttacks();
+        List<WarAttack> attacks = member.getAttacks();
         for (int j = 0; j < 2; j++) {
             if (!rightSide)
                 DrawUtils.drawSimpleString(g2d, MessageFormat.format(i18n.getString("attack.index"), j + 1), 105, y + 55 + j * 47, 8f, attackColor);
@@ -135,15 +135,15 @@ public class WarCommand {
             }
 
             // If the player made at least one attack
-            Attack attack = attacks.get(j);
-            ClanWarMember defender = getClanWarMemberByTag(opponentMembers, attack.getDefenderTag());
+            WarAttack attack = attacks.get(j);
+            WarMember defender = getClanWarMemberByTag(opponentMembers, attack.getDefenderTag());
 
             if (!rightSide) {
                 DrawUtils.drawShadowedString(g2d, defender != null ? defender.getMapPosition() + ". " + defender.getName() : "Unknown", 105, y + 78 + j * 46, 16f);
-                DrawUtils.drawSimpleStringLeft(g2d, attack.getDestructionPercentage().longValue() + "%", 370, y + 70 + j * 47, 16f, Color.BLACK);
+                DrawUtils.drawSimpleStringLeft(g2d, attack.getDestructionPercentage() + "%", 370, y + 70 + j * 47, 16f, Color.BLACK);
             } else {
                 DrawUtils.drawShadowedStringLeft(g2d, defender != null ? defender.getMapPosition() + ". " + defender.getName() : "Unknown", 1100, y + 78 + j * 46, 16f);
-                DrawUtils.drawSimpleString(g2d, attack.getDestructionPercentage().longValue() + "%", 840, y + 70 + j * 47, 16f, Color.BLACK);
+                DrawUtils.drawSimpleString(g2d, attack.getDestructionPercentage() + "%", 840, y + 70 + j * 47, 16f, Color.BLACK);
             }
 
             int newStars = getNewStars(opponentAttacks, attack);
@@ -166,7 +166,7 @@ public class WarCommand {
         return stars;
     }
 
-    public static void drawMapPosition(Graphics2D g2d, ClanWarMember member, ClanWarMember enemy, int y) {
+    public static void drawMapPosition(Graphics2D g2d, WarMember member, WarMember enemy, int y) {
         g2d.setColor(Color.WHITE);
 
         // Username
@@ -190,12 +190,12 @@ public class WarCommand {
         DrawUtils.drawCenteredString(g2d, starRect2, g2d.getFont().deriveFont(26f), String.valueOf(drawMemberResults(g2d, enemy, members, sortedAttacks, true, y)));
     }
 
-    public static WarInfo getWar(SlashCommandEvent event, Locale lang, String[] args) {
+    public static War getWar(SlashCommandEvent event, Locale lang, String[] args) {
         // If rate limitation has exceeded
         if (!CoreUtils.checkThrottle(event, lang))
             return null;
 
-        WarInfo war = null;
+        War war = null;
         tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getMember().getIdLong());
 
         if (tag == null) {
@@ -216,7 +216,7 @@ public class WarCommand {
 
     public static void execute(SlashCommandEvent event, Locale lang, String... args) {
         MessageChannel channel = event.getChannel();
-        WarInfo war = getWar(event, lang, args);
+        War war = getWar(event, lang, args);
         if (war == null)
             return;
 
@@ -232,8 +232,8 @@ public class WarCommand {
             Font font = DrawUtils.getFont("Supercell.ttf").deriveFont(FONT_SIZE);
             g2d.setFont(font);
 
-            members = war.getClan().getWarMembers();
-            enemyMembers = war.getEnemy().getWarMembers();
+            members = war.getClan().getMembers();
+            enemyMembers = war.getOpponent().getMembers();
 
             members.sort(new SortMemberByOrder());
             enemyMembers.sort(new SortMemberByOrder());
@@ -249,11 +249,11 @@ public class WarCommand {
 
             // Clan badges
             g2d.drawImage(FileUtils.getImageFromUrl(war.getClan().getBadgeUrls().getSmall()), 20, 20, 135, 135, null);
-            g2d.drawImage(FileUtils.getImageFromUrl(war.getEnemy().getBadgeUrls().getSmall()), 1050, 20, 135, 135, null);
+            g2d.drawImage(FileUtils.getImageFromUrl(war.getOpponent().getBadgeUrls().getSmall()), 1050, 20, 135, 135, null);
 
             // Clan names
             DrawUtils.drawShadowedString(g2d, war.getClan().getName(), 165, 70, 32f, 2, clanNameColor);
-            DrawUtils.drawShadowedStringLeft(g2d, war.getEnemy().getName(), 1030, 70, 32f, 2, clanNameColor);
+            DrawUtils.drawShadowedStringLeft(g2d, war.getOpponent().getName(), 1030, 70, 32f, 2, clanNameColor);
 
             // Status
             Rectangle statusRect = new Rectangle(0, 55, WIDTH, 20);
@@ -295,7 +295,7 @@ public class WarCommand {
             Rectangle clanStarRect2 = new Rectangle(890, 100, 200, 20);
 
             DrawUtils.drawCenteredString(g2d, clanStarRect1, font.deriveFont(28f), String.valueOf(war.getClan().getStars()));
-            DrawUtils.drawCenteredString(g2d, clanStarRect2, font.deriveFont(28f), String.valueOf(war.getEnemy().getStars()));
+            DrawUtils.drawCenteredString(g2d, clanStarRect2, font.deriveFont(28f), String.valueOf(war.getOpponent().getStars()));
 
             // Total destruction percentage
             Rectangle destructionRect1 = new Rectangle(290, 102, 150, 20);
@@ -304,7 +304,7 @@ public class WarCommand {
             DecimalFormatSymbols dfs = new DecimalFormatSymbols(lang);
             DecimalFormat df = new DecimalFormat("#.#", dfs);
             DrawUtils.drawSimpleCenteredString(g2d, df.format(war.getClan().getDestructionPercentage()) + "%", destructionRect1, 26f, Color.BLACK);
-            DrawUtils.drawSimpleCenteredString(g2d, df.format(war.getEnemy().getDestructionPercentage()) + "%", destructionRect2, 26f, Color.BLACK);
+            DrawUtils.drawSimpleCenteredString(g2d, df.format(war.getOpponent().getDestructionPercentage()) + "%", destructionRect2, 26f, Color.BLACK);
 
             FileUtils.sendImage(event, image);
             g2d.dispose();

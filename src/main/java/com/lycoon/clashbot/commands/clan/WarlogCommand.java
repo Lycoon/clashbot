@@ -1,8 +1,7 @@
 package com.lycoon.clashbot.commands.clan;
 
-import com.lycoon.clashapi.cocmodels.clanwar.ClanWarModel;
-import com.lycoon.clashapi.cocmodels.clanwar.WarlogItem;
-import com.lycoon.clashapi.cocmodels.clanwar.WarlogModel;
+import com.lycoon.clashapi.models.war.WarlogClan;
+import com.lycoon.clashapi.models.war.WarlogEntry;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.CacheComponents;
@@ -11,7 +10,6 @@ import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -71,7 +69,7 @@ public class WarlogCommand {
         return CacheComponents.warlogTie; // tie
     }
 
-    public static void drawWar(Graphics2D g2d, WarlogItem war, int y) {
+    public static void drawWar(Graphics2D g2d, WarlogEntry war, int y) {
         boolean isCWL = war.getResult() == null;
 
         // Member background
@@ -79,8 +77,8 @@ public class WarlogCommand {
         g2d.drawImage(result, 0, y, null);
 
         // Clan badges
-        ClanWarModel clan = war.getClan();
-        ClanWarModel enemy = war.getOpponent();
+        WarlogClan clan = war.getClan();
+        WarlogClan enemy = war.getOpponent();
         g2d.drawImage(FileUtils.getImageFromUrl(clan.getBadgeUrls().getMedium()), 395, y + 5, 70, 70, null);
         g2d.drawImage(FileUtils.getImageFromUrl(enemy.getBadgeUrls().getMedium()), 470, y + 5, 70, 70, null);
 
@@ -91,8 +89,8 @@ public class WarlogCommand {
         // Stars
         g2d.drawImage(CacheComponents.newStar, 355, y + 39, 22, 22, null);
         g2d.drawImage(CacheComponents.newStar, 555, y + 39, 22, 22, null);
-        DrawUtils.drawShadowedStringLeft(g2d, clan.getStars().toString(), 350, y + 58, 16f);
-        DrawUtils.drawShadowedString(g2d, enemy.getStars().toString(), 581, y + 58, 16f);
+        DrawUtils.drawShadowedStringLeft(g2d, String.valueOf(clan.getStars()), 350, y + 58, 16f);
+        DrawUtils.drawShadowedString(g2d, String.valueOf(enemy.getStars()), 581, y + 58, 16f);
 
         // Destruction percentage
         DecimalFormatSymbols dfs = new DecimalFormatSymbols(lang);
@@ -119,12 +117,12 @@ public class WarlogCommand {
         DrawUtils.drawCenteredString(g2d, teamSizeRect, g2d.getFont().deriveFont(14f), MessageFormat.format(i18n.getString("team.size.versus"), war.getTeamSize()), versusColor);
     }
 
-    public static WarlogModel getWarlog(SlashCommandEvent event, Locale lang, String[] args) {
+    public static List<WarlogEntry> getWarlog(SlashCommandEvent event, Locale lang, String[] args) {
         // If rate limitation has exceeded
         if (!CoreUtils.checkThrottle(event, lang))
             return null;
 
-        WarlogModel warlog = null;
+        List<WarlogEntry> warlog = null;
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         String tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getMember().getIdLong());
 
@@ -145,23 +143,20 @@ public class WarlogCommand {
     }
 
     public static void execute(SlashCommandEvent event, String... args) {
-        MessageChannel channel = event.getChannel();
-
         lang = LangUtils.getLanguage(event.getMember().getIdLong());
         i18n = LangUtils.getTranslations(lang);
 
-        WarlogModel warlog = getWarlog(event, lang, args);
+        List<WarlogEntry> warlog = getWarlog(event, lang, args);
         if (warlog == null)
             return;
 
         // Checking index validity
-        int index = ErrorUtils.checkIndex(event, i18n, args[0], warlog.getWars().size() / SIZE);
+        int index = ErrorUtils.checkIndex(event, i18n, args[0], warlog.size() / SIZE);
         if (index == -1)
             return;
 
         // Checking if there are any clan wars
-        List<WarlogItem> wars = warlog.getWars();
-        if (wars.size() <= 0) {
+        if (warlog.size() <= 0) {
             ErrorUtils.sendError(event, i18n.getString("no.warlog"));
             return;
         }
@@ -169,7 +164,7 @@ public class WarlogCommand {
         // Computing stats
         int total, wins, losses, draws;
         wins = losses = draws = 0;
-        for (WarlogItem war : wars) {
+        for (WarlogEntry war : warlog) {
             if (war.getResult() == null)
                 continue;
 
@@ -199,7 +194,7 @@ public class WarlogCommand {
 
         // Drawing stats
         DrawUtils.drawShadowedString(g2d, i18n.getString("warlog.stats"), 80, 52, 20f);
-        DrawUtils.drawShadowedString(g2d, MessageFormat.format(i18n.getString("warlog.coverage"), wars.size()), 80, 70, 10f);
+        DrawUtils.drawShadowedString(g2d, MessageFormat.format(i18n.getString("warlog.coverage"), warlog.size()), 80, 70, 10f);
         DrawUtils.drawShadowedString(g2d, i18n.getString("wins"), 340, 40, 16f, 2, winsColor);
         DrawUtils.drawShadowedString(g2d, i18n.getString("losses"), 495, 40, 16f, 2, lossesColor);
         DrawUtils.drawShadowedString(g2d, i18n.getString("draws"), 645, 40, 16f, 2, drawsColor);
@@ -212,7 +207,7 @@ public class WarlogCommand {
 
         // Drawing wars
         for (int i = 0; i < SIZE; i++)
-            drawWar(g2d, wars.get((index - 1) * SIZE + i), 118 + i * WAR_ITEM_HEIGHT + i * PADDING);
+            drawWar(g2d, warlog.get((index - 1) * SIZE + i), 118 + i * WAR_ITEM_HEIGHT + i * PADDING);
 
         FileUtils.sendImage(event, image);
         g2d.dispose();

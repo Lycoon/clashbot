@@ -1,15 +1,13 @@
 package com.lycoon.clashbot.commands;
 
-import com.lycoon.clashapi.cocmodels.player.Player;
-import com.lycoon.clashapi.cocmodels.player.Troop;
+import com.lycoon.clashapi.models.player.Player;
+import com.lycoon.clashapi.models.player.Troop;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.*;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -18,7 +16,6 @@ import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
@@ -60,7 +57,7 @@ public class PlayerCommand {
     }
 
     public static void drawSuperTroop(Graphics2D g2d, Troop troop, String troopName, int x, int y) {
-        if (troop == null || troop.isActiveSuperTroop() == null)
+        if (troop == null || troop.isSuperTroopActive() == null)
             g2d.drawImage(FileUtils.getImageFromFile("troops/locked/" + troopName + ".png"), x, y, 44, 44, null);
         else
             g2d.drawImage(FileUtils.getImageFromFile("troops/" + troop.getName() + ".png"), x, y, 44, 44, null);
@@ -72,14 +69,14 @@ public class PlayerCommand {
             g2d.drawImage(FileUtils.getImageFromFile("troops/locked/" + troopName + ".png"), x, y, 44, 44, null);
         else {
             g2d.drawImage(FileUtils.getImageFromFile("troops/" + troop.getName() + ".png"), x, y, 44, 44, null);
-            if (troop.getLevel().intValue() == troop.getMaxLevel().intValue())
+            if (troop.getLevel() == troop.getMaxLevel())
                 g2d.drawImage(FileUtils.getImageFromFile("icons/level-label-max.png"), x + 1, y + 22, 20, 20, null);
             else if (troop.getLevel() != 1)
                 g2d.drawImage(FileUtils.getImageFromFile("icons/level-label.png"), x + 1, y + 22, 20, 20, null);
 
             if (troop.getLevel() != 1) {
                 Rectangle levelRect = new Rectangle(x + 1, y + 22, 20, 20);
-                DrawUtils.drawCenteredString(g2d, levelRect, font.deriveFont(font.getSize() - 2f), troop.getLevel().toString());
+                DrawUtils.drawCenteredString(g2d, levelRect, font.deriveFont(font.getSize() - 2f), String.valueOf(troop.getLevel()));
             }
         }
     }
@@ -156,7 +153,7 @@ public class PlayerCommand {
         // Experience level
         g2d.drawImage(FileUtils.getImageFromFile("icons/exp-star.png"), 20, 18, 45, 45, null);
         Rectangle level = new Rectangle(23, 30, 40, 20);
-        DrawUtils.drawCenteredString(g2d, level, font.deriveFont(FONT_SIZE + 5f), Objects.requireNonNull(player).getExpLevel().toString());
+        DrawUtils.drawCenteredString(g2d, level, font.deriveFont(FONT_SIZE + 5f), String.valueOf(player.getExpLevel()));
 
         // Nickname
         DrawUtils.drawShadowedString(g2d, player.getName(), 75, 36, FONT_SIZE + 8f);
