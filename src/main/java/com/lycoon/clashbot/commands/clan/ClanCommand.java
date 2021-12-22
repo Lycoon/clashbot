@@ -193,10 +193,10 @@ public class ClanCommand {
 
         drawSimpleString(g2d, nf.format(clan.getRequiredTrophies()), 503, 198, 12f, valueColor);
 
-        var members = clan.getMemberList().stream();
-        int averageTrophies = (int) members.mapToInt(ClanMember::getTrophies).average().orElse(0);
-        int totalTrophies = members.mapToInt(ClanMember::getTrophies).sum();
-        int totalVersusTrophies = members.mapToInt(ClanMember::getVersusTrophies).sum();
+        var members = clan.getMemberList();
+        int averageTrophies = (int) members.stream().mapToInt(ClanMember::getTrophies).average().orElse(0);
+        int totalTrophies = members.stream().mapToInt(ClanMember::getTrophies).sum();
+        int totalVersusTrophies = members.stream().mapToInt(ClanMember::getVersusTrophies).sum();
 
         drawSimpleString(g2d, nf.format(averageTrophies), 503, 228, 12f, valueColor);
         drawSimpleString(g2d, nf.format(totalTrophies), 503, 263, 12f, valueColor);
