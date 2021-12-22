@@ -1,5 +1,12 @@
 package com.lycoon.clashbot.commands.clan;
 
+import static com.lycoon.clashbot.utils.DrawUtils.*;
+import static com.lycoon.clashbot.utils.FileUtils.*;
+import static com.lycoon.clashbot.utils.ErrorUtils.*;
+import static com.lycoon.clashbot.utils.DatabaseUtils.*;
+import static com.lycoon.clashbot.utils.CoreUtils.*;
+import static com.lycoon.clashbot.utils.GameUtils.*;
+
 import com.lycoon.clashapi.models.war.War;
 import com.lycoon.clashapi.models.war.WarClan;
 import com.lycoon.clashapi.models.warleague.WarLeagueClan;
@@ -11,9 +18,7 @@ import com.lycoon.clashbot.core.ClanWarStats;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.core.RoundWarInfo;
 import com.lycoon.clashbot.lang.LangUtils;
-import com.lycoon.clashbot.utils.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -33,7 +38,7 @@ public class WarLeagueCommand {
             if (event.getOptions().isEmpty())
             {
                 ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
-                ErrorUtils.sendError(event,
+                sendError(event,
                         i18n.getString("wrong.usage"),
                         MessageFormat.format(i18n.getString("tip.usage"), "prefix"));
                 return;
@@ -75,39 +80,39 @@ public class WarLeagueCommand {
 
         switch (firstWar.getState()) {
             case "preparation" -> {
-                timeLeft = GameUtils.getTimeLeft(firstWar.getStartTime());
-                g2d.drawImage(FileUtils.getImageFromFile("backgrounds/cwl/cwl-preparation.png"), 0, 0, null);
-                DrawUtils.drawSimpleCenteredString(g2d,
+                timeLeft = getTimeLeft(firstWar.getStartTime());
+                g2d.drawImage(getImageFromFile("backgrounds/cwl/cwl-preparation.png"), 0, 0, null);
+                drawSimpleCenteredString(g2d,
                         MessageFormat.format(i18n.getString("war.timeleft"),
                                 MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
                         timeRect, 19f, Color.BLACK);
-                DrawUtils.drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.preparation"));
+                drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.preparation"));
             }
             case "warEnded" -> {
-                timeLeft = GameUtils.getTimeLeft(firstWar.getEndTime());
-                g2d.drawImage(FileUtils.getImageFromFile("backgrounds/cwl/cwl-ended.png"), 0, 0, null);
-                DrawUtils.drawSimpleCenteredString(g2d,
+                timeLeft = getTimeLeft(firstWar.getEndTime());
+                g2d.drawImage(getImageFromFile("backgrounds/cwl/cwl-ended.png"), 0, 0, null);
+                drawSimpleCenteredString(g2d,
                         MessageFormat.format(i18n.getString("war.since"),
                                 MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
                         timeRect, 19f, Color.BLACK);
-                DrawUtils.drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.ended"));
+                drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.ended"));
             }
             case "notInWar" -> {
-                ErrorUtils.sendError(event, i18n.getString("exception.warleague.notinwar"));
+                sendError(event, i18n.getString("exception.warleague.notinwar"));
                 return;
             }
             default -> {
                 // inWar
-                timeLeft = GameUtils.getTimeLeft(firstWar.getEndTime());
-                g2d.drawImage(FileUtils.getImageFromFile("backgrounds/cwl/cwl-inwar.png"), 0, 0, null);
-                DrawUtils.drawSimpleCenteredString(g2d,
+                timeLeft = getTimeLeft(firstWar.getEndTime());
+                g2d.drawImage(getImageFromFile("backgrounds/cwl/cwl-inwar.png"), 0, 0, null);
+                drawSimpleCenteredString(g2d,
                         MessageFormat.format(i18n.getString("war.timeleft"),
                                 MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
                         timeRect, 19f, Color.BLACK);
-                DrawUtils.drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.inwar"));
+                drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.inwar"));
             }
         }
-        DrawUtils.drawSimpleCenteredString(g2d, MessageFormat.format(i18n.getString("round.index"), roundIndex + 1), roundLabel, 22f, Color.BLACK);
+        drawSimpleCenteredString(g2d, MessageFormat.format(i18n.getString("round.index"), roundIndex + 1), roundLabel, 22f, Color.BLACK);
 
         // Wars
         for (int i = 0; i < wars.size(); i++) {
@@ -129,29 +134,29 @@ public class WarLeagueCommand {
                 // Drawing stars
                 Rectangle rectStarClan1 = new Rectangle(383, 93 + i * 60, 50, 20);
                 Rectangle rectStarClan2 = new Rectangle(503, 93 + i * 60, 50, 20);
-                DrawUtils.drawCenteredString(g2d, rectStarClan1, font.deriveFont(18f), String.valueOf(clan1.getStars()));
-                DrawUtils.drawCenteredString(g2d, rectStarClan2, font.deriveFont(18f), String.valueOf(clan2.getStars()));
+                drawCenteredString(g2d, rectStarClan1, font.deriveFont(18f), String.valueOf(clan1.getStars()));
+                drawCenteredString(g2d, rectStarClan2, font.deriveFont(18f), String.valueOf(clan2.getStars()));
 
                 if (firstWar.getState().equals("inWar")) {
                     // Drawing clan names
-                    DrawUtils.drawShadowedStringLeft(g2d, clan1.getName(), 255, 113 + i * 60, 16f, Color.WHITE);
-                    DrawUtils.drawShadowedString(g2d, clan2.getName(), 670, 113 + i * 60, 16f);
+                    drawShadowedStringLeft(g2d, clan1.getName(), 255, 113 + i * 60, 16f, Color.WHITE);
+                    drawShadowedString(g2d, clan2.getName(), 670, 113 + i * 60, 16f);
 
                     // Drawing clan badges
-                    g2d.drawImage(FileUtils.getImageFromUrl(clan1.getBadgeUrls().getSmall()), 270, 85 + i * 60, 40, 40, null);
-                    g2d.drawImage(FileUtils.getImageFromUrl(clan2.getBadgeUrls().getSmall()), 620, 85 + i * 60, 40, 40, null);
+                    g2d.drawImage(getImageFromUrl(clan1.getBadgeUrls().getSmall()), 270, 85 + i * 60, 40, 40, null);
+                    g2d.drawImage(getImageFromUrl(clan2.getBadgeUrls().getSmall()), 620, 85 + i * 60, 40, 40, null);
 
                     // Drawing clan attacks
-                    DrawUtils.drawShadowedString(g2d, String.valueOf(clan2.getAttacks()), 350, 109 + i * 60, 12f);
-                    DrawUtils.drawShadowedString(g2d, String.valueOf(clan1.getAttacks()), 569, 109 + i * 60, 12f);
+                    drawShadowedString(g2d, String.valueOf(clan2.getAttacks()), 350, 109 + i * 60, 12f);
+                    drawShadowedString(g2d, String.valueOf(clan1.getAttacks()), 569, 109 + i * 60, 12f);
                 } else {
                     // Drawing clan names
-                    DrawUtils.drawShadowedStringLeft(g2d, clan1.getName(), 300, 113 + i * 60, 16f, Color.WHITE);
-                    DrawUtils.drawShadowedString(g2d, clan2.getName(), 625, 113 + i * 60, 16f);
+                    drawShadowedStringLeft(g2d, clan1.getName(), 300, 113 + i * 60, 16f, Color.WHITE);
+                    drawShadowedString(g2d, clan2.getName(), 625, 113 + i * 60, 16f);
 
                     // Drawing clan badges
-                    g2d.drawImage(FileUtils.getImageFromUrl(clan1.getBadgeUrls().getSmall()), 320, 85 + i * 60, 40, 40, null);
-                    g2d.drawImage(FileUtils.getImageFromUrl(clan2.getBadgeUrls().getSmall()), 570, 85 + i * 60, 40, 40, null);
+                    g2d.drawImage(getImageFromUrl(clan1.getBadgeUrls().getSmall()), 320, 85 + i * 60, 40, 40, null);
+                    g2d.drawImage(getImageFromUrl(clan2.getBadgeUrls().getSmall()), 570, 85 + i * 60, 40, 40, null);
                 }
             }
         }
@@ -182,15 +187,15 @@ public class WarLeagueCommand {
 
     public static WarLeagueGroup getLeagueGroup(SlashCommandEvent event, Locale lang, String[] args) {
         // If rate limitation has exceeded
-        if (!CoreUtils.checkThrottle(event, lang))
+        if (!checkThrottle(event, lang))
             return null;
 
         WarLeagueGroup leagueGroup = null;
         ResourceBundle i18n = LangUtils.getTranslations(lang);
-        String tag = args.length > 1 ? args[1] : DatabaseUtils.getClanTag(event.getMember().getIdLong());
+        String tag = args.length > 1 ? args[1] : getClanTag(event.getMember().getIdLong());
 
         if (tag == null) {
-            ErrorUtils.sendError(event, i18n.getString("set.clan.error"),
+            sendError(event, i18n.getString("set.clan.error"),
                     MessageFormat.format(i18n.getString("cmd.general.tip"), Command.SET_CLAN.formatCommand()));
             return null;
         }
@@ -199,7 +204,7 @@ public class WarLeagueCommand {
             leagueGroup = ClashBotMain.clashAPI.getCWLGroup(tag);
         } catch (IOException ignored) {
         } catch (ClashAPIException e) {
-            ErrorUtils.sendExceptionError(event, i18n, e, tag, "warleague");
+            sendExceptionError(event, i18n, e, tag, "warleague");
             return null;
         }
         return leagueGroup;
@@ -210,7 +215,7 @@ public class WarLeagueCommand {
         ResourceBundle i18n = LangUtils.getTranslations(lang);
 
         // Checking index validity
-        int index = ErrorUtils.checkIndex(event, i18n, args[0], 7);
+        int index = checkIndex(event, i18n, args[0], 7);
         if (index == -1)
             return;
 
@@ -220,15 +225,15 @@ public class WarLeagueCommand {
 
         // Initializing image
         BufferedImage image = new BufferedImage(ROUND_WIDTH, ROUND_HEIGHT, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = DrawUtils.initGraphics(ROUND_WIDTH, ROUND_HEIGHT, image);
-        Font font = DrawUtils.getFont("Supercell.ttf").deriveFont(FONT_SIZE);
+        Graphics2D g2d = initGraphics(ROUND_WIDTH, ROUND_HEIGHT, image);
+        Font font = getFont("Supercell.ttf").deriveFont(FONT_SIZE);
         g2d.setFont(font);
 
         // Rounds
         List<War> roundWars = getWars(warLeague, index - 1);
         drawRound(g2d, event, roundWars, i18n, index - 1);
 
-        FileUtils.sendImage(event, image);
+        sendImage(event, image);
         g2d.dispose();
     }
 
@@ -267,8 +272,8 @@ public class WarLeagueCommand {
 
         // Initializing image
         BufferedImage image = new BufferedImage(ROUND_WIDTH, ROUND_HEIGHT, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = DrawUtils.initGraphics(ROUND_WIDTH, ROUND_HEIGHT, image);
-        Font font = DrawUtils.getFont("Supercell.ttf").deriveFont(FONT_SIZE);
+        Graphics2D g2d = initGraphics(ROUND_WIDTH, ROUND_HEIGHT, image);
+        Font font = getFont("Supercell.ttf").deriveFont(FONT_SIZE);
         g2d.setFont(font);
 
         HashMap<String, Integer> stars = new HashMap<>();
@@ -298,7 +303,7 @@ public class WarLeagueCommand {
             System.out.println(clan.getName() + ": " + stars.get(clan.getName()) + " étoiles (" + destruction.get(clan.getName()) + "%)");
         }
 
-        FileUtils.sendImage(event, image);
+        sendImage(event, image);
         g2d.dispose();
     }
 
