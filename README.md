@@ -1,6 +1,11 @@
 ![Clashbot banner](/src/main/resources/icons/clashbot-banner.png)
 
-[![Check CI](https://github.com/Lycoon/clashbot/actions/workflows/check-ci.yml/badge.svg)](https://github.com/Lycoon/clashbot/actions/workflows/check-ci.yml)
+<p align="center">
+  <a href="https://github.com/Lycoon/clashbot/actions/workflows/check-ci.yml">
+    <img alt="Check CI status" src="https://github.com/Lycoon/clashbot/actions/workflows/check-ci.yml/badge.svg?branch=dev">
+  </a>
+  <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/Lycoon/clashbot">
+</p>
 
 **Clashbot** is a verified Discord bot generating pictures from Clash of Clans ingame info. Invite it by clicking [here](https://discord.com/api/oauth2/authorize?client_id=734481969630543883&permissions=2147780672&scope=bot).
 
