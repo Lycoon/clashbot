@@ -7,7 +7,9 @@
   <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/Lycoon/clashbot">
 </p>
 
-**Clashbot** is a verified Discord bot generating pictures from Clash of Clans ingame info. Invite it by clicking [here](https://discord.com/api/oauth2/authorize?client_id=734481969630543883&permissions=2147780672&scope=bot).
+<p align="center">
+  <b>Clashbot</b> is a verified Discord bot generating pictures from Clash of Clans ingame info
+</p>
 
 # Features
 The bot proposes several features including: language choice, saving default tags, accessing clan and player profiles, clan warlogs, current clanwars, warleague rounds...
@@ -33,8 +35,16 @@ The bot proposes several features including: language choice, saving default tag
 ### Player
 - `/player [playerTag]` - shows player profile
 
+# Dependencies
+- Discord JDA `4.3.0`
+- ClashAPI `1.0.2`
+- GSon `2.8.9`
+- HikariCP `5.0.0`
+- MariaDB Java `2.7.4`
+- Logback `1.2.7`
+
 # Related
-The bot relies on a custom Java wrapper I designed to make calls to the game API. I wrote it for the purpose of this project but it can be used for any other. I'm trying to keep up with the updates of the game so that most features are implemented.
+The bot relies on a [custom Java wrapper](https://github.com/Lycoon/clash-api) I designed to make calls to the game API. I wrote it for the purpose of this project but it can be used for any other. I'm trying to keep up with the updates of the game so that most features are implemented.
 
 # Disclaimer
 All rights reserved. This repository **does not** accept any contribution and is only consultable for the sake of transparency.
