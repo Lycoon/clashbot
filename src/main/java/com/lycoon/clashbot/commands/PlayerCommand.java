@@ -44,11 +44,11 @@ public class PlayerCommand {
             "Bomber", "Baby Dragon", "Cannon Cart", "Night Witch", "Drop Ship", "Super P.E.K.K.A", "Hog Glider"};
     private final static String[] SUPER_TROOPS = {"Super Barbarian", "Super Archer", "Super Giant", "Sneaky Goblin",
             "Super Wall Breaker", "Super Wizard", "Inferno Dragon", "Super Minion", "Super Valkyrie", "Super Witch",
-            "Ice Hound"};
+            "Ice Hound", "Rocket Balloon", "Super Dragon", "Super Bowler"};
     private final static String[] HEROES = {"Barbarian King", "Archer Queen", "Grand Warden", "Royal Champion",
             "Battle Machine"};
     private final static String[] MACHINES = {"Wall Wrecker", "Battle Blimp", "Stone Slammer", "Siege Barracks",
-            "Log Launcher"};
+            "Log Launcher", "Flame Flinger"};
     private final static String[] PETS = {"L.A.S.S.I", "Electro Owl", "Mighty Yak", "Unicorn"};
 
     public static void call(SlashCommandEvent event) {
@@ -61,7 +61,7 @@ public class PlayerCommand {
     }
 
     public static void drawSuperTroop(Graphics2D g2d, Troop troop, String troopName, int x, int y) {
-        if (troop == null || troop.isSuperTroopActive() == null)
+        if (troop == null || !troop.isSuperTroopActive())
             g2d.drawImage(getImageFromFile("troops/locked/" + troopName + ".png"), x, y, 44, 44, null);
         else
             g2d.drawImage(getImageFromFile("troops/" + troop.getName() + ".png"), x, y, 44, 44, null);
@@ -226,7 +226,7 @@ public class PlayerCommand {
         drawShadowedString(g2d, i18n.getString("super.troops"), 711, ARMY_TOPLINE - 12, FONT_SIZE + 2f);
         drawShadowedString(g2d, i18n.getString("heroes"), 251, ARMY_BOTLINE - 12, FONT_SIZE + 2f);
         drawShadowedString(g2d, i18n.getString("machines"), 481, ARMY_BOTLINE - 12, FONT_SIZE + 2f);
-        drawShadowedString(g2d, i18n.getString("pets"), 711, ARMY_BOTLINE - 12, FONT_SIZE + 2f);
+        drawShadowedString(g2d, i18n.getString("pets"), 711, ARMY_BOTLINE + 38, FONT_SIZE + 2f);
 
         // Troops
         List<Troop> troops = player.getTroops();
@@ -240,7 +240,7 @@ public class PlayerCommand {
 
         drawHeroes(g2d, font, heroes, ARMY_BOTLINE);
         drawMachines(g2d, font, troops, ARMY_BOTLINE);
-        drawPets(g2d, font, troops, ARMY_BOTLINE);
+        drawPets(g2d, font, troops, ARMY_BOTLINE + 50);
 
         sendImage(event, image);
 

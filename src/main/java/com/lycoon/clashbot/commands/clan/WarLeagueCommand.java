@@ -58,7 +58,7 @@ public class WarLeagueCommand {
         for (String warTag : round.getWarTags()) {
             War warInfo = null;
             try {
-                warInfo = ClashBotMain.clashAPI.getCWLWar(warTag);
+                warInfo = ClashBotMain.clashAPI.getWarLeagueWar(warTag);
             } catch (IOException | ClashAPIException ignored) {
             }
 
@@ -201,7 +201,7 @@ public class WarLeagueCommand {
         }
 
         try {
-            leagueGroup = ClashBotMain.clashAPI.getCWLGroup(tag);
+            leagueGroup = ClashBotMain.clashAPI.getWarLeagueGroup(tag);
         } catch (IOException ignored) {
         } catch (ClashAPIException e) {
             sendExceptionError(event, i18n, e, tag, "warleague");
