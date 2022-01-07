@@ -232,6 +232,8 @@ public class WarLeagueCommand {
         // Rounds
         List<War> roundWars = getWars(warLeague, index - 1);
         drawRound(g2d, event, roundWars, i18n, index - 1);
+        if (roundWars.get(0).getState().equals("notInWar"))
+            return;
 
         sendImage(event, image);
         g2d.dispose();

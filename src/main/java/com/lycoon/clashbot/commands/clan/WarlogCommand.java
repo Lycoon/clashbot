@@ -49,7 +49,7 @@ public class WarlogCommand {
         CompletableFuture.runAsync(() -> {
             if (event.getOptions().isEmpty())
             {
-                ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
+                i18n = LangUtils.getTranslations(event.getMember().getIdLong());
                 sendError(event,
                         i18n.getString("wrong.usage"),
                         MessageFormat.format(i18n.getString("tip.usage"), "prefix"));

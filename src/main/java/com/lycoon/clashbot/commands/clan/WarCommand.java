@@ -30,6 +30,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class WarCommand {
     private static String tag;
+    private static ResourceBundle i18n;
+    private static Locale lang;
 
     private final static int PADDING = 145;
     private final static int SIZE = 5;
@@ -39,7 +41,6 @@ public class WarCommand {
 
     private static List<WarMember> members, enemyMembers;
     private static List<WarAttack> sortedAttacks, sortedEnemyAttacks;
-    private static ResourceBundle i18n;
     private final static Color backgroundColor = new Color(0xe7e7e1);
     private final static Color clanNameColor = new Color(0xfeffaf);
     private final static Color notUsedAttackColor = new Color(0xfbbf70);
@@ -61,19 +62,17 @@ public class WarCommand {
 
     public static void call(SlashCommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
-
             if (event.getOptions().isEmpty()) {
-                i18n = LangUtils.getTranslations(lang);
+                i18n = LangUtils.getTranslations(event.getMember().getIdLong());
                 sendError(event, i18n.getString("wrong.usage"),
                         MessageFormat.format(i18n.getString("tip.usage"), "prefix"));
                 return;
             }
 
             if (event.getOptions().size() == 1)
-                execute(event, lang, Objects.requireNonNull(event.getOption("page")).getAsString());
+                execute(event, Objects.requireNonNull(event.getOption("page")).getAsString());
             else
-                execute(event, lang, Objects.requireNonNull(event.getOption("page")).getAsString(), Objects.requireNonNull(event.getOption("clan_tag")).getAsString());
+                execute(event, Objects.requireNonNull(event.getOption("page")).getAsString(), Objects.requireNonNull(event.getOption("clan_tag")).getAsString());
         });
     }
 
@@ -220,8 +219,10 @@ public class WarCommand {
         return war;
     }
 
-    public static void execute(SlashCommandEvent event, Locale lang, String... args) {
-        MessageChannel channel = event.getChannel();
+    public static void execute(SlashCommandEvent event, String... args) {
+        lang = LangUtils.getLanguage(event.getMember().getIdLong());
+        i18n = LangUtils.getTranslations(lang);
+
         War war = getWar(event, lang, args);
         if (war == null)
             return;
