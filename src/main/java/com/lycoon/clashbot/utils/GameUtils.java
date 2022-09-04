@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
-import com.lycoon.clashapi.cocmodels.player.Troop;
+import com.lycoon.clashapi.models.player.Troop;
 
 public class GameUtils {
     public static int getPositive(float value) {

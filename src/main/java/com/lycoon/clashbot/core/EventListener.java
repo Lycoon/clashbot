@@ -68,9 +68,9 @@ public class EventListener extends ListenerAdapter {
             return;
         }
 
-        String cmd = event.getName();
         event.deferReply().queue();
 
+        String cmd = event.getName();
         if (isCommand(cmd, Command.SET_LANG))
             SetCommand.call(event);
         else if (isCommand(cmd, Command.PLAYER))
@@ -93,6 +93,12 @@ public class EventListener extends ListenerAdapter {
             ClearCommand.call(event);
         else if (isCommand(cmd, Command.INVITE))
             InviteCommand.call(event);
+        else {
+            event.getHook().deleteOriginal().queue();
+            return;
+        }
+
+        ClashBotMain.LOGGER.info(event.getMember().getEffectiveName() + " (" + event.getMember().getId() + ") executed " + event.getName() + " command");
     }
 
     @Override
