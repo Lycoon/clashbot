@@ -1,14 +1,14 @@
 package com.lycoon.clashbot.core;
 
-import com.lycoon.clashapi.cocmodels.clanwar.ClanWarModel;
+import com.lycoon.clashapi.models.war.WarClan;
 
 public class ClanWarStats
 {
 	int stars;
 	double destructionPercentage;
-	ClanWarModel clan;
+	WarClan clan;
 	
-	public ClanWarStats(ClanWarModel clan)
+	public ClanWarStats(WarClan clan)
 	{
 		stars = 0;
 		destructionPercentage = 0;
@@ -25,7 +25,7 @@ public class ClanWarStats
 		return destructionPercentage;
 	}
 	
-	public ClanWarModel getClan()
+	public WarClan getClan()
 	{
 		return clan;
 	}

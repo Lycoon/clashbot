@@ -2,9 +2,11 @@ package com.lycoon.clashbot.utils;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;
+import static com.lycoon.clashbot.utils.CoreUtils.addUserToGenerating;
+import static com.lycoon.clashbot.utils.CoreUtils.removeUserFromGenerating;
+import static com.lycoon.clashbot.utils.CoreUtils.isOwner;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -27,8 +29,8 @@ public class FileUtils {
 
         // Callback function
         long id = event.getMember().getIdLong();
-        if (!CoreUtils.isOwner(id))
-            CoreUtils.addUserToGenerating(id);
+        if (!isOwner(id))
+            addUserToGenerating(id);
 
         Consumer<Message> sendingCallback = (res) ->
         {
@@ -39,7 +41,7 @@ public class FileUtils {
                 e.printStackTrace();
             }
 
-            CoreUtils.removeUserFromGenerating(id);
+            removeUserFromGenerating(id);
         };
         event.getHook().sendFile(bos.toByteArray(), "clashbot.png").queue(sendingCallback);
         LOGGER.info("Picture sent to " + event.getMember().getUser().getAsTag() + " on " + event.getGuild().getIdLong());
