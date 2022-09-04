@@ -135,9 +135,8 @@ public class EventListener extends ListenerAdapter {
                 || isOldCommand(args[0], prefix, Command.HELP) || isOldCommand(args[0], prefix, Command.CLEAR)
                 || isOldCommand(args[0], prefix, Command.INVITE))
         {
+            LOGGER.info(event.getAuthor().getAsTag() + " issued old command: " + message);
             warnOldCommands(event);
         }
-
-        LOGGER.info(event.getAuthor().getAsTag() + " issued: " + message);
     }
 }
