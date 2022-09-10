@@ -17,7 +17,7 @@ public class ClashBotMain {
     static final String CONFIG = "tokens.properties";
 
     public static long[] owners = {138282927502000128L, 198485955701768192L};
-    public static final String VERSION = "1.3.1";
+    public static final String VERSION = "1.3.2";
     public static final String INVITE = "https://discord.com/api/oauth2/authorize?client_id=734481969630543883&permissions=2147534848&scope=bot%20applications.commands";
     public static Logger LOGGER = LoggerFactory.getLogger(ClashBotMain.class.getName());
 

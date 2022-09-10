@@ -33,23 +33,6 @@ public class EventListener extends ListenerAdapter {
         return arg.equalsIgnoreCase(cmd.toString());
     }
 
-    static boolean isOldCommand(String arg, String prefix, Command cmd) {
-        return arg.equalsIgnoreCase(prefix + cmd.toString());
-    }
-
-    static void warnOldCommands(MessageReceivedEvent event) {
-        EmbedBuilder builder = new EmbedBuilder();
-
-        builder.setColor(Color.YELLOW);
-        builder.setTitle("Switching to slash commands");
-        builder.setDescription("Starting from January 1st 2022, old Clashbot command system will be dropped in favour of slash commands. " +
-                "This is done in compliance with Discord terms as they address privacy concerns dealing with interactions in a more elegant way.\n\n" +
-                "⚠ Click [here](" + ClashBotMain.INVITE + ") to reinvite with new permissions\n" +
-                "➡ Start using slash commands typing `/help` in the chat");
-
-        event.getChannel().sendMessage(builder.build()).queue();
-    }
-
     static MessageEmbed warnNotInGuild() {
         EmbedBuilder builder = new EmbedBuilder();
 
@@ -111,32 +94,5 @@ public class EventListener extends ListenerAdapter {
 
         try { Objects.requireNonNull(defaultChannel).sendMessage(builder.build()).queue(); }
         catch (MissingAccessException ignored) {}
-    }
-
-    /**
-     * TO DELETE: On January 1st 2022
-     */
-    @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
-        if (!event.isFromType(ChannelType.TEXT))
-            return;
-
-        String message = event.getMessage().getContentRaw();
-        String prefix = DatabaseUtils.getServerPrefix(event.getGuild().getIdLong());
-
-        if (!message.startsWith(prefix))
-            return;
-
-        String[] args = message.split(" ");
-        if (isOldCommand(args[0], prefix, Command.SET_LANG) || isOldCommand(args[0], prefix, Command.LANG)
-                || isOldCommand(args[0], prefix, Command.PLAYER) || isOldCommand(args[0], prefix, Command.CLAN)
-                || isOldCommand(args[0], prefix, Command.WAR) || isOldCommand(args[0], prefix, Command.WARLOG)
-                || isOldCommand(args[0], prefix, Command.WARLEAGUE) || isOldCommand(args[0], prefix, Command.INFO)
-                || isOldCommand(args[0], prefix, Command.HELP) || isOldCommand(args[0], prefix, Command.CLEAR)
-                || isOldCommand(args[0], prefix, Command.INVITE))
-        {
-            LOGGER.info(event.getAuthor().getAsTag() + " issued old command: " + message);
-            warnOldCommands(event);
-        }
     }
 }
