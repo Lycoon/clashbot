@@ -63,6 +63,7 @@ public class ClanCommand {
         put("Relaxed", "label.relaxed");
         put("Competitive", "label.competitive");
         put("Newbie Friendly", "label.newbie");
+        put("Clan Capital", "label.capital");
     }};
 
     public static void call(SlashCommandEvent event) {
@@ -177,6 +178,9 @@ public class ClanCommand {
             // Printing each label
             for (int i = 0; i < clan.getLabels().size(); i++) {
                 Label label = clan.getLabels().get(i);
+                if (!labels.containsKey(label.getName()))
+                    continue;
+
                 g2d.drawImage(getImageFromFile("backgrounds/field-placeholder.png"), 70, 190 + i * 40, 185, 24, null);
                 g2d.drawImage(getImageFromUrl(label.getIconUrls().getMedium()), 25, 185 + i * 40, 35, 35, null);
                 drawShadowedString(g2d, i18n.getString(labels.get(label.getName())), 80, 207 + i * 40, 12f);
