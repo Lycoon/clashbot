@@ -171,7 +171,7 @@ public class PlayerCommand {
         drawShadowedString(g2d, i18n.getString("level") + " " + player.getTownHallLevel(), 25, 150, FONT_SIZE + 8f);
 
         // Builder hall
-        if (player.getBuilderHallLevel() != null) {
+        if (player.getBuilderHallLevel() != 0) {
             g2d.drawImage(CacheComponents.getBuilderHallImage(player.getBuilderHallLevel()), 265, 85, 95, 95, null);
             drawShadowedString(g2d, i18n.getString("level") + " " + player.getBuilderHallLevel(), 200, 150, FONT_SIZE + 8f);
         } else {
