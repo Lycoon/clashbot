@@ -1,6 +1,7 @@
 ![Clashbot banner](/src/main/resources/icons/clashbot-banner.png)
 
 <p align="center">
+  <img alt="Discord" src="https://img.shields.io/discord/757249777439080500">
   <a href="https://github.com/Lycoon/clashbot/actions/workflows/check-ci.yml">
     <img alt="Check CI status" src="https://github.com/Lycoon/clashbot/actions/workflows/check-ci.yml/badge.svg?branch=dev">
   </a>
@@ -37,10 +38,10 @@ The bot proposes several features including: language choice, saving default tag
 
 # Dependencies
 - Discord JDA `4.3.0`
-- ClashAPI `1.0.2`
-- GSon `2.8.9`
-- HikariCP `5.0.0`
-- MariaDB Java `2.7.4`
+- ClashAPI `3.0.2`
+- GSon `2.9.0`
+- HikariCP `5.0.1`
+- MariaDB Java `3.0.6`
 - Logback `1.2.7`
 
 # Related
