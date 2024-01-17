@@ -1,6 +1,6 @@
 package com.lycoon.clashbot.commands.settings;
 
-import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashapi.core.exceptions.ClashAPIException;
 import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
@@ -8,18 +8,17 @@ import com.lycoon.clashbot.utils.CoreUtils;
 import com.lycoon.clashbot.utils.DatabaseUtils;
 import com.lycoon.clashbot.utils.ErrorUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class SetCommand {
-    public static void call(SlashCommandEvent event) {
+public class SetCommand
+{
+    public static void call(SlashCommandInteractionEvent event)
+    {
         if (event.getSubcommandName() == null) {
             ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
             ErrorUtils.sendError(event,
@@ -29,7 +28,8 @@ public class SetCommand {
         }
 
         String type = event.getSubcommandName();
-        switch (type) {
+        switch (type)
+        {
             case "player" -> executePlayer(event, event.getOption("player_tag").getAsString());
             case "clan" -> executeClan(event, event.getOption("clan_tag").getAsString());
             case "lang" -> executeLang(event, event.getOption("language").getAsString());
@@ -42,7 +42,7 @@ public class SetCommand {
         }
     }
 
-    public static void executePlayer(SlashCommandEvent event, String tag) {
+    public static void executePlayer(SlashCommandInteractionEvent event, String tag) {
         ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
 
         try {
@@ -62,13 +62,14 @@ public class SetCommand {
         CoreUtils.sendMessage(event, i18n, builder);
     }
 
-    public static void executeClan(SlashCommandEvent event, String tag) {
+    public static void executeClan(SlashCommandInteractionEvent event, String tag)
+    {
         ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
 
         try {
             // Checks if the clan exists
             ClashBotMain.clashAPI.getClan(tag);
-        } catch (ClashAPIException | IOException e) {
+        } catch (ClashAPIException e) {
             ErrorUtils.sendExceptionError(event, i18n, e, tag, "clan");
             return;
         }
@@ -82,9 +83,11 @@ public class SetCommand {
         CoreUtils.sendMessage(event, i18n, builder);
     }
 
-    public static void executeLang(SlashCommandEvent event, String language) {
+    public static void executeLang(SlashCommandInteractionEvent event, String language)
+    {
         long id = event.getMember().getIdLong();
-        if (LangUtils.isSupportedLanguage(language)) {
+        if (LangUtils.isSupportedLanguage(language))
+        {
             DatabaseUtils.setUserLang(id, language);
             Locale lang = new Locale(language);
             ResourceBundle i18n = LangUtils.getTranslations(lang);
@@ -98,7 +101,9 @@ public class SetCommand {
                             Command.SET_LANG.formatCommand()));
 
             CoreUtils.sendMessage(event, i18n, builder);
-        } else {
+        }
+        else
+        {
             Locale lang = LangUtils.getLanguage(id);
             ResourceBundle i18n = LangUtils.getTranslations(lang);
 
@@ -110,7 +115,8 @@ public class SetCommand {
             int length = LangUtils.LANGUAGES.length;
             double perColumn = Math.ceil(length / 3D);
             StringBuilder str = new StringBuilder();
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; i++)
+            {
                 if (i != 0 && i % perColumn == 0) {
                     builder.addField(str.toString(), "", true);
                     str = new StringBuilder();

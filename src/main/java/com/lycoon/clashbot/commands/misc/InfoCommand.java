@@ -1,24 +1,19 @@
 package com.lycoon.clashbot.commands.misc;
 
-import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
-import com.lycoon.clashbot.utils.CoreUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class InfoCommand {
+public class InfoCommand
+{
     private static final String TWITTER = "@LycoonMC";
     private static final String DISCORD = "Lycoon#7542";
     private static final String WEBSITE = "https://clashbot.app/";
@@ -29,11 +24,12 @@ public class InfoCommand {
     static final String PATREON_EMOJI = "<:patreon:909058096503062528>";
     static final String CLASHBOT_EMOJI = "<:clashbot:909058781583917107>";
 
-    public static void call(SlashCommandEvent event) {
+    public static void call(SlashCommandInteractionEvent event) {
         execute(event);
     }
 
-    public static void execute(SlashCommandEvent event) {
+    public static void execute(SlashCommandInteractionEvent event)
+    {
         Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         NumberFormat nf = NumberFormat.getInstance(lang);

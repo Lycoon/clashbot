@@ -7,16 +7,20 @@ import static com.lycoon.clashbot.utils.DatabaseUtils.*;
 import static com.lycoon.clashbot.utils.CoreUtils.*;
 import static com.lycoon.clashbot.utils.GameUtils.*;
 
+import com.lycoon.clashapi.core.ClashAPI;
+import com.lycoon.clashapi.core.exceptions.ClashAPIException;
 import com.lycoon.clashapi.models.war.WarAttack;
 import com.lycoon.clashapi.models.war.WarMember;
 import com.lycoon.clashapi.models.war.War;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashapi.models.war.enums.WarState;
 import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -60,7 +64,7 @@ public class WarCommand {
         }
     }
 
-    public static void call(SlashCommandEvent event) {
+    public static void call(SlashCommandInteractionEvent event) {
         CompletableFuture.runAsync(() -> {
             if (event.getOptions().isEmpty()) {
                 i18n = LangUtils.getTranslations(event.getMember().getIdLong());
@@ -195,7 +199,7 @@ public class WarCommand {
         drawCenteredString(g2d, starRect2, g2d.getFont().deriveFont(26f), String.valueOf(drawMemberResults(g2d, enemy, members, sortedAttacks, true, y)));
     }
 
-    public static War getWar(SlashCommandEvent event, Locale lang, String[] args) {
+    public static War getWar(SlashCommandInteractionEvent event, Locale lang, String[] args) {
         // If rate limitation has exceeded
         if (!checkThrottle(event, lang))
             return null;
@@ -211,7 +215,6 @@ public class WarCommand {
 
         try {
             war = ClashBotMain.clashAPI.getCurrentWar(tag);
-        } catch (IOException ignored) {
         } catch (ClashAPIException e) {
             sendExceptionError(event, i18n, e, tag, "war");
             return null;
@@ -219,103 +222,104 @@ public class WarCommand {
         return war;
     }
 
-    public static void execute(SlashCommandEvent event, String... args) {
+    public static void execute(SlashCommandInteractionEvent event, String... args) {
         lang = LangUtils.getLanguage(event.getMember().getIdLong());
         i18n = LangUtils.getTranslations(lang);
 
         War war = getWar(event, lang, args);
-        if (war == null)
+        if (Objects.requireNonNull(war).getState() == WarState.NOT_IN_WAR)
+        {
+            sendError(event, MessageFormat.format(i18n.getString("exception.404.war"), tag));
+            return;
+        }
+
+        // Checking index validity
+        int index = checkIndex(event, i18n, args[0], war.getTeamSize() / 5);
+        if (index == -1)
             return;
 
-        if (!war.getState().equals("notInWar")) {
-            // Checking index validity
-            int index = checkIndex(event, i18n, args[0], war.getTeamSize() / 5);
-            if (index == -1)
-                return;
+        // Initializing image
+        BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = initGraphics(WIDTH, HEIGHT, image);
+        Font font = getFont("Supercell.ttf").deriveFont(FONT_SIZE);
+        g2d.setFont(font);
 
-            // Initializing image
-            BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-            Graphics2D g2d = initGraphics(WIDTH, HEIGHT, image);
-            Font font = getFont("Supercell.ttf").deriveFont(FONT_SIZE);
-            g2d.setFont(font);
+        members = war.getClan().getMembers();
+        enemyMembers = war.getOpponent().getMembers();
 
-            members = war.getClan().getMembers();
-            enemyMembers = war.getOpponent().getMembers();
+        members.sort(new SortMemberByOrder());
+        enemyMembers.sort(new SortMemberByOrder());
+        sortedAttacks = getAttacksByOrder(members);
+        sortedEnemyAttacks = getAttacksByOrder(enemyMembers);
 
-            members.sort(new SortMemberByOrder());
-            enemyMembers.sort(new SortMemberByOrder());
-            sortedAttacks = getAttacksByOrder(members);
-            sortedEnemyAttacks = getAttacksByOrder(enemyMembers);
+        // Color background
+        g2d.setColor(backgroundColor);
+        g2d.fillRect(0, 0, WIDTH, HEIGHT);
 
-            // Color background
-            g2d.setColor(backgroundColor);
-            g2d.fillRect(0, 0, WIDTH, HEIGHT);
+        // Image background
+        g2d.drawImage(getImageFromFile("backgrounds/clanwar/war-background.png"), 0, 0, null);
 
-            // Image background
-            g2d.drawImage(getImageFromFile("backgrounds/clanwar/war-background.png"), 0, 0, null);
+        // Clan badges
+        g2d.drawImage(getImageFromUrl(war.getClan().getBadgeUrls().getSmall()), 20, 20, 135, 135, null);
+        g2d.drawImage(getImageFromUrl(war.getOpponent().getBadgeUrls().getSmall()), 1050, 20, 135, 135, null);
 
-            // Clan badges
-            g2d.drawImage(getImageFromUrl(war.getClan().getBadgeUrls().getSmall()), 20, 20, 135, 135, null);
-            g2d.drawImage(getImageFromUrl(war.getOpponent().getBadgeUrls().getSmall()), 1050, 20, 135, 135, null);
+        // Clan names
+        drawShadowedString(g2d, war.getClan().getName(), 165, 70, 32f, 2, clanNameColor);
+        drawShadowedStringLeft(g2d, war.getOpponent().getName(), 1030, 70, 32f, 2, clanNameColor);
 
-            // Clan names
-            drawShadowedString(g2d, war.getClan().getName(), 165, 70, 32f, 2, clanNameColor);
-            drawShadowedStringLeft(g2d, war.getOpponent().getName(), 1030, 70, 32f, 2, clanNameColor);
-
-            // Status
-            Rectangle statusRect = new Rectangle(0, 55, WIDTH, 20);
-            Rectangle timeRect = new Rectangle(0, 95, WIDTH, 20);
-            int[] timeLeft;
-            switch (war.getState()) {
-                case "inWar" -> {
-                    timeLeft = getTimeLeft(war.getEndTime());
-                    drawSimpleCenteredString(g2d, i18n.getString("war.inwar"), statusRect, 30f, Color.BLACK);
-                    drawSimpleCenteredString(g2d,
-                            MessageFormat.format(i18n.getString("war.timeleft"),
-                                    MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
-                            timeRect, 22f, Color.BLACK);
-                }
-                case "preparation" -> {
-                    timeLeft = getTimeLeft(war.getStartTime());
-                    drawSimpleCenteredString(g2d, i18n.getString("war.preparation"), statusRect, 30f, Color.BLACK);
-                    drawSimpleCenteredString(g2d,
-                            MessageFormat.format(i18n.getString("war.timeleft"),
-                                    MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
-                            timeRect, 22f, Color.BLACK);
-                }
-                default -> {
-                    //warEnded
-                    timeLeft = getTimeLeft(war.getEndTime());
-                    drawSimpleCenteredString(g2d, i18n.getString("war.ended"), statusRect, 30f, Color.BLACK);
-                    drawSimpleCenteredString(g2d,
-                            MessageFormat.format(i18n.getString("war.since"),
-                                    MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
-                            timeRect, 22f, Color.BLACK);
-                }
+        // Status
+        Rectangle statusRect = new Rectangle(0, 55, WIDTH, 20);
+        Rectangle timeRect = new Rectangle(0, 95, WIDTH, 20);
+        int[] timeLeft;
+        switch (war.getState())
+        {
+            case IN_WAR -> {
+                timeLeft = getTimeLeft(war.getEndTime());
+                drawSimpleCenteredString(g2d, i18n.getString("war.inwar"), statusRect, 30f, Color.BLACK);
+                drawSimpleCenteredString(g2d,
+                        MessageFormat.format(i18n.getString("war.timeleft"),
+                                MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
+                        timeRect, 22f, Color.BLACK);
             }
+            case PREPARATION -> {
+                timeLeft = getTimeLeft(war.getStartTime());
+                drawSimpleCenteredString(g2d, i18n.getString("war.preparation"), statusRect, 30f, Color.BLACK);
+                drawSimpleCenteredString(g2d,
+                        MessageFormat.format(i18n.getString("war.timeleft"),
+                                MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
+                        timeRect, 22f, Color.BLACK);
+            }
+            default -> {
+                //warEnded
+                timeLeft = getTimeLeft(war.getEndTime());
+                drawSimpleCenteredString(g2d, i18n.getString("war.ended"), statusRect, 30f, Color.BLACK);
+                drawSimpleCenteredString(g2d,
+                        MessageFormat.format(i18n.getString("war.since"),
+                                MessageFormat.format(i18n.getString("war.date"), timeLeft[0], timeLeft[1], timeLeft[2])),
+                        timeRect, 22f, Color.BLACK);
+            }
+        }
 
-            for (int i = 0; i < SIZE; i++)
-                drawMapPosition(g2d, members.get(i + (index - 1) * SIZE), enemyMembers.get(i + (index - 1) * SIZE), 168 + i * PADDING);
+        for (int i = 0; i < SIZE; i++)
+            drawMapPosition(g2d, members.get(i + (index - 1) * SIZE), enemyMembers.get(i + (index - 1) * SIZE), 168 + i * PADDING);
 
-            // Total clan stars
-            Rectangle clanStarRect1 = new Rectangle(110, 100, 200, 20);
-            Rectangle clanStarRect2 = new Rectangle(890, 100, 200, 20);
+        // Total clan stars
+        Rectangle clanStarRect1 = new Rectangle(110, 100, 200, 20);
+        Rectangle clanStarRect2 = new Rectangle(890, 100, 200, 20);
 
-            drawCenteredString(g2d, clanStarRect1, font.deriveFont(28f), String.valueOf(war.getClan().getStars()));
-            drawCenteredString(g2d, clanStarRect2, font.deriveFont(28f), String.valueOf(war.getOpponent().getStars()));
+        drawCenteredString(g2d, clanStarRect1, font.deriveFont(28f), String.valueOf(war.getClan().getStars()));
+        drawCenteredString(g2d, clanStarRect2, font.deriveFont(28f), String.valueOf(war.getOpponent().getStars()));
 
-            // Total destruction percentage
-            Rectangle destructionRect1 = new Rectangle(290, 102, 150, 20);
-            Rectangle destructionRect2 = new Rectangle(758, 102, 150, 20);
+        // Total destruction percentage
+        Rectangle destructionRect1 = new Rectangle(290, 102, 150, 20);
+        Rectangle destructionRect2 = new Rectangle(758, 102, 150, 20);
 
-            DecimalFormatSymbols dfs = new DecimalFormatSymbols(lang);
-            DecimalFormat df = new DecimalFormat("#.#", dfs);
-            drawSimpleCenteredString(g2d, df.format(war.getClan().getDestructionPercentage()) + "%", destructionRect1, 26f, Color.BLACK);
-            drawSimpleCenteredString(g2d, df.format(war.getOpponent().getDestructionPercentage()) + "%", destructionRect2, 26f, Color.BLACK);
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols(lang);
+        DecimalFormat df = new DecimalFormat("#.#", dfs);
+        drawSimpleCenteredString(g2d, df.format(war.getClan().getDestructionPercentage()) + "%", destructionRect1, 26f, Color.BLACK);
+        drawSimpleCenteredString(g2d, df.format(war.getOpponent().getDestructionPercentage()) + "%", destructionRect2, 26f, Color.BLACK);
 
-            sendImage(event, image);
-            g2d.dispose();
-        } else
-            sendError(event, MessageFormat.format(i18n.getString("exception.404.war"), tag));
+        sendImage(event, image);
+        g2d.dispose();
     }
 }

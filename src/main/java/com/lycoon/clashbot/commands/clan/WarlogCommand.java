@@ -7,14 +7,17 @@ import static com.lycoon.clashbot.utils.DatabaseUtils.*;
 import static com.lycoon.clashbot.utils.CoreUtils.*;
 import static com.lycoon.clashbot.utils.GameUtils.*;
 
+import com.lycoon.clashapi.core.exceptions.ClashAPIException;
 import com.lycoon.clashapi.models.war.WarlogClan;
 import com.lycoon.clashapi.models.war.WarlogEntry;
 import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashapi.models.war.enums.WarResult;
 import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -45,7 +48,7 @@ public class WarlogCommand {
     private final static Color versusColor = new Color(0xffffc0);
     private final static Color percentageColor = new Color(0x5e5d60);
 
-    public static void call(SlashCommandEvent event) {
+    public static void call(SlashCommandInteractionEvent event) {
         CompletableFuture.runAsync(() -> {
             if (event.getOptions().isEmpty())
             {
@@ -63,18 +66,20 @@ public class WarlogCommand {
         });
     }
 
-    public static Image getImageStatus(String result) {
+    public static Image getImageStatus(WarResult result)
+    {
         if (result == null)
             return CacheComponents.warlogCWL; // CWL
-        else if (result.equals("win"))
+        else if (result == WarResult.WIN)
             return CacheComponents.warlogWon; // won
-        else if (result.equals("lose"))
+        else if (result == WarResult.LOSE)
             return CacheComponents.warlogLost; // lost
 
         return CacheComponents.warlogTie; // tie
     }
 
-    public static void drawWar(Graphics2D g2d, WarlogEntry war, int y) {
+    public static void drawWar(Graphics2D g2d, WarlogEntry war, int y)
+    {
         boolean isCWL = war.getResult() == null;
 
         // Member background
@@ -122,7 +127,8 @@ public class WarlogCommand {
         drawCenteredString(g2d, teamSizeRect, g2d.getFont().deriveFont(14f), MessageFormat.format(i18n.getString("team.size.versus"), war.getTeamSize()), versusColor);
     }
 
-    public static List<WarlogEntry> getWarlog(SlashCommandEvent event, Locale lang, String[] args) {
+    public static List<WarlogEntry> getWarlog(SlashCommandInteractionEvent event, Locale lang, String[] args)
+    {
         // If rate limitation has exceeded
         if (!checkThrottle(event, lang))
             return null;
@@ -147,7 +153,8 @@ public class WarlogCommand {
         return warlog;
     }
 
-    public static void execute(SlashCommandEvent event, String... args) {
+    public static void execute(SlashCommandInteractionEvent event, String... args)
+    {
         lang = LangUtils.getLanguage(event.getMember().getIdLong());
         i18n = LangUtils.getTranslations(lang);
 
@@ -161,21 +168,22 @@ public class WarlogCommand {
             return;
 
         // Checking if there are any clan wars
-        if (warlog.size() <= 0) {
+        if (warlog.isEmpty()) {
             sendError(event, i18n.getString("no.warlog"));
             return;
         }
 
         // Computing stats
-        int total, wins, losses, draws;
-        wins = losses = draws = 0;
-        for (WarlogEntry war : warlog) {
+        int total = 0, wins = 0, losses = 0, draws = 0;
+        for (WarlogEntry war : warlog)
+        {
             if (war.getResult() == null)
                 continue;
 
-            switch (war.getResult()) {
-                case "win" -> wins++;
-                case "lose" -> losses++;
+            switch (war.getResult())
+            {
+                case WIN -> wins++;
+                case LOSE -> losses++;
                 default -> draws++;
             }
         }

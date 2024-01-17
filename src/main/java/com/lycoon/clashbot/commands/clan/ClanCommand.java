@@ -6,25 +6,26 @@ import static com.lycoon.clashbot.utils.ErrorUtils.*;
 import static com.lycoon.clashbot.utils.DatabaseUtils.*;
 import static com.lycoon.clashbot.utils.CoreUtils.*;
 
+import com.lycoon.clashapi.core.exceptions.ClashAPIException;
 import com.lycoon.clashapi.models.clan.ClanMember;
 import com.lycoon.clashapi.models.clan.Clan;
 import com.lycoon.clashapi.models.common.Label;
-import com.lycoon.clashapi.core.exception.ClashAPIException;
+import com.lycoon.clashapi.models.player.enums.Role;
 import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public class ClanCommand {
+public class ClanCommand
+{
     private final static int WIDTH = 932;
     private final static int HEIGHT = 322;
     private final static float FONT_SIZE = 12f;
@@ -66,7 +67,8 @@ public class ClanCommand {
         put("Clan Capital", "label.capital");
     }};
 
-    public static void call(SlashCommandEvent event) {
+    public static void call(SlashCommandInteractionEvent event)
+    {
         CompletableFuture.runAsync(() -> {
             if (event.getOptions().isEmpty())
                 execute(event);
@@ -75,15 +77,16 @@ public class ClanCommand {
         });
     }
 
-    public static String getClanChief(List<ClanMember> members) {
+    public static String getClanChief(List<ClanMember> members)
+    {
         for (ClanMember member : members)
-            if (member.getRole().equals("leader"))
+            if (member.getRole() == Role.LEADER)
                 return member.getName();
-
         return "";
     }
 
-    public static Clan getClan(SlashCommandEvent event, Locale lang, String[] args) {
+    public static Clan getClan(SlashCommandInteractionEvent event, Locale lang, String[] args)
+    {
         // Checking rate limitation
         if (!checkThrottle(event, lang))
             return null;
@@ -100,7 +103,6 @@ public class ClanCommand {
 
         try {
             clan = ClashBotMain.clashAPI.getClan(tag);
-        } catch (IOException ignored) {
         } catch (ClashAPIException e) {
             sendExceptionError(event, i18n, e, tag, "clan");
             return null;
@@ -108,7 +110,8 @@ public class ClanCommand {
         return clan;
     }
 
-    public static void execute(SlashCommandEvent event, String... args) {
+    public static void execute(SlashCommandInteractionEvent event, String... args)
+    {
         Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         NumberFormat nf = NumberFormat.getInstance(lang);
@@ -157,9 +160,9 @@ public class ClanCommand {
             drawShadowedStringLeft(g2d, i18n.getString("undefined"), 905, 33, 14f, 2);
 
         // Invitation type
-        switch (clan.getType()) {
-            case "inviteOnly" -> drawShadowedStringLeft(g2d, i18n.getString("clan.type.inviteonly"), 905, 67, 12f, 2, clanTypeInviteOnlyColor);
-            case "open" -> drawShadowedStringLeft(g2d, i18n.getString("clan.type.open"), 905, 67, 12f, 2, clanTypeOpenColor);
+        switch (clan.getInviteType()) {
+            case INVITE_ONLY -> drawShadowedStringLeft(g2d, i18n.getString("clan.type.inviteonly"), 905, 67, 12f, 2, clanTypeInviteOnlyColor);
+            case OPEN -> drawShadowedStringLeft(g2d, i18n.getString("clan.type.open"), 905, 67, 12f, 2, clanTypeOpenColor);
             default -> drawShadowedStringLeft(g2d, i18n.getString("clan.type.closed"), 905, 67, 12f, 2, clanTypeClosedColor);
         }
 

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import java.awt.*;
@@ -46,7 +47,8 @@ public class CoreUtils {
         return threshold;
     }
 
-    public static boolean checkThrottle(SlashCommandEvent event, Locale lang) {
+    public static boolean checkThrottle(SlashCommandInteractionEvent event, Locale lang)
+    {
         ResourceBundle i18n = LangUtils.getTranslations(lang);
 
         NumberFormat nf = NumberFormat.getNumberInstance(lang);
@@ -64,7 +66,8 @@ public class CoreUtils {
         return isValid;
     }
 
-    public static boolean isOwner(long id) {
+    public static boolean isOwner(long id)
+    {
         for (int i = 0; i < ClashBotMain.owners.length; i++)
             if (id == ClashBotMain.owners[i])
                 return true;
@@ -72,21 +75,22 @@ public class CoreUtils {
         return false;
     }
 
-    public static void sendMessage(SlashCommandEvent event, ResourceBundle i18n, EmbedBuilder builder) {
-        try {
-            event.getHook().sendMessageEmbeds(builder.build()).queue();
-        } catch (InsufficientPermissionException e) {
+    public static void sendMessage(SlashCommandInteractionEvent event, ResourceBundle i18n, EmbedBuilder builder)
+    {
+        try { event.getHook().sendMessageEmbeds(builder.build()).queue(); }
+        catch (InsufficientPermissionException e)
+        {
             LOGGER.debug(e.getMessage());
             event.getMember().getUser().openPrivateChannel().queue(
-                    // Success
-                    (channel) ->
-                            ErrorUtils.sendError(event, INFO_EMOJI + " " +
-                                    i18n.getString("exception.permission.title"), MessageFormat.format(
-                                    i18n.getString("exception.permission.tip"),
-                                    event.getGuild().getName(), ClashBotMain.INVITE)),
+                // Success
+                (channel) -> ErrorUtils.sendError(event, INFO_EMOJI + " " +
+                    i18n.getString("exception.permission.title"), MessageFormat.format(
+                    i18n.getString("exception.permission.tip"),
+                    event.getGuild().getName(), ClashBotMain.INVITE)),
 
-                    // Failure
-                    (err) -> LOGGER.debug(err.getMessage()));
+                // Failure
+                (err) -> LOGGER.debug(err.getMessage())
+            );
         }
 
         builder.clear();

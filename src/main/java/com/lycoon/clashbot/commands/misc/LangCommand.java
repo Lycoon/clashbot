@@ -3,10 +3,8 @@ package com.lycoon.clashbot.commands.misc;
 import com.lycoon.clashbot.commands.Command;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
-import com.lycoon.clashbot.utils.DatabaseUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
 import java.text.MessageFormat;
@@ -15,12 +13,12 @@ import java.util.ResourceBundle;
 
 public class LangCommand
 {
-    public static void call(SlashCommandEvent event, String... args)
+    public static void call(SlashCommandInteractionEvent event, String... args)
     {
         execute(event);
     }
 
-    public static void execute(SlashCommandEvent event)
+    public static void execute(SlashCommandInteractionEvent event)
     {
         Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);

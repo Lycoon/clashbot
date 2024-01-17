@@ -7,13 +7,13 @@ import static com.lycoon.clashbot.utils.DatabaseUtils.*;
 import static com.lycoon.clashbot.utils.CoreUtils.*;
 import static com.lycoon.clashbot.utils.GameUtils.*;
 
+import com.lycoon.clashapi.core.exceptions.ClashAPIException;
 import com.lycoon.clashapi.models.player.Player;
 import com.lycoon.clashapi.models.player.Troop;
-import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -51,7 +51,7 @@ public class PlayerCommand {
             "Log Launcher", "Flame Flinger"};
     private final static String[] PETS = {"L.A.S.S.I", "Electro Owl", "Mighty Yak", "Unicorn"};
 
-    public static void call(SlashCommandEvent event) {
+    public static void call(SlashCommandInteractionEvent event) {
         CompletableFuture.runAsync(() -> {
             if (event.getOptions().isEmpty())
                 execute(event);
@@ -61,7 +61,7 @@ public class PlayerCommand {
     }
 
     public static void drawSuperTroop(Graphics2D g2d, Troop troop, String troopName, int x, int y) {
-        if (troop == null || !troop.isSuperTroopActive())
+        if (troop == null || !troop.getSuperTroopIsActive())
             g2d.drawImage(getImageFromFile("troops/locked/" + troopName + ".png"), x, y, 44, 44, null);
         else
             g2d.drawImage(getImageFromFile("troops/" + troop.getName() + ".png"), x, y, 44, 44, null);
@@ -120,7 +120,7 @@ public class PlayerCommand {
             drawTroop(g2d, font, getTroopByName(pets, PETS[i]), PETS[i], (i % COLUMNS) * 50 + 710, y + j * 50);
     }
 
-    public static void execute(SlashCommandEvent event, String... args) {
+    public static void execute(SlashCommandInteractionEvent event, String... args) {
         Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
         NumberFormat nf = NumberFormat.getInstance(lang);
@@ -140,7 +140,7 @@ public class PlayerCommand {
 
         try {
             player = ClashBotMain.clashAPI.getPlayer(tag);
-        } catch (ClashAPIException | IOException e) {
+        } catch (ClashAPIException e) {
             sendExceptionError(event, i18n, e, tag, "player");
             return;
         }
@@ -196,7 +196,7 @@ public class PlayerCommand {
             Rectangle clanNameRect = new Rectangle(775, 130, 148, 30);
             Rectangle clanRoleRect = new Rectangle(775, 151, 148, 30);
             drawCenteredString(g2d, clanNameRect, font.deriveFont(FONT_SIZE + 2f), player.getClan().getName());
-            drawCenteredString(g2d, clanRoleRect, font.deriveFont(FONT_SIZE - 2f), i18n.getString(player.getRole()));
+            drawCenteredString(g2d, clanRoleRect, font.deriveFont(FONT_SIZE - 2f), i18n.getString(String.valueOf(player.getRole())));
         } else {
             Rectangle noClanRect = new Rectangle(775, 130, 148, 30);
             drawCenteredString(g2d, noClanRect, font.deriveFont(FONT_SIZE + 2f), i18n.getString("no.clan"));

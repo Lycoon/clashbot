@@ -1,17 +1,17 @@
 package com.lycoon.clashbot.utils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
-public class ErrorUtils {
+public class ErrorUtils
+{
     private static final String OFFICIAL_TWITTER = "https://twitter.com/ClashofClans";
 
-    public static void sendExceptionError(SlashCommandEvent event, ResourceBundle i18n, Exception e, String... args) {
+    public static void sendExceptionError(SlashCommandInteractionEvent event, ResourceBundle i18n, Exception e, String... args)
+    {
         switch (e.getMessage()) {
             case "400" -> sendError(event, i18n.getString("exception.other"));
             case "403" -> sendError(event, i18n.getString("exception.403"));
@@ -28,7 +28,8 @@ public class ErrorUtils {
         }
     }
 
-    public static int checkIndex(SlashCommandEvent event, ResourceBundle i18n, String arg, int max) {
+    public static int checkIndex(SlashCommandInteractionEvent event, ResourceBundle i18n, String arg, int max)
+    {
         int index;
         try {
             index = Integer.parseInt(arg);
@@ -57,7 +58,7 @@ public class ErrorUtils {
 	}
 	*/
 
-    public static void sendError(SlashCommandEvent event, String title, String... args) {
+    public static void sendError(SlashCommandInteractionEvent event, String title, String... args) {
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(CoreUtils.invalidColor);
         error.setTitle(title);

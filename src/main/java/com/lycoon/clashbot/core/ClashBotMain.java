@@ -13,38 +13,57 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class ClashBotMain {
-    static final String CONFIG = "tokens.properties";
+public class ClashBotMain
+{
+    private static final String CONFIG = "tokens.properties";
+    private static Properties tokens;
 
     public static long[] owners = {138282927502000128L, 198485955701768192L};
-    public static final String VERSION = "1.4.3";
+    public static final String VERSION = "2.0.0";
     public static final String INVITE = "https://discord.com/api/oauth2/authorize?client_id=734481969630543883&permissions=2147534848&scope=bot%20applications.commands";
     public static Logger LOGGER = LoggerFactory.getLogger(ClashBotMain.class.getName());
 
+    // Following attributes are initialized on launch
     public static ClashAPI clashAPI;
     public static CacheComponents cached;
     public static JDA jda;
 
     /*
-     * Clashbot entry point
+     * ############################## Clashbot ##############################
+     * 		                    Author: Hugo BOIS
+     * 			             All rights reserved 2024
+     * ######################################################################
      */
-    public static void main(String[] args) throws LoginException, InterruptedException {
-        Properties tokens = new Properties();
-        try {
-            // Loading secret tokens
+    public static void main(String[] args) throws InterruptedException {
+        loadTokensFromConfig();
+        buildDiscordInstance();
+
+        clashAPI = new ClashAPI(tokens.getProperty("clash-of-clans"));
+        cached = CacheComponents.getInstance();
+    }
+
+    /*
+     * Load secret tokens from config file for Clash of Clans and Discord APIs
+     */
+    private static void loadTokensFromConfig()
+    {
+        try
+        {
             tokens.load(new FileInputStream(CONFIG));
             LOGGER.info("Secret tokens loaded");
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
         }
-        JDABuilder builder = JDABuilder.createDefault(tokens.getProperty("discord"));
+        catch (IOException e) { LOGGER.error(e.getMessage()); }
+    }
 
+    /*
+     * Build Discord instance from previous loaded token
+     */
+    private static void buildDiscordInstance() throws InterruptedException
+    {
+        JDABuilder builder = JDABuilder.createDefault(tokens.getProperty("discord"));
         builder.addEventListeners(new EventListener());
         builder.setStatus(OnlineStatus.ONLINE);
         builder.setActivity(Activity.playing("Clash of Clans"));
         jda = builder.build().awaitReady();
-
-        clashAPI = new ClashAPI(tokens.getProperty("clash-of-clans"));
-        cached = CacheComponents.getInstance();
     }
 }

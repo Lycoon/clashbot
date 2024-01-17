@@ -7,8 +7,10 @@ import static com.lycoon.clashbot.utils.DatabaseUtils.*;
 import static com.lycoon.clashbot.utils.CoreUtils.*;
 import static com.lycoon.clashbot.utils.GameUtils.*;
 
+import com.lycoon.clashapi.core.exceptions.ClashAPIException;
 import com.lycoon.clashapi.models.war.War;
 import com.lycoon.clashapi.models.war.WarClan;
+import com.lycoon.clashapi.models.war.enums.WarState;
 import com.lycoon.clashapi.models.warleague.WarLeagueClan;
 import com.lycoon.clashapi.models.warleague.WarLeagueRound;
 import com.lycoon.clashapi.models.warleague.WarLeagueGroup;
@@ -19,6 +21,7 @@ import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.core.RoundWarInfo;
 import com.lycoon.clashbot.lang.LangUtils;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -35,7 +38,7 @@ public class WarLeagueCommand {
 
     private static ResourceBundle i18n;
 
-    public static void call(SlashCommandEvent event) {
+    public static void call(SlashCommandInteractionEvent event) {
         Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         i18n = LangUtils.getTranslations(lang);
 
@@ -72,7 +75,7 @@ public class WarLeagueCommand {
         return wars;
     }
 
-    public static void drawRound(Graphics2D g2d, SlashCommandEvent event, List<War> wars, ResourceBundle i18n, int roundIndex) {
+    public static void drawRound(Graphics2D g2d, SlashCommandInteractionEvent event, List<War> wars, ResourceBundle i18n, int roundIndex) {
         Font font = g2d.getFont().deriveFont(FONT_SIZE);
 
         // Round label
@@ -190,7 +193,7 @@ public class WarLeagueCommand {
         }
     }
 
-    public static WarLeagueGroup getLeagueGroup(SlashCommandEvent event, Locale lang, String[] args) {
+    public static WarLeagueGroup getLeagueGroup(SlashCommandInteractionEvent event, Locale lang, String[] args) {
         // If rate limitation has exceeded
         if (!checkThrottle(event, lang))
             return null;
@@ -207,7 +210,6 @@ public class WarLeagueCommand {
 
         try {
             leagueGroup = ClashBotMain.clashAPI.getWarLeagueGroup(tag);
-        } catch (IOException ignored) {
         } catch (ClashAPIException e) {
             sendExceptionError(event, i18n, e, tag, "warleague");
             return null;
@@ -215,7 +217,7 @@ public class WarLeagueCommand {
         return leagueGroup;
     }
 
-    public static void executeRound(SlashCommandEvent event, String... args) {
+    public static void executeRound(SlashCommandInteractionEvent event, String... args) {
         Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
 
@@ -237,14 +239,17 @@ public class WarLeagueCommand {
         // Rounds
         List<War> roundWars = getWars(warLeague, index - 1);
         drawRound(g2d, event, roundWars, i18n, index - 1);
-        if (roundWars.get(0).getState().equals("notInWar"))
+
+        WarState state = roundWars.get(0).getState();
+        if (state == WarState.NOT_IN_WAR)
             return;
 
         sendImage(event, image);
         g2d.dispose();
     }
 
-    public static WarClan getWinner(WarClan clan1, WarClan clan2) {
+    public static WarClan getWinner(WarClan clan1, WarClan clan2)
+    {
         if (clan1.getStars() > clan2.getStars())
             return clan1;
         else if (clan1.getStars() == clan2.getStars()) {
@@ -269,7 +274,8 @@ public class WarLeagueCommand {
         return 0;
     }
 
-    public static void executeAll(SlashCommandEvent event, String... args) {
+    public static void executeAll(SlashCommandInteractionEvent event, String... args)
+    {
         Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
 
@@ -286,11 +292,14 @@ public class WarLeagueCommand {
         HashMap<String, Integer> stars = new HashMap<>();
         HashMap<String, Integer> destruction = new HashMap<>();
 
-        for (WarLeagueClan clan : warLeague.getClans()) {
+        for (WarLeagueClan clan : warLeague.getClans())
+        {
             stars.put(clan.getName(), 0);
             destruction.put(clan.getName(), 0);
         }
-        for (int i = 0; i < 7; i++) {
+
+        for (int i = 0; i < 7; i++)
+        {
             List<War> wars = getWars(warLeague, i);
             for (War war : wars) {
                 WarClan clan1 = war.getClan();
@@ -306,15 +315,14 @@ public class WarLeagueCommand {
             System.out.println();
         }
 
-        for (WarLeagueClan clan : warLeague.getClans()) {
+        for (WarLeagueClan clan : warLeague.getClans())
             System.out.println(clan.getName() + ": " + stars.get(clan.getName()) + " étoiles (" + destruction.get(clan.getName()) + "%)");
-        }
 
         sendImage(event, image);
         g2d.dispose();
     }
 
-    public static void executeClan(SlashCommandEvent event, String... args) {
+    public static void executeClan(SlashCommandInteractionEvent event, String... args) {
 
     }
 }
