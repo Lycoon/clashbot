@@ -6,7 +6,8 @@ import java.util.List;
 
 import com.lycoon.clashbot.utils.FileUtils;
 
-public class CacheComponents {
+public class CacheComponents
+{
     public static Image alreadyStar = FileUtils.getImageFromFile("icons/clanwar/alreadyclan-star.png");
     public static Image newStar = FileUtils.getImageFromFile("icons/clanwar/clan-star.png");
     public static Image noStar = FileUtils.getImageFromFile("icons/clanwar/noclan-star.png");
@@ -22,7 +23,8 @@ public class CacheComponents {
 
     private static final CacheComponents singleton = new CacheComponents();
 
-    private CacheComponents() {
+    private CacheComponents()
+    {
         for (int i = 0; i < 14; i++)
             townhalls.add(FileUtils.getImageFromFile("buildings/townhalls/home/th" + (i + 1) + ".png"));
         for (int i = 0; i < 9; i++)

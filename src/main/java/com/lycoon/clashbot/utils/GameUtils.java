@@ -9,19 +9,23 @@ import java.util.List;
 import java.util.Locale;
 
 import com.lycoon.clashapi.models.player.Troop;
+import com.lycoon.clashapi.models.player.enums.Village;
 
-public class GameUtils {
+public class GameUtils
+{
     public static int getPositive(float value) {
         return (int) (value * (value < 0 ? -1 : 1));
     }
 
-    public static String getCurrentSeason(Locale lang) {
+    public static String getCurrentSeason(Locale lang)
+    {
         ZonedDateTime utcDateZoned = ZonedDateTime.now(ZoneId.of("Etc/UTC"));
         DateTimeFormatter pattern = DateTimeFormatter.ofPattern("MMMM yyyy").withLocale(lang);
         return utcDateZoned.format(pattern);
     }
 
-    public static int[] getTimeLeft(String toParse) {
+    public static int[] getTimeLeft(String toParse)
+    {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss.SSS'Z'");
         LocalDateTime endDate = LocalDateTime.parse(toParse, formatter);
         ZonedDateTime zonedTime = endDate.atZone(ZoneId.of("UTC"));
@@ -36,27 +40,27 @@ public class GameUtils {
         return new int[]{getPositive(hours), getPositive(minutes), getPositive(seconds)};
     }
 
-    public static Troop getTroopByName(List<Troop> troops, String name) {
-        for (Troop troop : troops)
-            if (troop.getName().equals(name))
-                return troop;
-
-        return null;
+    public static Troop getTroopByName(List<Troop> troops, String name)
+    {
+        return troops.stream()
+                .filter(troop -> troop.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 
-    public static Troop getBuilderTroopByName(List<Troop> troops, String name) {
-        for (Troop troop : troops)
-            if (troop.getVillage().equals("builderBase") && troop.getName().equals(name))
-                return troop;
-
-        return null;
+    public static Troop getBuilderTroopByName(List<Troop> troops, String name)
+    {
+        return troops.stream()
+                .filter(troop -> troop.getVillage() == Village.BUILDER_BASE && troop.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 
-    public static Troop getHomeTroopByName(List<Troop> troops, String name) {
-        for (Troop troop : troops)
-            if (troop.getVillage().equals("home") && troop.getName().equals(name))
-                return troop;
-
-        return null;
+    public static Troop getHomeTroopByName(List<Troop> troops, String name)
+    {
+        return troops.stream()
+                .filter(troop -> troop.getVillage() == Village.HOME_VILLAGE && troop.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 }

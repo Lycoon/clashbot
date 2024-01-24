@@ -2,12 +2,12 @@ package com.lycoon.clashbot.utils;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
-import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.AttributedString;
 import java.util.Objects;
+
+import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;
 
 public class DrawUtils
 {
@@ -34,7 +34,7 @@ public class DrawUtils
 			InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream("fonts/" + file);
 			font = Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(stream));
 		}
-		catch (FontFormatException | IOException e) {e.printStackTrace();}
+		catch (FontFormatException | IOException e) { LOGGER.error("Error while loading font: " + file, e); }
 
 		return font;
 	}

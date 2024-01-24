@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.security.auth.login.LoginException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -16,12 +15,12 @@ import java.util.Properties;
 public class ClashBotMain
 {
     private static final String CONFIG = "tokens.properties";
-    private static Properties tokens;
+    private static final Properties tokens = new Properties();
 
     public static long[] owners = {138282927502000128L, 198485955701768192L};
     public static final String VERSION = "2.0.0";
     public static final String INVITE = "https://discord.com/api/oauth2/authorize?client_id=734481969630543883&permissions=2147534848&scope=bot%20applications.commands";
-    public static Logger LOGGER = LoggerFactory.getLogger(ClashBotMain.class.getName());
+    public static Logger LOGGER = LoggerFactory.getLogger(ClashBotMain.class);
 
     // Following attributes are initialized on launch
     public static ClashAPI clashAPI;
@@ -34,7 +33,8 @@ public class ClashBotMain
      * 			             All rights reserved 2024
      * ######################################################################
      */
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException
+    {
         loadTokensFromConfig();
         buildDiscordInstance();
 

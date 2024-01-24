@@ -4,7 +4,9 @@ import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.awt.*;
 import java.text.NumberFormat;
@@ -15,7 +17,7 @@ import java.util.ResourceBundle;
 public class InfoCommand
 {
     private static final String TWITTER = "@LycoonMC";
-    private static final String DISCORD = "Lycoon#7542";
+    private static final String AUTHOR = "@lycoon";
     private static final String WEBSITE = "https://clashbot.app/";
     private static final String DISCORD_INVITE = "https://discord.gg/Cy86PDA";
     private static final String PATREON = "https://www.patreon.com/clashbot";
@@ -43,15 +45,15 @@ public class InfoCommand
 
         builder.addField("Version", ClashBotMain.VERSION, true);
         builder.addField("Library", "Discord JDA", true);
-        builder.addField("Author", "Lycoon#7542", true);
+        builder.addField("Author", AUTHOR, true);
         builder.addField("Members", nf.format(guilds.stream().mapToInt(Guild::getMemberCount).sum()), true);
         builder.addField("Servers", nf.format(guilds.size()), true);
         builder.addField("Ping", nf.format(ClashBotMain.jda.getRestPing().complete()) + "ms", true);
 
         event.getHook().sendMessageEmbeds(builder.build()).addActionRow(
-                Button.link(WEBSITE, "Official Website").withEmoji(Emoji.fromMarkdown(CLASHBOT_EMOJI)),
-                Button.link(DISCORD_INVITE, "Official Discord").withEmoji(Emoji.fromMarkdown(DISCORD_EMOJI)),
-                Button.link(PATREON, "Contribute").withEmoji(Emoji.fromMarkdown(PATREON_EMOJI))
+                Button.link(WEBSITE, "Official Website").withEmoji(Emoji.fromFormatted(CLASHBOT_EMOJI)),
+                Button.link(DISCORD_INVITE, "Official Discord").withEmoji(Emoji.fromFormatted(DISCORD_EMOJI)),
+                Button.link(PATREON, "Contribute").withEmoji(Emoji.fromFormatted(PATREON_EMOJI))
         ).queue();
     }
 }

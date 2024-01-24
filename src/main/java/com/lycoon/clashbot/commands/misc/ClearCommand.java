@@ -2,7 +2,7 @@ package com.lycoon.clashbot.commands.misc;
 
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
-import com.lycoon.clashbot.utils.DatabaseUtils;
+import com.lycoon.clashbot.utils.database.DatabaseUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 

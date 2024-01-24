@@ -3,7 +3,7 @@ package com.lycoon.clashbot.commands.clan;
 import static com.lycoon.clashbot.utils.DrawUtils.*;
 import static com.lycoon.clashbot.utils.FileUtils.*;
 import static com.lycoon.clashbot.utils.ErrorUtils.*;
-import static com.lycoon.clashbot.utils.DatabaseUtils.*;
+import static com.lycoon.clashbot.utils.database.DatabaseUtils.*;
 import static com.lycoon.clashbot.utils.CoreUtils.*;
 import static com.lycoon.clashbot.utils.GameUtils.*;
 
@@ -14,13 +14,11 @@ import com.lycoon.clashapi.models.war.enums.WarState;
 import com.lycoon.clashapi.models.warleague.WarLeagueClan;
 import com.lycoon.clashapi.models.warleague.WarLeagueRound;
 import com.lycoon.clashapi.models.warleague.WarLeagueGroup;
-import com.lycoon.clashapi.core.exception.ClashAPIException;
-import com.lycoon.clashbot.commands.Command;
+import com.lycoon.clashbot.commands.CommandData;
 import com.lycoon.clashbot.core.ClanWarStats;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.core.RoundWarInfo;
 import com.lycoon.clashbot.lang.LangUtils;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
@@ -36,11 +34,10 @@ public class WarLeagueCommand {
     private final static int ROUND_HEIGHT = 333;
     private final static float FONT_SIZE = 16f;
 
-    private static ResourceBundle i18n;
-
-    public static void call(SlashCommandInteractionEvent event) {
+    public static void call(SlashCommandInteractionEvent event)
+    {
         Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
-        i18n = LangUtils.getTranslations(lang);
+        ResourceBundle i18n1 = LangUtils.getTranslations(lang);
 
         CompletableFuture.runAsync(() -> {
             if (event.getOptions().isEmpty())
@@ -86,8 +83,9 @@ public class WarLeagueCommand {
         int[] timeLeft;
         War firstWar = wars.get(0);
 
-        switch (firstWar.getState()) {
-            case "preparation" -> {
+        switch (firstWar.getState())
+        {
+            case PREPARATION -> {
                 timeLeft = getTimeLeft(firstWar.getStartTime());
                 g2d.drawImage(getImageFromFile("backgrounds/cwl/cwl-preparation.png"), 0, 0, null);
                 drawSimpleCenteredString(g2d,
@@ -96,7 +94,7 @@ public class WarLeagueCommand {
                         timeRect, 19f, Color.BLACK);
                 drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.preparation"));
             }
-            case "warEnded" -> {
+            case ENDED -> {
                 timeLeft = getTimeLeft(firstWar.getEndTime());
                 g2d.drawImage(getImageFromFile("backgrounds/cwl/cwl-ended.png"), 0, 0, null);
                 drawSimpleCenteredString(g2d,
@@ -105,7 +103,7 @@ public class WarLeagueCommand {
                         timeRect, 19f, Color.BLACK);
                 drawCenteredString(g2d, stateLabel, font.deriveFont(24f), i18n.getString("war.ended"));
             }
-            case "notInWar" -> {
+            case NOT_IN_WAR -> {
                 sendError(event, i18n.getString("exception.warleague.notinwar"));
                 return;
             }
@@ -128,9 +126,9 @@ public class WarLeagueCommand {
             WarClan clan1 = war.getClan();
             WarClan clan2 = war.getOpponent();
 
-            if (war.getState().equals("warEnded")) {
-                if (clan2.getStars() > clan1.getStars() ||
-                        (clan2.getStars() == clan1.getStars() &&
+            if (war.getState() == WarState.ENDED)
+            {
+                if (clan2.getStars() > clan1.getStars() || (clan2.getStars() == clan1.getStars() &&
                                 clan2.getDestructionPercentage() > clan1.getDestructionPercentage())) {
                     WarClan tmp = clan1;
                     clan1 = clan2;
@@ -145,7 +143,8 @@ public class WarLeagueCommand {
                 drawCenteredString(g2d, rectStarClan1, font.deriveFont(18f), String.valueOf(clan1.getStars()));
                 drawCenteredString(g2d, rectStarClan2, font.deriveFont(18f), String.valueOf(clan2.getStars()));
 
-                if (firstWar.getState().equals("inWar")) {
+                if (firstWar.getState() == WarState.IN_WAR)
+                {
                     // Drawing clan names
                     drawShadowedStringLeft(g2d, clan1.getName(), 255, 113 + i * 60, 16f, Color.WHITE);
                     drawShadowedString(g2d, clan2.getName(), 670, 113 + i * 60, 16f);
@@ -157,7 +156,9 @@ public class WarLeagueCommand {
                     // Drawing clan attacks
                     drawShadowedString(g2d, String.valueOf(clan2.getAttacks()), 350, 109 + i * 60, 12f);
                     drawShadowedString(g2d, String.valueOf(clan1.getAttacks()), 569, 109 + i * 60, 12f);
-                } else {
+                }
+                else
+                {
                     // Drawing clan names
                     drawShadowedStringLeft(g2d, clan1.getName(), 300, 113 + i * 60, 16f, Color.WHITE);
                     drawShadowedString(g2d, clan2.getName(), 625, 113 + i * 60, 16f);
@@ -170,8 +171,10 @@ public class WarLeagueCommand {
         }
     }
 
-    public static void updateStats(WarClan clan, HashMap<String, ClanWarStats> stats) {
-        if (clan != null) {
+    public static void updateStats(WarClan clan, HashMap<String, ClanWarStats> stats)
+    {
+        if (clan != null)
+        {
             if (stats.containsKey(clan.getTag())) {
                 ClanWarStats stats1 = stats.get(clan.getTag());
                 stats1.addStars(clan.getStars());
@@ -182,10 +185,13 @@ public class WarLeagueCommand {
         }
     }
 
-    public static void drawStats(List<RoundWarInfo> rounds) {
+    public static void drawStats(List<RoundWarInfo> rounds)
+    {
         HashMap<String, ClanWarStats> stats = new HashMap<>();
-        for (RoundWarInfo roundWars : rounds) {
-            for (int j = 0; j < roundWars.getWars().size(); j++) {
+        for (RoundWarInfo roundWars : rounds)
+        {
+            for (int j = 0; j < roundWars.getWars().size(); j++)
+            {
                 War warInfo = roundWars.getWars().get(j);
                 updateStats(warInfo.getClan(), stats);
                 updateStats(warInfo.getOpponent(), stats);
@@ -193,7 +199,8 @@ public class WarLeagueCommand {
         }
     }
 
-    public static WarLeagueGroup getLeagueGroup(SlashCommandInteractionEvent event, Locale lang, String[] args) {
+    public static WarLeagueGroup getLeagueGroup(SlashCommandInteractionEvent event, Locale lang, String[] args)
+    {
         // If rate limitation has exceeded
         if (!checkThrottle(event, lang))
             return null;
@@ -204,20 +211,21 @@ public class WarLeagueCommand {
 
         if (tag == null) {
             sendError(event, i18n.getString("set.clan.error"),
-                    MessageFormat.format(i18n.getString("cmd.general.tip"), Command.SET_CLAN.formatCommand()));
+                    MessageFormat.format(i18n.getString("cmd.general.tip"), CommandData.SET_CLAN.formatCommand()));
             return null;
         }
 
         try {
             leagueGroup = ClashBotMain.clashAPI.getWarLeagueGroup(tag);
-        } catch (ClashAPIException e) {
+        } catch (ClashAPIException | IOException e) {
             sendExceptionError(event, i18n, e, tag, "warleague");
             return null;
         }
         return leagueGroup;
     }
 
-    public static void executeRound(SlashCommandInteractionEvent event, String... args) {
+    public static void executeRound(SlashCommandInteractionEvent event, String... args)
+    {
         Locale lang = LangUtils.getLanguage(event.getMember().getIdLong());
         ResourceBundle i18n = LangUtils.getTranslations(lang);
 
@@ -263,11 +271,12 @@ public class WarLeagueCommand {
         return clan2;
     }
 
-    public static int getWinStars(WarClan clan1, WarClan clan2, War war) {
-        if (!war.getState().equals("warEnded")) {
+    public static int getWinStars(WarClan clan1, WarClan clan2, War war)
+    {
+        if (war.getState() != WarState.ENDED)
+        {
             if (getWinner(clan1, clan2) == null)
                 return 0;
-
             if (Objects.equals(getWinner(clan1, clan2), clan1))
                 return 10;
         }

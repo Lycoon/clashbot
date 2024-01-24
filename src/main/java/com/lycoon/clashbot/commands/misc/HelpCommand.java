@@ -1,6 +1,6 @@
 package com.lycoon.clashbot.commands.misc;
 
-import com.lycoon.clashbot.commands.Command;
+import com.lycoon.clashbot.commands.CommandData;
 import com.lycoon.clashbot.commands.CommandCategory;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
@@ -20,10 +20,10 @@ public class HelpCommand
         execute(event);
     }
 
-    public static void drawCategory(CommandCategory category, Command[] commands)
+    public static void drawCategory(CommandCategory category, CommandData[] commands)
     {
         StringBuilder categoryField = new StringBuilder();
-        for (Command cmd : commands)
+        for (CommandData cmd : commands)
             if (cmd.getCategory().equals(category)) {
                 categoryField.append("▫ `").append(cmd.formatCommand()).append("` ");
                 categoryField.append(i18n.getString(cmd.getDescription())).append("\n");
@@ -42,7 +42,7 @@ public class HelpCommand
 
         CommandCategory[] categories = CommandCategory.values();
         for (CommandCategory category : categories)
-            drawCategory(category, Command.values());
+            drawCategory(category, CommandData.values());
 
         CoreUtils.sendMessage(event, i18n, builder);
     }

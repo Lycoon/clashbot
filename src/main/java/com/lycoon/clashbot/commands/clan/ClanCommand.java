@@ -3,7 +3,7 @@ package com.lycoon.clashbot.commands.clan;
 import static com.lycoon.clashbot.utils.DrawUtils.*;
 import static com.lycoon.clashbot.utils.FileUtils.*;
 import static com.lycoon.clashbot.utils.ErrorUtils.*;
-import static com.lycoon.clashbot.utils.DatabaseUtils.*;
+import static com.lycoon.clashbot.utils.database.DatabaseUtils.*;
 import static com.lycoon.clashbot.utils.CoreUtils.*;
 
 import com.lycoon.clashapi.core.exceptions.ClashAPIException;
@@ -11,13 +11,14 @@ import com.lycoon.clashapi.models.clan.ClanMember;
 import com.lycoon.clashapi.models.clan.Clan;
 import com.lycoon.clashapi.models.common.Label;
 import com.lycoon.clashapi.models.player.enums.Role;
-import com.lycoon.clashbot.commands.Command;
+import com.lycoon.clashbot.commands.CommandData;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.List;
@@ -97,16 +98,16 @@ public class ClanCommand
 
         if (tag == null) {
             sendError(event, i18n.getString("set.clan.error"),
-                    MessageFormat.format(i18n.getString("cmd.general.tip"), Command.SET_CLAN.formatCommand()));
+                    MessageFormat.format(i18n.getString("cmd.general.tip"), CommandData.SET_CLAN.formatCommand()));
             return null;
         }
 
-        try {
-            clan = ClashBotMain.clashAPI.getClan(tag);
-        } catch (ClashAPIException e) {
+        try { clan = ClashBotMain.clashAPI.getClan(tag); }
+        catch (ClashAPIException | IOException e) {
             sendExceptionError(event, i18n, e, tag, "clan");
             return null;
         }
+
         return clan;
     }
 

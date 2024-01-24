@@ -1,6 +1,6 @@
 package com.lycoon.clashbot.lang;
 
-import com.lycoon.clashbot.utils.DatabaseUtils;
+import com.lycoon.clashbot.utils.database.DatabaseUtils;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

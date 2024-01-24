@@ -58,7 +58,8 @@ public class ErrorUtils
 	}
 	*/
 
-    public static void sendError(SlashCommandInteractionEvent event, String title, String... args) {
+    public static void sendError(SlashCommandInteractionEvent event, String title, String... args)
+    {
         EmbedBuilder error = new EmbedBuilder();
         error.setColor(CoreUtils.invalidColor);
         error.setTitle(title);

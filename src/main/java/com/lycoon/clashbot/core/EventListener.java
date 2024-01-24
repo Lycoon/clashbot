@@ -6,10 +6,10 @@ import com.lycoon.clashbot.commands.clan.WarCommand;
 import com.lycoon.clashbot.commands.clan.WarLeagueCommand;
 import com.lycoon.clashbot.commands.clan.WarlogCommand;
 import com.lycoon.clashbot.commands.misc.*;
+import com.lycoon.clashbot.commands.player.PlayerCommand;
 import com.lycoon.clashbot.commands.settings.SetCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,7 +21,7 @@ import java.util.Objects;
 
 public class EventListener extends ListenerAdapter
 {
-    static boolean isCommand(String arg, Command cmd) {
+    static boolean isCommand(String arg, CommandData cmd) {
         return arg.equalsIgnoreCase(cmd.toString());
     }
 
@@ -37,9 +37,9 @@ public class EventListener extends ListenerAdapter
     }
 
     @Override
-    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        if (!event.isFromGuild())
-        {
+    public void onSlashCommandInteraction(SlashCommandInteractionEvent event)
+    {
+        if (!event.isFromGuild()){
             event.replyEmbeds(warnNotInGuild()).queue();
             return;
         }
@@ -47,27 +47,27 @@ public class EventListener extends ListenerAdapter
         event.deferReply().queue();
 
         String cmd = event.getName();
-        if (isCommand(cmd, Command.SET_LANG))
+        if (isCommand(cmd, CommandData.SET_LANG))
             SetCommand.call(event);
-        else if (isCommand(cmd, Command.PLAYER))
+        else if (isCommand(cmd, CommandData.PLAYER))
             PlayerCommand.call(event);
-        else if (isCommand(cmd, Command.CLAN))
+        else if (isCommand(cmd, CommandData.CLAN))
             ClanCommand.call(event);
-        else if (isCommand(cmd, Command.WAR))
+        else if (isCommand(cmd, CommandData.WAR))
             WarCommand.call(event);
-        else if (isCommand(cmd, Command.WARLOG))
+        else if (isCommand(cmd, CommandData.WARLOG))
             WarlogCommand.call(event);
-        else if (isCommand(cmd, Command.WARLEAGUE))
+        else if (isCommand(cmd, CommandData.WARLEAGUE))
             WarLeagueCommand.call(event);
-        else if (isCommand(cmd, Command.LANG))
+        else if (isCommand(cmd, CommandData.LANG))
             LangCommand.call(event);
-        else if (isCommand(cmd, Command.INFO))
+        else if (isCommand(cmd, CommandData.INFO))
             InfoCommand.call(event);
-        else if (isCommand(cmd, Command.HELP))
+        else if (isCommand(cmd, CommandData.HELP))
             HelpCommand.call(event);
-        else if (isCommand(cmd, Command.CLEAR))
+        else if (isCommand(cmd, CommandData.CLEAR))
             ClearCommand.call(event);
-        else if (isCommand(cmd, Command.INVITE))
+        else if (isCommand(cmd, CommandData.INVITE))
             InviteCommand.call(event);
         else {
             event.getHook().deleteOriginal().queue();
@@ -86,7 +86,7 @@ public class EventListener extends ListenerAdapter
         builder.setTitle("Hi, thanks for inviting me!");
         builder.setDescription("Run `/help` to get the list of all available commands :scroll:");
 
-        try { Objects.requireNonNull(defaultChannel).asTextChannel().sendMessage(builder.build()).queue(); }
+        try { Objects.requireNonNull(defaultChannel).asTextChannel().sendMessageEmbeds(builder.build()).queue(); }
         catch (MissingAccessException ignored) {}
     }
 }

@@ -11,7 +11,8 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
-public class UTF16Control extends Control {
+public class UTF16Control extends Control
+{
     public ResourceBundle newBundle
             (String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
             throws IOException {

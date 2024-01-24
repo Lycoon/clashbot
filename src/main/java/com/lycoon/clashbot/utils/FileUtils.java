@@ -1,8 +1,8 @@
 package com.lycoon.clashbot.utils;
 
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;
 import static com.lycoon.clashbot.utils.CoreUtils.addUserToGenerating;
@@ -40,8 +40,11 @@ public class FileUtils
 
             removeUserFromGenerating(id);
         };
-        event.getHook().sendFile(bos.toByteArray(), "clashbot.png").queue(sendingCallback);
-        LOGGER.info("Picture sent to " + event.getMember().getUser().getAsTag() + " on " + event.getGuild().getIdLong());
+
+        FileUpload file = FileUpload.fromData(bos.toByteArray(), "clashbot.png");
+        event.getHook().sendFiles(file).queue(sendingCallback);
+
+        LOGGER.info("Picture sent to " + event.getMember().getUser().getName() + " on " + event.getGuild().getIdLong());
     }
 
     public static Image getImageFromFile(String file)

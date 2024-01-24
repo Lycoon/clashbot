@@ -25,9 +25,7 @@ public class InviteCommand
         EmbedBuilder builder = new EmbedBuilder();
 
         builder.setColor(Color.GRAY);
-        builder.setDescription(INVITE_EMOJI + " " + MessageFormat.format(
-                i18n.getString("cmd.invite.panel"),
-                ClashBotMain.INVITE));
+        builder.setDescription(INVITE_EMOJI + " " + MessageFormat.format(i18n.getString("cmd.invite.panel"), ClashBotMain.INVITE));
 
         CoreUtils.sendMessage(event, i18n, builder);
     }

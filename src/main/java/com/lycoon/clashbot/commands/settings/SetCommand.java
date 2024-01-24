@@ -1,11 +1,11 @@
 package com.lycoon.clashbot.commands.settings;
 
 import com.lycoon.clashapi.core.exceptions.ClashAPIException;
-import com.lycoon.clashbot.commands.Command;
+import com.lycoon.clashbot.commands.CommandData;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
-import com.lycoon.clashbot.utils.DatabaseUtils;
+import com.lycoon.clashbot.utils.database.DatabaseUtils;
 import com.lycoon.clashbot.utils.ErrorUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -19,15 +19,15 @@ public class SetCommand
 {
     public static void call(SlashCommandInteractionEvent event)
     {
-        if (event.getSubcommandName() == null) {
+        String type = event.getSubcommandName();
+        if (type == null)
+        {
             ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
-            ErrorUtils.sendError(event,
-                    i18n.getString("wrong.usage"),
+            ErrorUtils.sendError(event, i18n.getString("wrong.usage"),
                     MessageFormat.format(i18n.getString("info.help"), "prefix"));
             return;
         }
 
-        String type = event.getSubcommandName();
         switch (type)
         {
             case "player" -> executePlayer(event, event.getOption("player_tag").getAsString());
@@ -35,14 +35,14 @@ public class SetCommand
             case "lang" -> executeLang(event, event.getOption("language").getAsString());
             default -> {
                 ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
-                ErrorUtils.sendError(event,
-                        i18n.getString("wrong.usage"),
+                ErrorUtils.sendError(event, i18n.getString("wrong.usage"),
                         MessageFormat.format(i18n.getString("info.help"), "prefix"));
             }
         }
     }
 
-    public static void executePlayer(SlashCommandInteractionEvent event, String tag) {
+    public static void executePlayer(SlashCommandInteractionEvent event, String tag)
+    {
         ResourceBundle i18n = LangUtils.getTranslations(event.getMember().getIdLong());
 
         try {
@@ -69,7 +69,7 @@ public class SetCommand
         try {
             // Checks if the clan exists
             ClashBotMain.clashAPI.getClan(tag);
-        } catch (ClashAPIException e) {
+        } catch (ClashAPIException | IOException e) {
             ErrorUtils.sendExceptionError(event, i18n, e, tag, "clan");
             return;
         }
@@ -98,7 +98,7 @@ public class SetCommand
                     MessageFormat.format(i18n.getString("lang.success"), lang.getDisplayLanguage(lang)));
             builder.setDescription(
                     MessageFormat.format(i18n.getString("lang.info.other"),
-                            Command.SET_LANG.formatCommand()));
+                            CommandData.SET_LANG.formatCommand()));
 
             CoreUtils.sendMessage(event, i18n, builder);
         }

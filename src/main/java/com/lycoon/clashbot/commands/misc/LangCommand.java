@@ -1,6 +1,6 @@
 package com.lycoon.clashbot.commands.misc;
 
-import com.lycoon.clashbot.commands.Command;
+import com.lycoon.clashbot.commands.CommandData;
 import com.lycoon.clashbot.lang.LangUtils;
 import com.lycoon.clashbot.utils.CoreUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -29,7 +29,7 @@ public class LangCommand
                 i18n.getString("lang.flag") + "  " + MessageFormat.format(
                         i18n.getString("lang.current"), lang.getDisplayLanguage(lang)));
         builder.setDescription(MessageFormat.format(
-                i18n.getString("lang.info.other"), Command.SET_LANG.formatCommand()));
+                i18n.getString("lang.info.other"), CommandData.SET_LANG.formatCommand()));
 
         CoreUtils.sendMessage(event, i18n, builder);
     }

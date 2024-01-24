@@ -3,20 +3,18 @@ package com.lycoon.clashbot.commands.clan;
 import static com.lycoon.clashbot.utils.DrawUtils.*;
 import static com.lycoon.clashbot.utils.FileUtils.*;
 import static com.lycoon.clashbot.utils.ErrorUtils.*;
-import static com.lycoon.clashbot.utils.DatabaseUtils.*;
+import static com.lycoon.clashbot.utils.database.DatabaseUtils.*;
 import static com.lycoon.clashbot.utils.CoreUtils.*;
 import static com.lycoon.clashbot.utils.GameUtils.*;
 
 import com.lycoon.clashapi.core.exceptions.ClashAPIException;
 import com.lycoon.clashapi.models.war.WarlogClan;
 import com.lycoon.clashapi.models.war.WarlogEntry;
-import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashapi.models.war.enums.WarResult;
-import com.lycoon.clashbot.commands.Command;
+import com.lycoon.clashbot.commands.CommandData;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
@@ -48,7 +46,8 @@ public class WarlogCommand {
     private final static Color versusColor = new Color(0xffffc0);
     private final static Color percentageColor = new Color(0x5e5d60);
 
-    public static void call(SlashCommandInteractionEvent event) {
+    public static void call(SlashCommandInteractionEvent event)
+    {
         CompletableFuture.runAsync(() -> {
             if (event.getOptions().isEmpty())
             {
@@ -139,17 +138,17 @@ public class WarlogCommand {
 
         if (tag == null) {
             sendError(event, i18n.getString("set.clan.error"),
-                    MessageFormat.format(i18n.getString("cmd.general.tip"), Command.SET_CLAN.formatCommand()));
+                    MessageFormat.format(i18n.getString("cmd.general.tip"), CommandData.SET_CLAN.formatCommand()));
             return null;
         }
 
-        try {
-            warlog = ClashBotMain.clashAPI.getWarlog(tag);
-        } catch (IOException ignored) {
-        } catch (ClashAPIException e) {
+        try { warlog = ClashBotMain.clashAPI.getWarlog(tag, null); }
+        catch (ClashAPIException | IOException e)
+        {
             sendExceptionError(event, i18n, e, tag, "warlog");
             return null;
         }
+
         return warlog;
     }
 

@@ -3,23 +3,19 @@ package com.lycoon.clashbot.commands.clan;
 import static com.lycoon.clashbot.utils.DrawUtils.*;
 import static com.lycoon.clashbot.utils.FileUtils.*;
 import static com.lycoon.clashbot.utils.ErrorUtils.*;
-import static com.lycoon.clashbot.utils.DatabaseUtils.*;
+import static com.lycoon.clashbot.utils.database.DatabaseUtils.*;
 import static com.lycoon.clashbot.utils.CoreUtils.*;
 import static com.lycoon.clashbot.utils.GameUtils.*;
 
-import com.lycoon.clashapi.core.ClashAPI;
 import com.lycoon.clashapi.core.exceptions.ClashAPIException;
 import com.lycoon.clashapi.models.war.WarAttack;
 import com.lycoon.clashapi.models.war.WarMember;
 import com.lycoon.clashapi.models.war.War;
-import com.lycoon.clashapi.core.exception.ClashAPIException;
 import com.lycoon.clashapi.models.war.enums.WarState;
-import com.lycoon.clashbot.commands.Command;
+import com.lycoon.clashbot.commands.CommandData;
 import com.lycoon.clashbot.core.CacheComponents;
 import com.lycoon.clashbot.core.ClashBotMain;
 import com.lycoon.clashbot.lang.LangUtils;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
@@ -50,14 +46,16 @@ public class WarCommand {
     private final static Color notUsedAttackColor = new Color(0xfbbf70);
     private final static Color attackColor = new Color(0x4c493a);
 
-    static class SortMemberByOrder implements Comparator<WarMember> {
+    static class SortMemberByOrder implements Comparator<WarMember>
+    {
         @Override
         public int compare(WarMember a, WarMember b) {
             return a.getMapPosition() - b.getMapPosition();
         }
     }
 
-    static class SortAttackByOrder implements Comparator<WarAttack> {
+    static class SortAttackByOrder implements Comparator<WarAttack>
+    {
         @Override
         public int compare(WarAttack a, WarAttack b) {
             return a.getOrder() - b.getOrder();
@@ -92,8 +90,7 @@ public class WarCommand {
         List<WarAttack> sortedAttacks = new ArrayList<>();
         for (WarMember member : members) {
             List<WarAttack> attacks = member.getAttacks();
-            if (attacks != null)
-                sortedAttacks.addAll(attacks);
+            sortedAttacks.addAll(attacks);
         }
         sortedAttacks.sort(new SortAttackByOrder());
         return sortedAttacks;
@@ -127,7 +124,7 @@ public class WarCommand {
             else
                 drawSimpleStringLeft(g2d, MessageFormat.format(i18n.getString("attack.index"), j + 1), 1100, y + 55 + j * 47, 8f, attackColor);
 
-            if (attacks == null) {
+            if (attacks.isEmpty()) {
                 if (!rightSide)
                     drawShadowedString(g2d, i18n.getString("not.used"), 105, y + 76 + j * 46, 15f, 2, notUsedAttackColor);
                 else
@@ -209,16 +206,17 @@ public class WarCommand {
 
         if (tag == null) {
             sendError(event, i18n.getString("set.clan.error"),
-                    MessageFormat.format(i18n.getString("cmd.general.tip"), Command.SET_CLAN.formatCommand()));
+                    MessageFormat.format(i18n.getString("cmd.general.tip"), CommandData.SET_CLAN.formatCommand()));
             return null;
         }
 
-        try {
-            war = ClashBotMain.clashAPI.getCurrentWar(tag);
-        } catch (ClashAPIException e) {
+        try { war = ClashBotMain.clashAPI.getCurrentWar(tag); }
+        catch (ClashAPIException | IOException e)
+        {
             sendExceptionError(event, i18n, e, tag, "war");
             return null;
         }
+
         return war;
     }
 

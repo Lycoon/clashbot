@@ -6,9 +6,6 @@ import static com.lycoon.clashbot.core.ClashBotMain.LOGGER;
 
 import com.lycoon.clashbot.lang.LangUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
@@ -19,11 +16,11 @@ import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class CoreUtils {
+public class CoreUtils
+{
     public static final Color validColor = new Color(0x48bd73);
     public static final Color invalidColor = new Color(0xc24646);
     public static final String INFO_EMOJI = "<:info:825346959514533928>";
